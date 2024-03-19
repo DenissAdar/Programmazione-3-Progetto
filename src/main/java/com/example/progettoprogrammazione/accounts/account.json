@@ -1,0 +1,36 @@
+[
+  {
+    "email": "gaia@example.com",
+    "contenuto": [
+      {
+        "from": "gaia@example.com",
+        "to": "destinatario1@example.com",
+        "object": "Oggetto dell'email 1",
+        "text": "Testo dell'email 1",
+        "dateTime": "2024-03-19"
+      },
+      {
+        // Qua inserisco in automatico quando invia una mail il mittente2
+      }
+    ]
+  },
+  {
+    "email": "mittente2@example.com",
+    "contenuto": [
+      {
+        "from": "mittente2@example.com",
+        "to": "destinatario2@example.com",
+        "object": "Oggetto dell'email 2",
+        "text": "Testo dell'email 2",
+        "dateTime": "2024-03-20"
+      },
+      {
+        "from": "mittente2@example.com",
+        "to": "destinatario3@example.com",
+        "object": "Oggetto dell'email 3",
+        "text": "Testo dell'email 3",
+        "dateTime": "2024-03-21"
+      }
+    ]
+  }
+]
