@@ -5,4 +5,5 @@ module com.example.progettoprogrammazione {
 
     opens com.example.progettoprogrammazione to javafx.fxml;
     exports com.example.progettoprogrammazione;
+
 }
