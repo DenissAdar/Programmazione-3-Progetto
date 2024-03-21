@@ -15,7 +15,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="927.0" prefWidth="1086.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <SplitPane dividerPositions="0.0847457627118644" layoutX="212.0" layoutY="56.0" orientation="VERTICAL" prefHeight="927.0" prefWidth="1086.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <SplitPane disable="true" dividerPositions="0.09297297297297297" layoutX="212.0" layoutY="56.0" orientation="VERTICAL" prefHeight="927.0" prefWidth="1086.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="32.0" prefWidth="1084.0">
                <children>
@@ -39,59 +39,83 @@
                <children>
                   <SplitPane dividerPositions="0.29797979797979796" prefHeight="843.3333333333334" prefWidth="1083.3333333333333" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                           <children>
-                              <ButtonBar buttonMinWidth="97.0" layoutX="-16.0" layoutY="14.0">
-                                <buttons>
-                                  <Button fx:id="inMailBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" text="Entrata" />
-                                    <Button fx:id="outMailBtn" alignment="CENTER" mnemonicParsing="false" text="Uscita" />
-                                    <Button fx:id="updateBtn" mnemonicParsing="false" text="Refresh" />
-                                </buttons>
-                              </ButtonBar>
-                              <ListView fx:id="mailList" layoutY="81.0" prefHeight="405.0" prefWidth="319.0" AnchorPane.bottomAnchor="370.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-                              <Label fx:id="connectionNotification" layoutX="67.0" layoutY="545.0" text="Errore di Connessione al Server" textFill="RED" />
-                              <Text fill="#14a7ff" layoutX="100.0" layoutY="628.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Nota: Per fare in modo che la finestra non cambi dimensione cambialo quando la dichiari nello stage nel codice" underline="true" wrappingWidth="175.33333333333326" />
-                           </children>
-                        </AnchorPane>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                           <children>
-                              <Label layoutX="29.0" layoutY="16.0" text="Mittente: " AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="10.0">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <Label layoutX="29.0" layoutY="46.0" text="Destinatario : " AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="50.0">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <Label layoutX="31.0" layoutY="77.0" text="Oggetto : " AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="90.0">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <TextField fx:id="mittenteTxt" layoutX="170.0" layoutY="13.0" promptText="Mittente (Messo in automatico=account.text quando si avvia il prog)" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="10.0" />
-                              <TextField fx:id="destinatarioTxt" layoutX="170.0" layoutY="48.0" promptText="Destinatario" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="50.0" />
-                              <TextField fx:id="oggettoTxt" layoutX="172.0" layoutY="78.0" promptText="Oggetto" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="90.0" />
-                              <Label layoutX="40.0" layoutY="100.0" text="Data : " AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="130.0">
-                                 <font>
-                                    <Font size="16.0" />
-                                 </font>
-                              </Label>
-                              <TextField fx:id="dataTxt" layoutX="150.0" layoutY="130.0" prefHeight="25.0" prefWidth="138.0" promptText="Data" AnchorPane.leftAnchor="150.0" AnchorPane.topAnchor="130.0" />
-                              <TextArea fx:id="mailBodyTxt" layoutX="14.0" layoutY="191.0" prefHeight="405.0" prefWidth="695.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" />
-                              <Button fx:id="replyBtn" layoutX="26.0" layoutY="632.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="104.0" text="Reply" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="632.0" />
-                              <Button fx:id="replyAllBtn" layoutX="26.0" layoutY="679.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="104.0" text="Reply All" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="679.0" />
-                              <Button fx:id="deleteBtn" contentDisplay="CENTER" layoutX="32.0" layoutY="777.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="104.0" text="Elimina" textFill="WHITE" textOverrun="CENTER_ELLIPSIS" AnchorPane.leftAnchor="26.0" AnchorPane.topAnchor="777.0" />
-                              <Button fx:id="inviaBtn" layoutX="558.0" layoutY="631.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="130.0" text="Invia" textAlignment="CENTER" underline="true" AnchorPane.leftAnchor="558.0" AnchorPane.topAnchor="631.0" />
-                              <Button fx:id="forwardBtn" layoutX="434.0" layoutY="631.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="104.0" text="Forward" />
-                           </children>
-                        </AnchorPane>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
                     </items>
                   </SplitPane>
                </children>
             </AnchorPane>
         </items>
       </SplitPane>
+      <ButtonBar buttonMinWidth="97.0">
+        <buttons>
+          <Button fx:id="inMailBtn" alignment="BASELINE_LEFT" mnemonicParsing="false" text="Entrata" />
+            <Button fx:id="outMailBtn" alignment="CENTER" mnemonicParsing="false" prefHeight="25.0" text="Uscita" />
+            <Button fx:id="updateBtn" mnemonicParsing="false" text="Refresh" />
+        </buttons>
+      </ButtonBar>
+      <ListView fx:id="mailList" layoutX="10.0" layoutY="91.0" prefHeight="405.0" prefWidth="319.0" />
+      <Label fx:id="connectionNotification" layoutX="77.0" layoutY="555.0" text="Errore di Connessione al Server" textFill="RED" />
+      <Text fill="#14a7ff" layoutX="110.0" layoutY="638.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Nota: Per fare in modo che la finestra non cambi dimensione cambialo quando la dichiari nello stage nel codice" underline="true" wrappingWidth="175.33333333333326" />
+      <Label layoutX="39.0" layoutY="26.0" text="Mittente: ">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label layoutX="39.0" layoutY="56.0" text="Destinatario : ">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label layoutX="41.0" layoutY="87.0" text="Oggetto : ">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <TextField fx:id="mittenteTxt" layoutX="180.0" layoutY="23.0" promptText="Mittente (Messo in automatico=account.text quando si avvia il prog)" />
+      <TextField fx:id="destinatarioTxt" layoutX="180.0" layoutY="58.0" promptText="Destinatario" />
+      <TextField fx:id="oggettoTxt" layoutX="182.0" layoutY="88.0" promptText="Oggetto" />
+      <Label layoutX="50.0" layoutY="110.0" text="Data : ">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <TextField fx:id="dataTxt" layoutX="160.0" layoutY="140.0" prefHeight="25.0" prefWidth="138.0" promptText="Data" />
+      <TextArea fx:id="mailBodyTxt" layoutX="24.0" layoutY="201.0" prefHeight="405.0" prefWidth="695.0" />
+      <Button fx:id="replyBtn" layoutX="36.0" layoutY="642.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="104.0" text="Reply" />
+      <Button fx:id="replyAllBtn" layoutX="36.0" layoutY="689.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="104.0" text="Reply All" />
+      <Button fx:id="deleteBtn" contentDisplay="CENTER" layoutX="42.0" layoutY="787.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="104.0" text="Elimina" textOverrun="CENTER_ELLIPSIS" />
+      <Button fx:id="inviaBtn" layoutX="568.0" layoutY="641.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="130.0" text="Invia" textAlignment="CENTER" underline="true" />
+      <Button fx:id="forwardBtn" layoutX="444.0" layoutY="641.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="104.0" text="Forward" />
+      <Label layoutX="39.0" layoutY="26.0" text="Mittente: ">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label layoutX="39.0" layoutY="56.0" text="Destinatario : ">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label layoutX="41.0" layoutY="87.0" text="Oggetto : ">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <TextField fx:id="mittenteTxt1" layoutX="180.0" layoutY="23.0" promptText="Mittente (Messo in automatico=account.text quando si avvia il prog)" />
+      <TextField fx:id="destinatarioTxt1" layoutX="180.0" layoutY="58.0" promptText="Destinatario" />
+      <TextField fx:id="oggettoTxt1" layoutX="182.0" layoutY="88.0" promptText="Oggetto" />
+      <Label layoutX="50.0" layoutY="110.0" text="Data : ">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <TextField fx:id="dataTxt1" layoutX="160.0" layoutY="140.0" prefHeight="25.0" prefWidth="138.0" promptText="Data" />
+      <TextArea fx:id="mailBodyTxt1" layoutX="24.0" layoutY="201.0" prefHeight="405.0" prefWidth="695.0" />
+      <Button fx:id="replyBtn1" layoutX="36.0" layoutY="642.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="104.0" text="Reply" />
+      <Button fx:id="replyAllBtn1" layoutX="36.0" layoutY="689.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="104.0" text="Reply All" />
+      <Button fx:id="deleteBtn1" contentDisplay="CENTER" layoutX="42.0" layoutY="787.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="104.0" text="Elimina" textOverrun="CENTER_ELLIPSIS" />
+      <Button fx:id="inviaBtn1" layoutX="568.0" layoutY="641.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="130.0" text="Invia" textAlignment="CENTER" underline="true" />
+      <Button fx:id="forwardBtn1" layoutX="444.0" layoutY="641.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="104.0" text="Forward" />
    </children>
 </AnchorPane>
