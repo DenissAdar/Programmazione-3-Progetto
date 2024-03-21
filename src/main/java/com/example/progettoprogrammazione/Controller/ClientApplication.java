@@ -17,7 +17,7 @@ public class ClientApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load(),700,600);
         stage.setScene(scene);
         stage.show();
-
+    int i = 0;
     }
     public static void main(String args[]) {
         launch();
