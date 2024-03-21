@@ -1,4 +1,4 @@
-package com.example.progettoprogrammazione;
+package com.example.progettoprogrammazione.Model;
 
 import java.io.Serializable;
 import java.util.Objects;
