@@ -9,6 +9,7 @@ module com.example.progettoprogrammazione {
     opens com.example.progettoprogrammazione.Model to javafx.fxml;
     exports com.example.progettoprogrammazione.Controller;
     opens com.example.progettoprogrammazione.Controller to javafx.fxml;
+    exports com.example.progettoprogrammazione;
 
 
 }
