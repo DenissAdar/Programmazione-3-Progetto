@@ -3,8 +3,8 @@ package com.example.progettoprogrammazione;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 
-// Come funzionano i bottoni degli OnAction
 public class ClientController {
     @FXML
     private Label accountDisplay;
@@ -28,13 +28,16 @@ public class ClientController {
     private Button inMailBtn;
 
     @FXML
+    private Button outMailBtn;
+
+    @FXML
     private Button inviaBtn;
 
     @FXML
     private TextArea mailBodyTxt;
 
     @FXML
-    private ListView<?> mailList;
+    private ListView<String> mailList;
 
     @FXML
     private TextField mittenteTxt;
@@ -45,8 +48,6 @@ public class ClientController {
     @FXML
     private TextField oggettoTxt;
 
-    @FXML
-    private Button outMailBtn;
     @FXML
     private Label test;
 
@@ -62,7 +63,13 @@ public class ClientController {
     @FXML
     private Label dataLable;
 
-    public void setUnvisible(){
+    private final String jsonPath = "src/main/java/com/example/progettoprogrammazione/accounts/account.json";
+    private Email selectedEmail;
+
+    private Client client;
+
+
+    public void setUnvisible() {
 
         replyBtn.setVisible(false);
         replyAllBtn.setVisible(false);
@@ -74,15 +81,46 @@ public class ClientController {
 
 
     }
+
     @FXML
-    public void newMailCreation(){
+    public void newMailCreation() {
         //Da bindare il mittente con la property giusta
         destinatarioTxt.clear();
         oggettoTxt.clear();
         mailBodyTxt.clear();
         setUnvisible();
     }
-    public void init(){
-        setUnvisible();
+
+    public void init() {
+
+        inMailBtn.setOnMouseClicked(this::onClickInMail);
+        outMailBtn.setOnMouseClicked(this::onClickOutMail);
+    }
+
+    // TODO da gestire quali sono le mail in entrata e quali in uscita
+    private void onClickInMail(MouseEvent mouseEvent) {
+
+        // Pulisco la ListView
+        mailList.getItems().clear();
+
+        client = new Client("accountName", jsonPath);
+
+        for (Email email : client.getInMail()) {
+            mailList.getItems().add(email.getSender() + " - " + email.getObject());
+        }
+    }
+
+    private void onClickOutMail(MouseEvent mouseEvent) {
+
+        // Pulisco la ListView
+        mailList.getItems().clear();
+
+        client = new Client("accountName", jsonPath);
+
+        // Aggiunta delle email alla ListView - Visualizzazione di tutte le mail
+        for (Email email : client.getInMail()) {
+            mailList.getItems().add(email.getSender() + " - " + email.getObject());
+        }
+
     }
 }

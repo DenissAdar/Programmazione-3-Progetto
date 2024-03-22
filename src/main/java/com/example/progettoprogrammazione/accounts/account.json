@@ -1,22 +1,19 @@
 [
   {
     "email": "gaia@example.com",
-    "contenuto": [
+    "content": [
       {
         "from": "gaia@example.com",
         "to": "destinatario1@example.com",
         "object": "Oggetto dell'email 1",
         "text": "Testo dell'email 1",
         "dateTime": "2024-03-19"
-      },
-      {
-        // Qua inserisco in automatico quando invia una mail il mittente2
       }
     ]
   },
   {
     "email": "mittente2@example.com",
-    "contenuto": [
+    "content": [
       {
         "from": "mittente2@example.com",
         "to": "destinatario2@example.com",

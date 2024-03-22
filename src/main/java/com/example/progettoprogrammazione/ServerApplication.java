@@ -6,14 +6,13 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-
-public class ClientApplication extends Application {
-@Override
+public class ServerApplication extends Application {
+    @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(ClientApplication.class.getResource("client.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(ClientApplication.class.getResource("server.fxml"));
 
         Scene scene = new Scene(fxmlLoader.load());
-        ClientController controller = fxmlLoader.getController();
+        ServerController controller = fxmlLoader.getController();
         controller.init();
         stage.setResizable(false);
         stage.setScene(scene);
@@ -23,3 +22,5 @@ public class ClientApplication extends Application {
         launch();
     }
 }
+
+
