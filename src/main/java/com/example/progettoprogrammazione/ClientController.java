@@ -47,6 +47,8 @@ public class ClientController {
 
     @FXML
     private Button outMailBtn;
+    @FXML
+    private Label test;
 
     @FXML
     private Button replyAllBtn;
