@@ -1,4 +1,4 @@
-package com.example.progettoprogrammazione;
+/*package com.example.progettoprogrammazione;
 
 import javafx.beans.property.SimpleStringProperty;
 
@@ -49,5 +49,5 @@ public class MailBox {
         this.account = account;
     }
 }
-
+*/
 

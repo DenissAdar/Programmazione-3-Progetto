@@ -1,15 +1,45 @@
 package com.example.progettoprogrammazione.Model;
-
 import com.example.progettoprogrammazione.Email;
-
-import java.util.Objects;
+import javafx.beans.property.SimpleStringProperty;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Client {
-    private String account; //esempio@gmail.com
 
-    public Client(String email){
-        this.account = email;
+    private List<Email> inMail ;
+    private String account;
+    private SimpleStringProperty mittenteProperty;
+
+    private SimpleStringProperty destinatarioProperty;
+
+    private SimpleStringProperty oggettoProperty;
+
+    private SimpleStringProperty messageProperty;
+
+    public Client(String a){
+
+        inMail = new ArrayList<Email>();
+
+        this.account = a;
+        mittenteProperty = new SimpleStringProperty();
+        destinatarioProperty = new SimpleStringProperty();
+        oggettoProperty = new SimpleStringProperty();
+        messageProperty = new SimpleStringProperty();
     }
+    public SimpleStringProperty getMittenteProperty(){return mittenteProperty;}
+    public SimpleStringProperty getDestinatarioProperty(){return destinatarioProperty;}
+    public SimpleStringProperty getOggettoProperty(){return oggettoProperty;}
+    public SimpleStringProperty getMessageProperty(){return messageProperty;}
+
+
+    public void aggiungiEmail(Email EmailDaAggiungere){
+        inMail.add(EmailDaAggiungere);
+    }
+    public void rimuoviEmail(Email EmailDaEliminare){
+        inMail.remove(EmailDaEliminare);
+    }
+
+
     public String getAccount() {
         return account;
     }
@@ -17,16 +47,4 @@ public class Client {
     public void setAccount(String account) {
         this.account = account;
     }
-
-/*
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Email email)) return false;
-        return Objects.equals(getMessage(), email.getMessage()) && Objects.equals(getObject(), email.getObject()) && Objects.equals(getSender(), email.getSender()) && Objects.equals(getRecevier(), email.getRecevier());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getMessage(), getObject(), getSender(), getRecevier());
-    }*/
 }

@@ -17,13 +17,10 @@ public class ClientApplication extends Application {
 
         Scene scene = new Scene(fxmlLoader.load());
         ClientController controller = fxmlLoader.getController();
-
-     controller.init();
-
-    stage.setResizable(false);
-    stage.setScene(scene);
+        controller.init();
+        stage.setResizable(false);
+        stage.setScene(scene);
         stage.show();
-    int i = 0;
     }
     public static void main(String[] args) {
         launch();
