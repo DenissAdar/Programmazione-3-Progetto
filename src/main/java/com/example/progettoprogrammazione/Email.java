@@ -1,15 +1,16 @@
-package com.example.progettoprogrammazione.Model;
-
+package com.example.progettoprogrammazione;
 import java.io.Serializable;
 import java.util.Objects;
 
 // Creo i dati che sono dentro a "contenuto" del file json
 public class Email implements Serializable {
 
+
     private String message;
     private String object;
     private String sender;
-    private String recevier;
+    private String receiver;
+    private String idMail;
 
     public Email(String message, String object, String sender, String recevier) {
         this.message = message;
@@ -43,7 +44,7 @@ public class Email implements Serializable {
                 ", recevier='" + recevier + '\'' +
                 '}';
     }
-
+/*
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
