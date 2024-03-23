@@ -4,27 +4,41 @@
     "content": [
       {
         "from": "gaia@example.com",
-        "to": "destinatario1@example.com",
-        "object": "Oggetto dell'email 1",
+        "to": "denis@example.com",
+        "object": "MGaia-Den",
         "text": "Testo dell'email 1",
+        "dateTime": "2024-03-19"
+      },
+      {
+        "from": "gaia@example.com",
+        "to": "marius@example.com",
+        "object": "MGaia-Mars",
+        "text": "Testo dell'email Gaia-",
         "dateTime": "2024-03-19"
       }
     ]
   },
   {
-    "email": "mittente2@example.com",
+    "email": "denis@example.com",
     "content": [
       {
-        "from": "mittente2@example.com",
-        "to": "destinatario2@example.com",
-        "object": "Oggetto dell'email 2",
+        "from": "denis@example.com",
+        "to": "gaia@example.com",
+        "object": "MDen-Gaia",
         "text": "Testo dell'email 2",
         "dateTime": "2024-03-20"
       },
       {
-        "from": "mittente2@example.com",
-        "to": "destinatario3@example.com",
-        "object": "Oggetto dell'email 3",
+        "from": "denis@example.com",
+        "to": "marius@example.com",
+        "object": "MDen-Mars",
+        "text": "Testo dell'email 3",
+        "dateTime": "2024-03-21"
+      },
+      {
+        "from": "denis@example.com",
+        "to": "giulia@example.com",
+        "object": "MDen-Giu",
         "text": "Testo dell'email 3",
         "dateTime": "2024-03-21"
       }

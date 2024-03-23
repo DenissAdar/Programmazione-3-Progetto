@@ -89,36 +89,34 @@ public class ClientController {
         oggettoTxt.clear();
         mailBodyTxt.clear();
         setUnvisible();
+
     }
 
     public void init() {
-
+        setUnvisible();
         inMailBtn.setOnMouseClicked(this::onClickInMail);
         outMailBtn.setOnMouseClicked(this::onClickOutMail);
     }
 
     // TODO da gestire quali sono le mail in entrata e quali in uscita
-    private void onClickInMail(MouseEvent mouseEvent) {
+    // Risolto in teoria vedi Client.java
 
+    // TODO DEN  bisogna bindare account a quello che ci sta scritto nella label accountDisplay
+    private void onClickInMail(MouseEvent mouseEvent) {
         // Pulisco la ListView
         mailList.getItems().clear();
-
-        client = new Client("accountName", jsonPath);
-
+        client = new Client("denis@example.com", jsonPath);
         for (Email email : client.getInMail()) {
             mailList.getItems().add(email.getSender() + " - " + email.getObject());
         }
     }
 
     private void onClickOutMail(MouseEvent mouseEvent) {
-
         // Pulisco la ListView
         mailList.getItems().clear();
-
-        client = new Client("accountName", jsonPath);
-
+        client = new Client("denis@example.com", jsonPath);
         // Aggiunta delle email alla ListView - Visualizzazione di tutte le mail
-        for (Email email : client.getInMail()) {
+        for (Email email : client.getOutMail()) {
             mailList.getItems().add(email.getSender() + " - " + email.getObject());
         }
 

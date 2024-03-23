@@ -8,13 +8,11 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="927.0" prefWidth="1086.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.progettoprogrammazione.ClientController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="758.0" prefWidth="899.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.progettoprogrammazione.ClientController">
    <children>
-      <ListView fx:id="mailList" layoutX="21.0" layoutY="143.0" prefHeight="500.0" prefWidth="366.0" AnchorPane.bottomAnchor="280.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="700.0" />
-      <Label fx:id="connectionNotification" layoutX="114.0" layoutY="717.0" text="Errore di Connessione al Server" textFill="RED" />
-      <Text fill="#14a7ff" layoutX="115.0" layoutY="786.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Nota: Per fare in modo che la finestra non cambi dimensione cambialo quando la dichiari nello stage nel codice" underline="true" wrappingWidth="175.33333333333326" />
+      <ListView fx:id="mailList" layoutX="21.0" layoutY="143.0" prefHeight="500.0" prefWidth="320.0" AnchorPane.leftAnchor="20.0" />
+      <Label fx:id="connectionNotification" layoutX="88.0" layoutY="700.0" text="Errore di Connessione al Server" textFill="RED" />
       <Label layoutX="475.0" layoutY="82.0" text="Mittente: " AnchorPane.leftAnchor="430.0" AnchorPane.topAnchor="90.0">
          <font>
             <Font size="16.0" />
@@ -39,18 +37,18 @@
          </font>
       </Label>
       <TextField fx:id="dataTxt" layoutX="629.0" layoutY="195.0" prefHeight="25.0" prefWidth="138.0" promptText="Data" AnchorPane.leftAnchor="550.0" AnchorPane.topAnchor="180.0" />
-      <TextArea fx:id="mailBodyTxt" layoutX="419.0" layoutY="245.0" prefHeight="396.0" prefWidth="646.0" AnchorPane.bottomAnchor="280.0" AnchorPane.leftAnchor="420.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="250.0" />
-      <Button fx:id="replyBtn" layoutX="422.0" layoutY="670.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="105.0" text="Reply" AnchorPane.bottomAnchor="227.33333333333337" AnchorPane.leftAnchor="422.0" AnchorPane.topAnchor="670.0" />
-      <Button fx:id="replyAllBtn" layoutX="550.0" layoutY="670.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="105.0" text="Reply All" AnchorPane.rightAnchor="430.66666666666663" AnchorPane.topAnchor="670.0" />
-      <Button fx:id="deleteBtn" contentDisplay="CENTER" layoutX="944.0" layoutY="696.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="105.0" text="Elimina" textOverrun="CENTER_ELLIPSIS" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="670.0" />
-      <Button fx:id="inviaBtn" layoutX="663.0" layoutY="693.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="125.0" text="Invia" textAlignment="CENTER" underline="true" AnchorPane.rightAnchor="280.0" AnchorPane.topAnchor="670.0" />
-      <Button fx:id="forwardBtn" layoutX="831.0" layoutY="670.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="105.0" text="Forward" AnchorPane.rightAnchor="149.66666666666663" AnchorPane.topAnchor="670.0" />
-      <Separator layoutX="424.0" layoutY="7.0" orientation="VERTICAL" prefHeight="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="400.0" AnchorPane.rightAnchor="680.0" AnchorPane.topAnchor="80.0" />
+      <TextArea fx:id="mailBodyTxt" layoutX="419.0" layoutY="245.0" prefHeight="396.0" prefWidth="455.0" AnchorPane.leftAnchor="420.0" AnchorPane.topAnchor="250.0" />
+      <Button fx:id="replyBtn" layoutX="422.0" layoutY="671.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="69.0" text="Reply" AnchorPane.topAnchor="671.0" />
+      <Button fx:id="replyAllBtn" layoutX="515.0" layoutY="671.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="69.0" text="Reply All" AnchorPane.topAnchor="671.0" />
+      <Button fx:id="deleteBtn" contentDisplay="CENTER" layoutX="805.0" layoutY="670.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="69.0" text="Elimina" textOverrun="CENTER_ELLIPSIS" AnchorPane.topAnchor="670.0" />
+      <Button fx:id="inviaBtn" layoutX="608.0" layoutY="670.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="98.0" text="Invia" textAlignment="CENTER" underline="true" AnchorPane.topAnchor="670.0" />
+      <Button fx:id="forwardBtn" layoutX="725.0" layoutY="670.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="69.0" text="Forward" AnchorPane.topAnchor="670.0" />
+      <Separator layoutX="424.0" layoutY="7.0" orientation="VERTICAL" prefHeight="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="380.0" AnchorPane.topAnchor="80.0" />
       <Separator layoutY="81.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0" />
-    <Button fx:id="inMailBtn" alignment="BASELINE_LEFT" layoutX="63.0" layoutY="94.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="93.0" text="Mail in Entrata" />
-      <Button fx:id="outMailBtn" alignment="CENTER" layoutX="245.0" layoutY="94.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="93.0" text="Mail in Uscita" />
-      <Button fx:id="updateBtn" layoutX="168.0" layoutY="672.0" mnemonicParsing="false" text="Refresh" AnchorPane.bottomAnchor="229.66666666666663" />
-      <Button fx:id="newMailBtn" layoutX="688.0" layoutY="26.0" mnemonicParsing="false" onAction="#newMailCreation" text="+" textFill="#058b10">
+    <Button fx:id="inMailBtn" alignment="BASELINE_LEFT" layoutX="39.0" layoutY="95.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="93.0" text="Mail in Entrata" />
+      <Button fx:id="outMailBtn" alignment="CENTER" layoutX="216.0" layoutY="95.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="93.0" text="Mail in Uscita" />
+      <Button fx:id="updateBtn" layoutX="142.0" layoutY="658.0" mnemonicParsing="false" text="Refresh" />
+      <Button fx:id="newMailBtn" layoutX="589.0" layoutY="26.0" mnemonicParsing="false" onAction="#newMailCreation" text="+" textFill="#058b10">
          <font>
             <Font name="Arial" size="19.0" />
          </font>
