@@ -19,18 +19,15 @@ public class Client {
     private List<Email> outMail;
     private String account;
     private SimpleStringProperty senderProperty;
-
-    private SimpleStringProperty recevierProperty;
-
+    private SimpleStringProperty receiverProperty;
     private SimpleStringProperty objectProperty;
-
     private SimpleStringProperty messageProperty;
 
+    /*Costruttore di un nuovo Servizio di Mail, conosciuto anche come MailBox, */
     public Client(String account, String jsonFilePath){
-
         this.account = account;
         senderProperty = new SimpleStringProperty();
-        recevierProperty = new SimpleStringProperty();
+        receiverProperty = new SimpleStringProperty();
         objectProperty = new SimpleStringProperty();
         messageProperty = new SimpleStringProperty();
         inMail = new ArrayList<>();
@@ -75,7 +72,7 @@ public class Client {
         }
 }
     public SimpleStringProperty getSenderProperty(){return senderProperty;}
-    public SimpleStringProperty getReceiverProperty(){return recevierProperty;}
+    public SimpleStringProperty getReceiverProperty(){return receiverProperty;}
     public SimpleStringProperty getObjectProperty(){return objectProperty;}
     public SimpleStringProperty getMessageProperty(){return messageProperty;}
     public List<Email> getInMail() {
