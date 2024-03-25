@@ -12,7 +12,6 @@ public class ServerController {
     private TextArea ServerLog;
     public void init()
     {
-        Server server = new Server();
-        server.listen(6000);
+
     }
 }

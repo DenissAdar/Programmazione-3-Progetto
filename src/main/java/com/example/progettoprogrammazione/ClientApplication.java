@@ -14,11 +14,20 @@ public class ClientApplication extends Application {
 
         Scene scene = new Scene(fxmlLoader.load());
         ClientController controller = fxmlLoader.getController();
-
+        controller.init();
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
-        controller.init();
+
+        runClient("127.0.0.1", 6000);
+
+}
+
+    public static void runClient(String host, int port) {
+
+        Client c = new Client("Mars");
+        c.communicate(host, port);
+
     }
     public static void main(String[] args) {
         launch();

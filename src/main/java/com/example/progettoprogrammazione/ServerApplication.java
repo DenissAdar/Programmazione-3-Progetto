@@ -13,11 +13,13 @@ public class ServerApplication extends Application {
 
         Scene scene = new Scene(fxmlLoader.load());
         ServerController controller = fxmlLoader.getController();
-
+        controller.init();
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
-        controller.init();
+
+        Server server = new Server();
+        server.listen(6000);
     }
     public static void main(String[] args) {
         launch();
