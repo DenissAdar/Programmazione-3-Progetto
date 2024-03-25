@@ -3,22 +3,27 @@ package com.example.progettoprogrammazione;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 
 public class Server {
     Socket socket = null;
     ObjectInputStream inputStream = null;
     ObjectOutputStream outputStream = null;
     public void listen(int port) {
+
         try {
             ServerSocket serverSocket = new ServerSocket(port);
-            String account;
-          /* while (true) {
 
-            }*/
+            while (true) {
+
+                serveClient(serverSocket);
+
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
+
             if (socket!=null)
                 try {
                     socket.close();
@@ -27,7 +32,21 @@ public class Server {
                 }
         }
     }
+    public void serveClient(ServerSocket serverSocket){
+        try {
+            String account;
+            openStreams(serverSocket);
+            account = (String) inputStream.readObject();
+            //outputStream.writeObject(account);
+            System.out.println(account);
 
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+
+            closeStreams();
+        }
+    }
     private void openStreams(ServerSocket serverSocket) throws IOException {
         socket = serverSocket.accept();
         System.out.println("Server Connesso");

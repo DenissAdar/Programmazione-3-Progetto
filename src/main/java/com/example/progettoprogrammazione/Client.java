@@ -90,7 +90,7 @@ public class Client {
 
         inputStream = new ObjectInputStream(socket.getInputStream());
 
-        System.out.println("[Client "+ this.id + "] Connesso");
+        System.out.println("[Client "+ getAccount() + "] Connesso");
     }
 
     public void communicate(String host, int port){
@@ -120,16 +120,16 @@ public class Client {
         try {
             connectToServer(host, port);
 
-
-            Thread.sleep(5000);
-
             outputStream.writeObject(getAccount());
             outputStream.flush();
+            //Thread.sleep(5000);
+
+
             return true;
         } catch (ConnectException ce) {
             // nothing to be done
             return false;
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return false;
         } finally {

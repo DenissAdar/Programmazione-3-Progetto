@@ -55,21 +55,13 @@ public class ClientController {
     public void init() {
 
         setInvisible();
-        runClient("127.0.0.1", 6000);
         //inMailBtn.setOnMouseClicked(this::onClickInMail);
        // outMailBtn.setOnMouseClicked(this::onClickOutMail);
     }
 
 
 
-    public static void runClient(String host, int port) {
 
-            Client c = new Client("Mars");
-            c.communicate(host, port);
-
-
-
-    }
 
 /* setInvisible setta i diversi pulsanti invisibili in modo da
 non vederli quando non servono(aka quando scrivo una mail)*/
