@@ -67,8 +67,9 @@ public class Client {
             }
         });
 
-
-        // Legge il file JSON e aggiunge le email al client
+        jSonReader();
+}
+    public void jSonReader (){
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
@@ -104,16 +105,16 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-}
+    }
     public SimpleStringProperty getSenderProperty(){return senderProperty;}
     public SimpleStringProperty getReceiverProperty(){return receiverProperty;}
     public SimpleStringProperty getObjectProperty(){return objectProperty;}
     public SimpleStringProperty getMessageProperty(){return messageProperty;}
-    public ListProperty<Email> getInMail() {
+    public ListProperty<Email> getInMailProperty() {
         return inMail;
     }
     //Aggiunto da DEN quando ho creato il metodo di controllo per l'inserimento in Lista
-    public ListProperty<Email> getOutMail() {
+    public ListProperty<Email> getOutMailProperty() {
         return outMail;
     }
 
