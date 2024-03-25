@@ -8,6 +8,9 @@ import javafx.beans.property.SimpleStringProperty;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -24,6 +27,10 @@ import javafx.collections.ObservableList;
 public class Client {
 
     Socket socket = null;
+    ObjectOutputStream outputStream = null;
+    ObjectInputStream inputStream = null;
+    private int id;
+    private final int MAXATTEMPTS = 5;
     private String jsonFilePath;
     private String account;
 
@@ -37,9 +44,9 @@ public class Client {
     private SimpleStringProperty objectProperty;
     private SimpleStringProperty messageProperty;
 
-    public Client(String account, String JFilePath){
+    public Client(String account){
         this.account = account;
-        this.jsonFilePath = JFilePath;
+
 
         senderProperty = new SimpleStringProperty();
         receiverProperty = new SimpleStringProperty();
@@ -67,9 +74,84 @@ public class Client {
             }
         });
 
-        jSonReader();
+
     }
-    public void jSonReader (){
+
+
+
+    //CONNESSIONE SERVER---------------------------------------------------------------------------------------------------------------
+    private void connectToServer(String host, int port) throws IOException {
+
+        socket = new Socket(host, port);
+        outputStream = new ObjectOutputStream(socket.getOutputStream());
+
+
+        outputStream.flush();
+
+        inputStream = new ObjectInputStream(socket.getInputStream());
+
+        System.out.println("[Client "+ this.id + "] Connesso");
+    }
+
+    public void communicate(String host, int port){
+        int attempts = 0;
+
+        boolean success = false;
+        while(attempts < MAXATTEMPTS && !success) {
+            attempts += 1;
+            System.out.println("[Client " +getAccount()+ "] Tentativo nr. " + attempts);
+
+
+            success = tryCommunication(host, port);
+            System.out.println(success);
+            if(success)
+                continue;
+
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private boolean tryCommunication(String host, int port) {
+        try {
+            connectToServer(host, port);
+
+
+            Thread.sleep(5000);
+
+            outputStream.writeObject(getAccount());
+            outputStream.flush();
+            return true;
+        } catch (ConnectException ce) {
+            // nothing to be done
+            return false;
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            closeConnections();
+        }
+    }
+
+    private void closeConnections() {
+        if (socket != null) {
+            try {
+                inputStream.close();
+                outputStream.close();
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    //CONNESSIONE SERVER---------------------------------------------------------------------------------------------------------------
+
+  /*  public void jSonReader (){
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
@@ -90,8 +172,7 @@ public class Client {
                     // Crea un oggetto Email e lo aggiunge alla lista corretta
                     Email emailObj = new Email(sender, receiver, object, message, dateTime);
 
-                    /* TODO - Ci dovrebbero essere una serie di if per controllare se il destinatario è l'account
-                       TODO - che abbiamo aperto e che quindi sono le mail in entrata altrimenti saranno outMail */
+
 
 
                     //Aggiunto da DEN quando ho creato il metodo di controllo per l'inserimento in Lista
@@ -105,7 +186,7 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    } */
     public SimpleStringProperty getSenderProperty(){return senderProperty;}
     public SimpleStringProperty getReceiverProperty(){return receiverProperty;}
     public SimpleStringProperty getObjectProperty(){return objectProperty;}
