@@ -68,7 +68,7 @@ public class Client {
         });
 
         jSonReader();
-}
+    }
     public void jSonReader (){
         try {
             ObjectMapper objectMapper = new ObjectMapper();
