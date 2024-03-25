@@ -20,6 +20,7 @@ public class ServerApplication extends Application {
 
         Server server = new Server();
         server.listen(6000);
+
     }
     public static void main(String[] args) {
         launch();

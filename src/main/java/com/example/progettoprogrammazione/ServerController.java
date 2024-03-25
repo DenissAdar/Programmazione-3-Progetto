@@ -12,6 +12,6 @@ public class ServerController {
     private TextArea ServerLog;
     public void init()
     {
-
+        ServerLog.textProperty().set("Funziona");
     }
 }
