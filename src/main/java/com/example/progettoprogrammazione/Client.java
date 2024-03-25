@@ -1,6 +1,7 @@
 package com.example.progettoprogrammazione;
 
 import com.example.progettoprogrammazione.Email;
+import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -19,17 +20,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
-
+// TODO Gaia - Dobbiamo iniziare a fare i thread per far funzionare il tutto
 public class Client {
 
     Socket socket = null;
     private String jsonFilePath;
+    private String account;
+
     private ListProperty<Email> inMail;
     private ListProperty<Email> outMail;
     private ObservableList<Email> inMailContent;
     private ObservableList<Email> outMailContent;
 
-    private String account;
     private SimpleStringProperty senderProperty;
     private SimpleStringProperty receiverProperty;
     private SimpleStringProperty objectProperty;
@@ -65,8 +67,9 @@ public class Client {
             }
         });
 
-
-        // Legge il file JSON e aggiunge le email al client
+        jSonReader();
+    }
+    public void jSonReader (){
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
@@ -102,17 +105,49 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-}
+    }
     public SimpleStringProperty getSenderProperty(){return senderProperty;}
     public SimpleStringProperty getReceiverProperty(){return receiverProperty;}
     public SimpleStringProperty getObjectProperty(){return objectProperty;}
     public SimpleStringProperty getMessageProperty(){return messageProperty;}
-    public ListProperty<Email> getInMail() {
+    public ListProperty<Email> getInMailProperty() {
         return inMail;
     }
     //Aggiunto da DEN quando ho creato il metodo di controllo per l'inserimento in Lista
-    public ListProperty<Email> getOutMail() {
+    public ListProperty<Email> getOutMailProperty() {
         return outMail;
+    }
+
+    // Metodo aggiorna le email in entrata o in uscita (fa il reload solo delle nuove) aggiorna in base a ciò che estrae dal server
+    public void setInOutEmail(ArrayList<Email> email, String inOut){
+        if(inOut == "in")
+        {
+            Platform.runLater(new Runnable()
+            {
+                @Override
+                public void run() {
+                    inMail.clear();
+                    inMail.addAll(email);
+
+                }
+            });
+        }
+        else
+        {
+            Platform.runLater(new Runnable()
+            {
+                @Override
+                public void run() {
+                    outMail.clear();
+                    outMail.addAll(email);
+
+                }
+            });
+
+        }
+
+
+
     }
 
 
