@@ -4,6 +4,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ClientController {
     @FXML
     private Label accountDisplay;
@@ -48,6 +51,26 @@ public class ClientController {
     private Client client;
 
 
+
+    public void init() {
+
+        setInvisible();
+        runClient("127.0.0.1", 6000);
+        //inMailBtn.setOnMouseClicked(this::onClickInMail);
+       // outMailBtn.setOnMouseClicked(this::onClickOutMail);
+    }
+
+
+
+    public static void runClient(String host, int port) {
+
+            Client c = new Client("Mars");
+            c.communicate(host, port);
+
+
+
+    }
+
 /* setInvisible setta i diversi pulsanti invisibili in modo da
 non vederli quando non servono(aka quando scrivo una mail)*/
     public void setInvisible() {
@@ -73,11 +96,7 @@ non vederli quando non servono(aka quando scrivo una mail)*/
 
     }
 /*Situazione di partenza*/
-    public void init() {
-        setInvisible();
-        inMailBtn.setOnMouseClicked(this::onClickInMail);
-        outMailBtn.setOnMouseClicked(this::onClickOutMail);
-    }
+
 
     // TODO da gestire quali sono le mail in entrata e quali in uscita
     // Risolto in teoria vedi Client.java
@@ -85,23 +104,23 @@ non vederli quando non servono(aka quando scrivo una mail)*/
     // TODO DEN  bisogna bindare account a quello che ci sta scritto nella label accountDisplay
 
     /*Azione eseguita quando clicco sul pulsante delle mail in ingresso*/
-    private void onClickInMail(MouseEvent mouseEvent) {
+   /* private void onClickInMail(MouseEvent mouseEvent) {
         // Pulisco la ListView
         mailList.getItems().clear();
         client = new Client("denis@example.com", jsonPath);
-        for (Email email : client.getInMail()) {
+        for (Email email : client.getInMailProperty()) {
             mailList.getItems().add(email.getSender() + " - " + email.getObject());
         }
-    }
+    }*/
     /*Azione eseguita quando clicco sul pulsante delle mail in uscita*/
-    private void onClickOutMail(MouseEvent mouseEvent) {
+    /*private void onClickOutMail(MouseEvent mouseEvent) {
         // Pulisco la ListView
         mailList.getItems().clear();
         client = new Client("denis@example.com", jsonPath);
         // Aggiunta delle email alla ListView - Visualizzazione di tutte le mail
-        for (Email email : client.getOutMail()) {
+        for (Email email : client.getOutMailProperty()) {
             mailList.getItems().add(email.getSender() + " - " + email.getObject());
         }
 
-    }
+    }*/
 }
