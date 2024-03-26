@@ -10,8 +10,9 @@ public class ServerController {
 
     @FXML
     private TextArea ServerLog;
+    private Server server = new Server();
     public void init()
     {
-        ServerLog.textProperty().set("Funziona");
+        ServerLog.textProperty().bind(server.getAccountLogProperty());
     }
 }

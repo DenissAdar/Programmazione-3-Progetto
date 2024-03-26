@@ -9,6 +9,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.beans.property.SimpleStringProperty;
 
 
 public class Server {
@@ -16,22 +17,23 @@ public class Server {
     ObjectInputStream inputStream = null;
     ObjectOutputStream outputStream = null;
     private String jsonFilePath= "src/main/java/com/example/progettoprogrammazione/accounts/account.json";
-    String account;
+    String account = "Si è connesso ";
     ArrayList<Email> inMail = new ArrayList<>();
     ArrayList<Email> outMail = new ArrayList<>();
     ArrayList<ArrayList<Email>> contenuto = new ArrayList<>();
 
+    private final SimpleStringProperty accountLog = new SimpleStringProperty();
 
-
+    //Conessione---------------------------------------------------------------------------------
     public void listen(int port) {
-        boolean v=true;
+
         try {
             ServerSocket serverSocket = new ServerSocket(port);
             // a Marius puzza la roba di v= false, sostituire con true
-            while (v) {
+            while (true) {
+                System.out.println("qua");
                 serveClient(serverSocket);
-//                System.out.println("sss");
-                v = false;
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -52,16 +54,21 @@ public class Server {
             openStreams(serverSocket);
 
             account = (String) inputStream.readObject();
-            jSonReader();
+            System.out.println(account);
+            accountLog.set(account);
+
+            /*jSonReader();
             contenuto.add(inMail);
             contenuto.add(outMail);
             System.out.println(contenuto);
             //mando sullo stream i contenuti letti dal json
             outputStream.writeObject( contenuto);
-            System.out.println(account);
+            System.out.println(account);*/
 
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         } finally {
             closeStreams();
         }
@@ -90,6 +97,8 @@ public class Server {
             e.printStackTrace();
         }
     }
+    //Conessione---------------------------------------------------------------------------------
+
     public void jSonReader (){
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -109,7 +118,7 @@ public class Server {
                     String dateTime = contentNode.get("dateTime").asText();
 
                     // Crea un oggetto Email e lo aggiunge alla lista corretta
-                    Email emailObj = new Email(sender, receiver, object, message, dateTime);
+                    Email emailObj = new Email(sender,  object,receiver, message);
 
                     //Aggiunto da DEN quando ho creato il metodo di controllo per l'inserimento in Lista
                     if(Objects.equals(this.account, sender))        outMail.add(emailObj);
@@ -123,5 +132,15 @@ public class Server {
             e.printStackTrace();
         }
     }
+
+    public String getAccountLog() {
+        return accountLog.get();
+    }
+
+    public SimpleStringProperty getAccountLogProperty() {
+        return accountLog;
+    }
+
+
 }
 

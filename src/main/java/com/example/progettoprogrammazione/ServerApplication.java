@@ -18,12 +18,14 @@ public class ServerApplication extends Application {
         stage.setScene(scene);
         stage.show();
 
-        Server server = new Server();
-        server.listen(6000);
+
 
     }
     public static void main(String[] args) {
         launch();
+        Server server = new Server();
+        server.listen(6000);
+
     }
 }
 

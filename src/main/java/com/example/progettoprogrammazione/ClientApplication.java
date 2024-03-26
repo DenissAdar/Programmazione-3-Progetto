@@ -19,7 +19,7 @@ public class ClientApplication extends Application {
         stage.setScene(scene);
         stage.show();
 
-        runClient("127.0.0.1", 6000);
+
 
 }
 
@@ -31,5 +31,6 @@ public class ClientApplication extends Application {
     }
     public static void main(String[] args) {
         launch();
+        runClient("127.0.0.1", 6000);
     }
 }
