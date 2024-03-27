@@ -13,6 +13,7 @@ public class ServerController {
     private Server server = new Server();
     public void init()
     {
-        ServerLog.textProperty().bind(server.getAccountLogProperty());
+        server.listen(6000);
+        //ServerLog.textProperty().bind(server.getAccountLogProperty());
     }
 }

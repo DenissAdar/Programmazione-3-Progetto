@@ -52,7 +52,7 @@ public class Client {
 
         inMail = new SimpleListProperty<>(inMailContent);
         inMailContent = FXCollections.observableList(new LinkedList<>());
-        System.out.println(inMailContent);
+
 
         outMail = new SimpleListProperty<>(outMailContent);
         outMailContent = FXCollections.observableList(new LinkedList<>());
@@ -60,14 +60,14 @@ public class Client {
         inMailContent.addListener(new ListChangeListener<Email>() {
             @Override
             public void onChanged(Change<? extends Email> change) {
-                System.out.println("Lista Mail in entrata è stata cambiata");
+
             }
         });
 
         outMailContent.addListener(new ListChangeListener<Email>() {
             @Override
             public void onChanged(Change<? extends Email> change) {
-                System.out.println("Lista Mail in uscita è stata cambiata");
+
             }
         });
 
@@ -92,7 +92,6 @@ public class Client {
             attempts += 1;
             System.out.println("[Client " +getAccount()+ "] Tentativo nr. " + attempts);
             success = tryCommunication(host, port);
-//            System.out.println("Stato della Communicate : "+ success);
             if(success)
                 continue;
             try {
