@@ -92,7 +92,6 @@ public class Client {
             attempts += 1;
             System.out.println("[Client " +getAccount()+ "] Tentativo nr. " + attempts);
             success = tryCommunication(host, port);
-            System.out.println(success);
             if(success)
                 continue;
             try {

@@ -13,85 +13,29 @@ import javafx.beans.property.SimpleStringProperty;
 
 
 public class Server {
-    Socket socket = null;
-    ObjectInputStream inputStream = null;
-    ObjectOutputStream outputStream = null;
+
     private String jsonFilePath= "src/main/java/com/example/progettoprogrammazione/accounts/account.json";
-    String account = "Si è connesso ";
+
     ArrayList<Email> inMail = new ArrayList<>();
     ArrayList<Email> outMail = new ArrayList<>();
     ArrayList<ArrayList<Email>> contenuto = new ArrayList<>();
 
-    private final SimpleStringProperty accountLog = new SimpleStringProperty();
 
     //Conessione---------------------------------------------------------------------------------
     public void listen(int port) {
 
         try {
+            int id = 1;
             ServerSocket serverSocket = new ServerSocket(port);
-            // a Marius puzza la roba di v= false, sostituire con true
             while (true) {
-                System.out.println("qua");
-                serveClient(serverSocket);
+                System.out.println("ascolto");
+                Socket incoming = serverSocket.accept();
+                //Classe dei runnable thread---
+                Runnable r = new ThreadHandler(incoming,id);
+                new Thread(r).start();
+                id++;
+                //serveClient(serverSocket);
 
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
- //           System.out.println("entrato nel finally");
-            if (socket!=null)
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-        }
- //       System.out.println("Fine di listen");
-    }
-    public void serveClient(ServerSocket serverSocket){
-        try {
-
-            openStreams(serverSocket);
-
-            account = (String) inputStream.readObject();
-            System.out.println(account);
-            accountLog.set(account);
-
-            /*jSonReader();
-            contenuto.add(inMail);
-            contenuto.add(outMail);
-            System.out.println(contenuto);
-            //mando sullo stream i contenuti letti dal json
-            outputStream.writeObject( contenuto);
-            System.out.println(account);*/
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } finally {
-            closeStreams();
-        }
-    }
-    private void openStreams(ServerSocket serverSocket) throws IOException {
-        socket = serverSocket.accept();
-        System.out.println("Server Connesso");
-
-        inputStream = new ObjectInputStream(socket.getInputStream());
-        outputStream = new ObjectOutputStream(socket.getOutputStream());
-
-        outputStream.flush();
-
-    }
-
-    private void closeStreams() {
-        try {
-            if(inputStream != null) {
-                inputStream.close();
-            }
-
-            if(outputStream != null) {
-                outputStream.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -99,7 +43,7 @@ public class Server {
     }
     //Conessione---------------------------------------------------------------------------------
 
-    public void jSonReader (){
+   /* public void jSonReader (){
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
@@ -131,16 +75,77 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }*/
+
+} //Fine classe Server-----------------------------------
+
+class ThreadHandler implements Runnable{
+    private Socket socket = null;
+    private ObjectInputStream inputStream = null;
+    private ObjectOutputStream outputStream = null;
+    String account = "Si è connesso ";
+    private final SimpleStringProperty accountLog = new SimpleStringProperty();
+
+    private Socket incoming;
+    private int id;
+
+    public ThreadHandler(Socket in, int id){
+        this.incoming = in;
+        this.id = id;
+    }
+    @Override
+    public void run() {
+        serveClient();
     }
 
-    public String getAccountLog() {
-        return accountLog.get();
+    public void serveClient(){
+        try {
+
+            openStreams();
+
+            account += (String) inputStream.readObject();
+            System.out.println(account);
+            accountLog.set(account);
+
+            /*jSonReader();
+            contenuto.add(inMail);
+            contenuto.add(outMail);
+            System.out.println(contenuto);
+            //mando sullo stream i contenuti letti dal json
+            outputStream.writeObject( contenuto);
+            System.out.println(account);*/
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } finally {
+            closeStreams();
+        }
+    }
+    private void openStreams() throws IOException {
+
+        System.out.println("Server Connesso");
+
+        inputStream = new ObjectInputStream(socket.getInputStream());
+        outputStream = new ObjectOutputStream(socket.getOutputStream());
+
+        outputStream.flush();
+
     }
 
-    public SimpleStringProperty getAccountLogProperty() {
-        return accountLog;
+    private void closeStreams() {
+        try {
+            if(inputStream != null) {
+                inputStream.close();
+            }
+
+            if(outputStream != null) {
+                outputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
-
-
 }
 
