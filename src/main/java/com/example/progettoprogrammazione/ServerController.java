@@ -10,9 +10,10 @@ public class ServerController {
 
     @FXML
     private TextArea ServerLog;
-    private Server server = new Server();
+    private Server server ;
     public void init()
     {
+        server = new Server();
         server.listen(6000);
         //ServerLog.textProperty().bind(server.getAccountLogProperty());
     }
