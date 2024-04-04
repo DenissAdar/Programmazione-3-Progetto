@@ -22,6 +22,7 @@ public class Server {
 
 
     //Conessione---------------------------------------------------------------------------------
+    //
     public void listen(int port) {
 
         try {
@@ -29,6 +30,7 @@ public class Server {
             ServerSocket serverSocket = new ServerSocket(port);
             while (true) {
                 System.out.println("ascolto");
+                // TODO Rimango in attesa finchè non trovo qualcosa da accettare
                 Socket incoming = serverSocket.accept();
                 //Classe dei runnable thread---
                 Runnable r = new ThreadHandler(incoming,id);
