@@ -4,36 +4,72 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 
 
 public class Server {
-    int cambiamento;
+
     private String jsonFilePath= "src/main/java/com/example/progettoprogrammazione/accounts/account.json";
+
+    ServerSocket serverSocket;
+    ThreadPoolExecutor executor;
+
+    private ListProperty<String> logList; /*binding in sever controller*/
+    private ObservableList<String> logListContent;
 
     ArrayList<Email> inMail = new ArrayList<>();
     ArrayList<Email> outMail = new ArrayList<>();
-    ArrayList<ArrayList<Email>> contenuto = new ArrayList<>();
 
+
+    public Server(){
+        try {
+            this.logListContent = FXCollections.observableList(new LinkedList<>());
+            this.logList = new SimpleListProperty<>();
+            this.logList.set(logListContent);
+            logListContent.addListener(new ListChangeListener<String>() {
+                @Override
+                public void onChanged(Change<? extends String> change) {
+
+                }
+            });
+
+
+            /*TODO: CREARE E GESTIRE HASHMAP PER LA MUTUA ESCLUSIONE DEL FILE JSON DELLE MAIL*/
+            serverSocket = new ServerSocket(6000);
+            new Thread(new RunServer()).start();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public ListProperty<String> getLogList(){
+        return logList;
+    }
 
     //Conessione---------------------------------------------------------------------------------
-    //
-    public void listen(int port) {
+    /*public void listen(int port) {
 
         try {
             int id = 1;
             ServerSocket serverSocket = new ServerSocket(port);
             while (true) {
                 System.out.println("ascolto");
-                // TODO Rimango in attesa finchè non trovo qualcosa da accettare
                 Socket incoming = serverSocket.accept();
                 //Classe dei runnable thread---
-                Runnable r = new ThreadHandler(incoming,id);
+                Runnable r = new RunServer(incoming,id);
                 new Thread(r).start();
                 id++;
                 //serveClient(serverSocket);
@@ -42,10 +78,10 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
     //Conessione---------------------------------------------------------------------------------
 
-   /* public void jSonReader (){
+    /*public void jSonReader (){
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
@@ -67,7 +103,7 @@ public class Server {
                     Email emailObj = new Email(sender,  object,receiver, message);
 
                     //Aggiunto da DEN quando ho creato il metodo di controllo per l'inserimento in Lista
-                    if(Objects.equals(this.account, sender))        outMail.add(emailObj);
+                    if(Objects.equals(this.account, sender))       outMail.add(emailObj);
                     else if(Objects.equals(this.account, receiver)) inMail.add(emailObj);
                 }
 
@@ -79,35 +115,107 @@ public class Server {
         }
     }*/
 
-} //Fine classe Server-----------------------------------
+    /*Decide randomicamente quale username dare ad un client appena creato*/
+    class ThreadAccount implements Runnable{
+        ObjectOutputStream out;
 
-class ThreadHandler implements Runnable{
-    private Socket socket = null;
-    private ObjectInputStream inputStream = null;
-    private ObjectOutputStream outputStream = null;
-    String account = "Si è connesso ";
-    private final SimpleStringProperty accountLog = new SimpleStringProperty();
+        public ThreadAccount(ObjectOutputStream out)
+        {
+            this.out = out;
+        }
 
-    private Socket incoming;
-    private int id;
+        @Override
+        public void run() {
+            try {
+                /*todo creare metodo per ottenere randomicamente un account e restituirlo come se fosse prova_user qua sotto*/
+                String prova_user = "gaia.didedda@merda";
+                out.writeObject(prova_user);
 
-    public ThreadHandler(Socket in, int id){
-        this.incoming = in;
-        this.id = id;
+                Platform.runLater(() -> logList.add(prova_user+" ha fatto l'accesso.")); /*loglist è l'elemento LOG dell'applicazione di sever lato grafico */
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
-    @Override
-    public void run() {
-        serveClient();
-    }
 
-    public void serveClient(){
-        try {
+    class RunServer implements Runnable{
+        private Socket socket;
+        private ObjectInputStream inputStream;
+        private ObjectOutputStream outputStream;
+        String account = "Si è connesso ";
+        private final SimpleStringProperty accountLog = new SimpleStringProperty();
 
-            openStreams();
+        private Socket incoming;
+        private int id;
+        private String action;
 
-            account += (String) inputStream.readObject();
-            System.out.println(account);
-            accountLog.set(account);
+        public RunServer(){}
+
+        @Override
+        public void run() {
+
+            try {
+                executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5); /*serve a richimare i thread funzioni più avanti ---> executor.execute(new ThreadUser(out));*/
+
+                /*
+                    socket = s.accept();
+                    System.out.println("Accettato socket");
+                    ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+                    out.flush();
+                    in = new ObjectInputStream(socket.getInputStream());
+                    username = (String) in.readObject();
+                    String command = (String) in.readObject();
+                    switch (command)...
+                */
+
+
+                while (true) {
+                    // Si blocca finchè non riceve qualcosa, va avanti SOLO SE LO RICEVE
+                    socket = serverSocket.accept();
+                    System.out.println(socket);
+                    System.out.println(socket.getPort());
+
+                    // Crea un nuovo oggetto che legge oggetti dal flusso di input derivato dalla connessione socket (client)
+                    openStreams();
+
+                    // Chi sta comunicando con il server, chi sta richiedendo quell'azione
+                    account = (String) inputStream.readObject();
+
+                    // Le azioni che vengono svolte
+                    action = (String) inputStream.readObject();
+
+                    // In base all'azione si crea un metodo thread runnable utilizzando execute
+                    switch (action) {
+                        case "account":
+                            executor.execute(new ThreadAccount(outputStream));
+
+                            break;
+                        case "emailIn":
+                            break;
+                        case "emailOut":
+                            break;
+                        case "send":
+                            break;
+                        case "sendAll":
+                            break;
+                        case "delete":
+                            break;
+                        case "deleteAll":
+                            break;
+
+                        default:
+                            System.out.println("default");
+                            break;
+                    }
+
+                    // Chiudo connessione e socket
+                    //socket.close();
+                }
+
+
+                /*account += (String) inputStream.readObject();
+                System.out.println(account);
+                accountLog.set(account);*/
 
             /*jSonReader();
             contenuto.add(inMail);
@@ -117,37 +225,41 @@ class ThreadHandler implements Runnable{
             outputStream.writeObject( contenuto);
             System.out.println(account);*/
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } finally {
-            closeStreams();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            } finally {
+                closeStreams();
+            }
+        }
+
+        public void openStreams() throws IOException {
+
+            System.out.println("Server Connesso");
+
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+
+            // Ripulisce lo stream
+            outputStream.flush();
+
+        }
+
+        public void closeStreams() {
+            try {
+                if(inputStream != null) {
+                    inputStream.close();
+                }
+
+                if(outputStream != null) {
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
-    private void openStreams() throws IOException {
+} //Fine classe Server-----------------------------------
 
-        System.out.println("Server Connesso");
-
-        inputStream = new ObjectInputStream(socket.getInputStream());
-        outputStream = new ObjectOutputStream(socket.getOutputStream());
-
-        outputStream.flush();
-
-    }
-
-    private void closeStreams() {
-        try {
-            if(inputStream != null) {
-                inputStream.close();
-            }
-
-            if(outputStream != null) {
-                outputStream.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
 

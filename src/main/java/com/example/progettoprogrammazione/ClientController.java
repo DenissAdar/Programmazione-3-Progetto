@@ -83,6 +83,7 @@ public class ClientController {
         setUnvisible();
     }
     public void init(){
+        new Client("prototipo");
         setUnvisible();
     }
 }

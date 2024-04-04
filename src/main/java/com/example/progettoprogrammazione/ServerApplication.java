@@ -18,8 +18,6 @@ public class ServerApplication extends Application {
         stage.show();
         controller.init();
 
-
-
     }
     public static void main(String[] args) {
         launch();

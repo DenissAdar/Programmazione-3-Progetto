@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
+import java.net.InetAddress;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,8 +44,20 @@ public class Client {
     private SimpleStringProperty objectProperty;
     private SimpleStringProperty messageProperty;
 
+    Thread t1;
+
     public Client(String account){
-        this.account = account;
+
+        t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                socketUsername();
+            }
+        });
+
+        t1.start();
+
+        //this.account = account;
         senderProperty = new SimpleStringProperty();
         receiverProperty = new SimpleStringProperty();
         objectProperty = new SimpleStringProperty();
@@ -181,13 +194,26 @@ public class Client {
 
     }
 
-
-
-
-
-
     public String getAccount() {
         return account;
+    }
+
+    public void socketUsername() {
+        try {
+            socket = new Socket(InetAddress.getLocalHost(), 6000);
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+
+            out.flush();
+            out.writeObject("");
+            out.writeObject("account");
+
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+            account = (String) in.readObject();
+            System.out.println("ciao");
+
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Non è stato possibile connettersi al server");
+        }
     }
 
     public void setAccount(String account) {
