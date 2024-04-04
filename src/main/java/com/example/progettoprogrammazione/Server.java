@@ -13,7 +13,7 @@ import javafx.beans.property.SimpleStringProperty;
 
 
 public class Server {
-
+    int cambiamento;
     private String jsonFilePath= "src/main/java/com/example/progettoprogrammazione/accounts/account.json";
 
     ArrayList<Email> inMail = new ArrayList<>();
