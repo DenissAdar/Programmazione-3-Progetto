@@ -1,5 +1,6 @@
 package com.example.progettoprogrammazione;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -61,6 +62,7 @@ public class ClientController {
 
     @FXML
     private Label dataLable;
+    private Client client;
 
     public void setUnvisible(){
 
@@ -83,7 +85,11 @@ public class ClientController {
         setUnvisible();
     }
     public void init(){
-        new Client("prototipo");
+        client = new Client();
         setUnvisible();
+        // non penso sia giusto cosi ma lo displaya
+        Platform.runLater( ()-> accountDisplay.textProperty().setValue(client.getAccount()))  ;
+        //TODO Dovrebbe funzionare sta roba  Platform.runLater( ()-> accountDisplay.textProperty().bind(client.giveAccountProperty()))  ;
+
     }
 }

@@ -18,6 +18,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Server {
@@ -81,7 +82,7 @@ public class Server {
     }*/
     //Conessione---------------------------------------------------------------------------------
 
-    /*public void jSonReader (){
+   /* public void jSonReader (){
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
@@ -103,32 +104,47 @@ public class Server {
                     Email emailObj = new Email(sender,  object,receiver, message);
 
                     //Aggiunto da DEN quando ho creato il metodo di controllo per l'inserimento in Lista
-                    if(Objects.equals(this.account, sender))       outMail.add(emailObj);
-                    else if(Objects.equals(this.account, receiver)) inMail.add(emailObj);
+                    //if(Objects.equals(this.account, sender))       outMail.add(emailObj);
+                    //else if(Objects.equals(this.account, receiver)) inMail.add(emailObj);
                 }
 
             }
-            System.out.println("Grandezza di outMail "+outMail.size());
-            System.out.println("Grandezza di inMail "+ inMail.size());
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }*/
+    }
 
     /*Decide randomicamente quale username dare ad un client appena creato*/
     class ThreadAccount implements Runnable{
         ObjectOutputStream out;
-
-        public ThreadAccount(ObjectOutputStream out)
-        {
+        public String accountPicker()  {
+            //todo: cambiare 3 con il numero degli elementi nell'array
+            String[] accountList = new String[2];
+            int i=0;
+            //carico un array di account
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
+                for(JsonNode emailNode: rootNode){
+                    accountList[i] = emailNode.get("email").asText();
+                    i++;
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            int randomNum = ThreadLocalRandom.current().nextInt(0, accountList.length );
+            return accountList[randomNum];
+        }
+        public ThreadAccount(ObjectOutputStream out) {
             this.out = out;
         }
-
         @Override
         public void run() {
             try {
                 /*todo creare metodo per ottenere randomicamente un account e restituirlo come se fosse prova_user qua sotto*/
-                String prova_user = "gaia.didedda@merda";
+                //todo den: fatto
+                String prova_user = accountPicker();
                 out.writeObject(prova_user);
 
                 Platform.runLater(() -> logList.add(prova_user+" ha fatto l'accesso.")); /*loglist è l'elemento LOG dell'applicazione di sever lato grafico */
@@ -136,6 +152,40 @@ public class Server {
                 throw new RuntimeException(e);
             }
         }
+    }
+    //TODO Fai le 6 classi Thread qui sotto
+    class ThreadInMail implements Runnable{
+        ObjectOutputStream out;
+        public ThreadInMail(ObjectOutputStream out){this.out=out;}
+        @Override
+        public void run(){
+            Platform.runLater(() -> logList.add("Mail In Entrata ricevuta da"));
+        }
+    }
+    class ThreadOutMail implements Runnable{
+        public ThreadOutMail(){}
+        @Override
+        public void run(){}
+    }
+    class ThreadSend implements Runnable{
+        public ThreadSend(){}
+        @Override
+        public void run(){}
+    }
+    class ThreadSendAll implements Runnable{
+        public ThreadSendAll(){}
+        @Override
+        public void run(){}
+    }
+    class ThreadDelete implements Runnable{
+        public ThreadDelete(){}
+        @Override
+        public void run(){}
+    }
+    class ThreadDeleteAll implements Runnable{
+        public ThreadDeleteAll(){}
+        @Override
+        public void run(){}
     }
 
     class RunServer implements Runnable{
@@ -188,7 +238,6 @@ public class Server {
                     switch (action) {
                         case "account":
                             executor.execute(new ThreadAccount(outputStream));
-
                             break;
                         case "emailIn":
                             break;

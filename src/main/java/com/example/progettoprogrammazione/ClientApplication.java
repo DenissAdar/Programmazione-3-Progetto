@@ -24,8 +24,8 @@ public class ClientApplication extends Application {
 }
 
     public static void runClient(String host, int port) {
-
-        Client c = new Client("denis@example.com");
+        //ho tolto il parametro che si da a client perchè tanto non serve inserire l'account
+        Client c = new Client();
         c.communicate(host, port);
 
     }
