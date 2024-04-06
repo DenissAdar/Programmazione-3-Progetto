@@ -116,8 +116,10 @@ public class Server {
     }
 
     /*Decide randomicamente quale username dare ad un client appena creato*/
-    class ThreadAccount implements Runnable{
+    class ThreadAccount implements Runnable{//TODO FARE IN MODO DA RESTITUIRE L'ACCOUNT CHE CI SERVE IN ALTRE COSE
         ObjectOutputStream out;
+
+        Socket socket;
         public String accountPicker()  {
             //todo: cambiare 3 con il numero degli elementi nell'array
             String[] accountList = new String[2];
@@ -136,8 +138,10 @@ public class Server {
             int randomNum = ThreadLocalRandom.current().nextInt(0, accountList.length );
             return accountList[randomNum];
         }
-        public ThreadAccount(ObjectOutputStream out) {
+
+        public ThreadAccount(ObjectOutputStream out, Socket socket,String account) {
             this.out = out;
+            this.socket = socket;
         }
         @Override
         public void run() {
@@ -145,21 +149,42 @@ public class Server {
                 /*todo creare metodo per ottenere randomicamente un account e restituirlo come se fosse prova_user qua sotto*/
                 //todo den: fatto
                 String prova_user = accountPicker();
+                //account = prova_user;
                 out.writeObject(prova_user);
 
                 Platform.runLater(() -> logList.add(prova_user+" ha fatto l'accesso.")); /*loglist è l'elemento LOG dell'applicazione di sever lato grafico */
+                socket.close(); /*todo da rivedere chiusura*/
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
     }
-    //TODO Fai le 6 classi Thread qui sotto
+
+
+
+
+
+
+
+
+
     class ThreadInMail implements Runnable{
         ObjectOutputStream out;
-        public ThreadInMail(ObjectOutputStream out){this.out=out;}
+        String account;
+        ArrayList<Email> emailList = new ArrayList<>();
+
+        public ThreadInMail(ObjectOutputStream out,String account){this.out=out;this.account=account;}
         @Override
         public void run(){
-            Platform.runLater(() -> logList.add("Mail In Entrata ricevuta da"));
+            try{
+                emailList = jSonReader("Entrata", account);
+                System.out.println(emailList);
+                out.writeObject(emailList);
+                Platform.runLater(() -> logList.add("Mail In Entrata ricevuta da"));
+            }catch(IOException e){throw new RuntimeException(e);}
+
+
         }
     }
     class ThreadOutMail implements Runnable{
@@ -203,21 +228,8 @@ public class Server {
 
         @Override
         public void run() {
-
             try {
                 executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5); /*serve a richimare i thread funzioni più avanti ---> executor.execute(new ThreadUser(out));*/
-
-                /*
-                    socket = s.accept();
-                    System.out.println("Accettato socket");
-                    ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-                    out.flush();
-                    in = new ObjectInputStream(socket.getInputStream());
-                    username = (String) in.readObject();
-                    String command = (String) in.readObject();
-                    switch (command)...
-                */
-
 
                 while (true) {
                     // Si blocca finchè non riceve qualcosa, va avanti SOLO SE LO RICEVE
@@ -230,26 +242,40 @@ public class Server {
 
                     // Chi sta comunicando con il server, chi sta richiedendo quell'azione
                     account = (String) inputStream.readObject();
-
+                    System.out.println("Sono nel while del run, valore di account :" + account);
                     // Le azioni che vengono svolte
                     action = (String) inputStream.readObject();
 
                     // In base all'azione si crea un metodo thread runnable utilizzando execute
                     switch (action) {
                         case "account":
-                            executor.execute(new ThreadAccount(outputStream));
+                            executor.execute(new ThreadAccount(outputStream, socket, account));
+
+
+                            //todo TROVARE UN MODO PER USARE LA STRINGA DI ACCOUNT, SERVE PER SCEGLIERE LE MAIL DA MANDARE IN EXECUTE THREADINMAIL
+
+
+
+                            System.out.println("Sono nel case account, valore di account :" + account);
                             break;
                         case "emailIn":
+                            System.out.println("Sono nel case emailIn, valore di account :" + account);
+                            executor.execute(new ThreadInMail(outputStream, account));
                             break;
                         case "emailOut":
+                           // executor.execute(new ThreadOutMail(outputStream));
                             break;
                         case "send":
+                            //executor.execute(new ThreadSend(outputStream));
                             break;
                         case "sendAll":
+                            //executor.execute(new ThreadSendAll(outputStream));
                             break;
                         case "delete":
+                            //executor.execute(new ThreadDelete(outputStream));
                             break;
                         case "deleteAll":
+                            //executor.execute(new ThreadDeleteAll(outputStream));
                             break;
 
                         default:
@@ -283,16 +309,18 @@ public class Server {
             }
         }
 
+
+
+
+
+
+
+
         public void openStreams() throws IOException {
-
             System.out.println("Server Connesso");
-
             inputStream = new ObjectInputStream(socket.getInputStream());
             outputStream = new ObjectOutputStream(socket.getOutputStream());
-
-            // Ripulisce lo stream
             outputStream.flush();
-
         }
 
         public void closeStreams() {
@@ -308,6 +336,44 @@ public class Server {
                 e.printStackTrace();
             }
         }
+    }
+    //Metodo JsonReader che restituisce le mail in entrata o in uscita in base ad un valore che gli viene passato come parametro(ingresso,uscita)
+    public ArrayList<Email> jSonReader (String mailListType, String account){
+        try {
+            System.out.println("Sono entrato in JsonReader , Valore di account: " + account);
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
+
+            // Itera sui nodi del file JSON
+            for (JsonNode emailNode : rootNode) {
+                String email = emailNode.get("email").asText();
+                JsonNode contenutoNode = emailNode.get("content");
+
+                if(Objects.equals(account,email)){
+                    // Itera sui contenuti delle del nodo Email
+                    for (JsonNode contentNode : contenutoNode) {
+                        String sender = contentNode.get("from").asText();
+                        String receiver = contentNode.get("to").asText();
+                        String object = contentNode.get("object").asText();
+                        String message = contentNode.get("text").asText();
+                        String dateTime = contentNode.get("dateTime").asText();
+                        if(mailListType.equals("Entrata")){
+                            Email emailObj = new Email(sender, object,receiver, message);
+                            if(Objects.equals(account, receiver)) inMail.add(emailObj);
+                        }
+                        else if(mailListType.equals("Uscita")){
+                            Email emailObj = new Email(sender, object,receiver, message);
+                            if(Objects.equals(account, sender)) inMail.add(emailObj);
+                        }
+
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return inMail;
     }
 } //Fine classe Server-----------------------------------
 

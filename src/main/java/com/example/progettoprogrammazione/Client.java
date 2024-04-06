@@ -3,9 +3,8 @@ package com.example.progettoprogrammazione;
 import com.example.progettoprogrammazione.Email;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
+
 import java.net.InetAddress;
 
 import java.io.File;
@@ -21,7 +20,6 @@ import java.util.List;
 import java.util.Objects;
 
 
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableStringValue;
 import javafx.collections.FXCollections;
@@ -38,7 +36,10 @@ public class Client {
     private final int MAXATTEMPTS = 5;
 
     private String account;
-    private StringProperty accountProperty;
+    private ObjectProperty<String> accountProperty = new SimpleObjectProperty<>();
+  /*  private SimpleListProperty<Email> inMailProperty;*/
+    ArrayList<Email> inMailList = new ArrayList<>();
+
 
     private ListProperty<Email> inMail;
     private ListProperty<Email> outMail;
@@ -50,6 +51,8 @@ public class Client {
     private SimpleStringProperty objectProperty;
     private SimpleStringProperty messageProperty;
 
+    private ObjectInputStream in;
+
     Thread t1;
 
     //todo allora ho tolto account dal costruttore e lo vado a togliere anche dal controller quando lo definisco
@@ -59,6 +62,8 @@ public class Client {
             @Override
             public void run() {
                 socketUsername();
+                socketInMail();
+                //Crea metododi comunicazione per il pulsante inMail
             }
         });
 
@@ -204,47 +209,56 @@ public class Client {
 
     }
 
+    ArrayList<Email> emailList = new ArrayList<>();
+    // Crea metodo di comunicazione in mail
+    public void socketInMail(){
+        try{
+            socket = new Socket(InetAddress.getLocalHost(), 6000);
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            out.flush();
+            out.writeObject("");
+            out.writeObject("emailIn");
+            in = new ObjectInputStream(socket.getInputStream());
+            emailList = (ArrayList<Email>) in.readObject();
+            System.out.println("-----------Risultato di socketinMail-----"+emailList);
+
+        }catch(IOException | ClassNotFoundException e) {
+            System.out.println("Non è stato possibile connettersi al server");
+        }
+
+    }
+
+
+
     public String getAccount() {
         return account;
     }
-
     public void socketUsername() {
         try {
             socket = new Socket(InetAddress.getLocalHost(), 6000);
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-
             out.flush();
             out.writeObject("");
             out.writeObject("account");
-
-            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-            //occhio
+            in = new ObjectInputStream(socket.getInputStream());
             account = (String) in.readObject();
             System.out.println(account + "è connesso anche al client");
-            //per come funziona adesso questo non viene usato
             Platform.runLater( ()-> setAccountProperty());
-
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server");
         }
     }
 
 
-
-
-    // per come funz.....usato perchè da sempre nullpointerexception
     public void setAccountProperty() {
         try {
-            accountProperty.setValue((String)account) ;
-            System.out.println("riuscito");
+            accountProperty.setValue((String)account);
         }catch (NullPointerException e){
-            System.out.println("Trovato NUllPointer EXception ");
+            System.out.println("Trovato NullPointer Exception ");
         }
     }
-    public StringProperty giveAccountProperty(){
+    public ObjectProperty<String> giveAccountProperty(){
         return accountProperty;
     }
-
-
 
 }

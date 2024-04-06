@@ -87,9 +87,8 @@ public class ClientController {
     public void init(){
         client = new Client();
         setUnvisible();
-        // non penso sia giusto cosi ma lo displaya
-        Platform.runLater( ()-> accountDisplay.textProperty().setValue(client.getAccount()))  ;
-        //TODO Dovrebbe funzionare sta roba  Platform.runLater( ()-> accountDisplay.textProperty().bind(client.giveAccountProperty()))  ;
+
+        accountDisplay.textProperty().bind(client.giveAccountProperty())  ;
 
     }
 }
