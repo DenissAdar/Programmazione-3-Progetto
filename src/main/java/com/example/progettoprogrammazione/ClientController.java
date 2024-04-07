@@ -85,12 +85,19 @@ public class ClientController {
         mailBodyTxt.clear();
         setUnvisible();
     }
+    @FXML
+    public void showInMail(){
+        client.socketInMail();
+    }
+    @FXML
+    public void showOutMail(){client.socketOutMail();}
     public void init(){
         client = new Client();
         setUnvisible();
 
-        accountDisplay.textProperty().bind(client.giveAccountProperty()) ;
-        mailList.itemsProperty().bind(client.giveEmailProperty());
+        accountDisplay.textProperty().bind(client.getAccountProperty()) ;
+        mailList.itemsProperty().bind(client.getEmailProperty());
+
 
 
     }

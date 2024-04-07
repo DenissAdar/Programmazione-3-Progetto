@@ -37,7 +37,6 @@ public class Client {
 
     private String account;
     private ObjectProperty<String> accountProperty = new SimpleObjectProperty<>();
-  /*  private SimpleListProperty<Email> inMailProperty;*/
     ArrayList<Email> inMailList = new ArrayList<>();
 
 
@@ -64,10 +63,6 @@ public class Client {
                 socketUsername();
                 //Crea metododi comunicazione per il pulsante inMail
                 //TODO bindare al pulsante
-                socketInMail();
-                System.out.println("----------");
-                socketOutMail();
-
             }
         });
 
@@ -113,7 +108,6 @@ public class Client {
             outputStream.flush();
             inputStream = new ObjectInputStream(socket.getInputStream());
             System.out.println("[Client "+ getAccount() + "] Connesso");
-            System.out.println("--------------------merda---------");
         }
 
         public void communicate(String host, int port){
@@ -226,8 +220,7 @@ public class Client {
             in = new ObjectInputStream(socket.getInputStream());
             emailList = (ArrayList<Email>) in.readObject();
             Platform.runLater(()-> setMailProperty());
-           // System.out.println("----------------");
-           // System.out.println("Risultato di socketinMail : "+emailList);
+
 
         }catch(IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server");
@@ -236,16 +229,25 @@ public class Client {
 
 
     public void setMailProperty(){
-        for(int i=0;i<emailList.size();i++){
-            inMailContent.add(emailList.get(i));
-        }
+        //TODO ATTENZIONE!!!!
+        // le due righe successive riescono a ripulire la listview, il problema e' che quando si ricarica si ricaricano anche le mail vecchie
+        // (il che e' diverso dal fatto che le mail si aggiungono alla listview che non si ripulisce )
+        inMail.clear();
+        inMailContent.clear();
         inMail.set(inMailContent);
-        System.out.println("::::::Contenuto di InMail" + inMail);
+        if(inMailContent.isEmpty()) {
+            for (int i = 0; i < emailList.size(); i++) {
+                System.out.println(":: " + emailList.get(i));
+                inMailContent.add(emailList.get(i));
+            }
+            inMail.set(inMailContent);
+            System.out.println("Prova: " + inMail);
+        }
     }
-    public ListProperty<Email> giveEmailProperty() {
-        System.out.println("Contenuto di inMailProperty :" + inMail);
+    public ListProperty<Email> getEmailProperty() {
         return inMail;
     }
+
 
     public void socketOutMail(){
         try{
@@ -256,7 +258,7 @@ public class Client {
             out.writeObject("emailOut");
             in = new ObjectInputStream(socket.getInputStream());
             emailList = (ArrayList<Email>) in.readObject();
-            System.out.println("-----------Risultato di socketOutMail-----"+emailList);
+            Platform.runLater(()-> setMailProperty());
 
         }catch(IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server");
@@ -290,7 +292,7 @@ public class Client {
             System.out.println("Trovato NullPointer Exception ");
         }
     }
-    public ObjectProperty<String> giveAccountProperty(){
+    public ObjectProperty<String> getAccountProperty(){
         return accountProperty;
     }
 

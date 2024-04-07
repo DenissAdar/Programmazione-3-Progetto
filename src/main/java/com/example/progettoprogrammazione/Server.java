@@ -19,7 +19,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import java.util.concurrent.ThreadLocalRandom;
-
+//IN MESSAGE CI STA IL MITTENTE
 
 public class Server {
 
@@ -169,8 +169,9 @@ public class Server {
         public void run(){
             try{
                 emailList = jSonReader("Entrata");
-                System.out.println(emailList);
+                System.out.println("Attenzione qua ingresso "+emailList);
                 out.writeObject(emailList);
+                out.flush();
                 Platform.runLater(() -> logList.add("L'utente: " + prova_user + " ha richiesto le mail in ingresso"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
@@ -183,8 +184,9 @@ public class Server {
         public void run(){
             try{
                 emailList = jSonReader("Uscita");
-                System.out.println(emailList);
+                System.out.println("Attenzione qua uscita"+emailList);
                 out.writeObject(emailList);
+                out.flush();
                 Platform.runLater(() -> logList.add("L'utente: " + prova_user + " ha richiesto le mail in uscita"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
