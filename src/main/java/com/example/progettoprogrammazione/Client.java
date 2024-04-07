@@ -3,6 +3,7 @@ package com.example.progettoprogrammazione;
 import com.example.progettoprogrammazione.Email;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.*;
 
 import java.net.InetAddress;
@@ -15,7 +16,6 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Observable;
 import java.util.List;
 import java.util.Objects;
 
@@ -65,6 +65,8 @@ public class Client {
                 //Crea metododi comunicazione per il pulsante inMail
                 //TODO bindare al pulsante
                 socketInMail();
+                System.out.println("----------");
+                socketOutMail();
 
             }
         });
@@ -77,7 +79,7 @@ public class Client {
         objectProperty = new SimpleStringProperty();
         messageProperty = new SimpleStringProperty();
 
-        inMail = new SimpleListProperty<>(inMailContent);
+        inMail = new SimpleListProperty<Email>(inMailContent);
         inMailContent = FXCollections.observableList(new LinkedList<>());
 
 
@@ -130,7 +132,6 @@ public class Client {
                 }
             }
         }
-    // stringproperty
 
         private boolean tryCommunication(String host, int port) {
             try {
@@ -214,7 +215,9 @@ public class Client {
     ArrayList<Email> emailList = new ArrayList<>();
     // Crea metodo di comunicazione in mail
     public void socketInMail(){
+
         try{
+            System.out.println("----------------");
             socket = new Socket(InetAddress.getLocalHost(), 6000);
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             out.flush();
@@ -222,12 +225,42 @@ public class Client {
             out.writeObject("emailIn");
             in = new ObjectInputStream(socket.getInputStream());
             emailList = (ArrayList<Email>) in.readObject();
-            System.out.println("-----------Risultato di socketinMail-----"+emailList);
+            Platform.runLater(()-> setMailProperty());
+           // System.out.println("----------------");
+           // System.out.println("Risultato di socketinMail : "+emailList);
 
         }catch(IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server");
         }
+    }
 
+
+    public void setMailProperty(){
+        for(int i=0;i<emailList.size();i++){
+            inMailContent.add(emailList.get(i));
+        }
+        inMail.set(inMailContent);
+        System.out.println("::::::Contenuto di InMail" + inMail);
+    }
+    public ListProperty<Email> giveEmailProperty() {
+        System.out.println("Contenuto di inMailProperty :" + inMail);
+        return inMail;
+    }
+
+    public void socketOutMail(){
+        try{
+            socket = new Socket(InetAddress.getLocalHost(), 6000);
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            out.flush();
+            out.writeObject("");
+            out.writeObject("emailOut");
+            in = new ObjectInputStream(socket.getInputStream());
+            emailList = (ArrayList<Email>) in.readObject();
+            System.out.println("-----------Risultato di socketOutMail-----"+emailList);
+
+        }catch(IOException | ClassNotFoundException e) {
+            System.out.println("Non è stato possibile connettersi al server");
+        }
     }
 
 
@@ -250,8 +283,6 @@ public class Client {
             System.out.println("Non è stato possibile connettersi al server");
         }
     }
-
-
     public void setAccountProperty() {
         try {
             accountProperty.setValue((String)account);

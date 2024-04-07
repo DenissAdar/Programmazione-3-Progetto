@@ -162,7 +162,6 @@ public class Server {
     }
     class ThreadInMail implements Runnable{
         ObjectOutputStream out;
-
         ArrayList<Email> emailList = new ArrayList<>();
 
         public ThreadInMail(ObjectOutputStream out){this.out=out;}
@@ -172,16 +171,23 @@ public class Server {
                 emailList = jSonReader("Entrata");
                 System.out.println(emailList);
                 out.writeObject(emailList);
-                Platform.runLater(() -> logList.add("Mail In Entrata ricevuta da"));
+                Platform.runLater(() -> logList.add("L'utente: " + prova_user + " ha richiesto le mail in ingresso"));
             }catch(IOException e){throw new RuntimeException(e);}
-
-
         }
     }
     class ThreadOutMail implements Runnable{
-        public ThreadOutMail(){}
+        ObjectOutputStream out;
+        ArrayList<Email> emailList = new ArrayList<>();
+        public ThreadOutMail(ObjectOutputStream out){this.out=out;}
         @Override
-        public void run(){}
+        public void run(){
+            try{
+                emailList = jSonReader("Uscita");
+                System.out.println(emailList);
+                out.writeObject(emailList);
+                Platform.runLater(() -> logList.add("L'utente: " + prova_user + " ha richiesto le mail in uscita"));
+            }catch(IOException e){throw new RuntimeException(e);}
+        }
     }
     class ThreadSend implements Runnable{
         public ThreadSend(){}
@@ -242,7 +248,7 @@ public class Server {
                             executor.execute(new ThreadInMail(outputStream));
                             break;
                         case "emailOut":
-                           // executor.execute(new ThreadOutMail(outputStream));
+                            executor.execute(new ThreadOutMail(outputStream));
                             break;
                         case "send":
                             //executor.execute(new ThreadSend(outputStream));
@@ -261,24 +267,7 @@ public class Server {
                             System.out.println("default");
                             break;
                     }
-
-                    // Chiudo connessione e socket
-                    //socket.close();
                 }
-
-
-                /*account += (String) inputStream.readObject();
-                System.out.println(account);
-                accountLog.set(account);*/
-
-            /*jSonReader();
-            contenuto.add(inMail);
-            contenuto.add(outMail);
-            System.out.println(contenuto);
-            //mando sullo stream i contenuti letti dal json
-            outputStream.writeObject( contenuto);
-            System.out.println(account);*/
-
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
@@ -287,14 +276,6 @@ public class Server {
                 closeStreams();
             }
         }
-
-
-
-
-
-
-
-
         public void openStreams() throws IOException {
             System.out.println("Server Connesso");
             inputStream = new ObjectInputStream(socket.getInputStream());
@@ -334,6 +315,7 @@ public class Server {
                     for (JsonNode contentNode : contenutoNode) {
                         String sender = contentNode.get("from").asText();
                         String receiver = contentNode.get("to").asText();
+                        System.out.println("Valore di Receiver in json" + receiver);
                         String object = contentNode.get("object").asText();
                         String message = contentNode.get("text").asText();
                         String dateTime = contentNode.get("dateTime").asText();
@@ -355,6 +337,6 @@ public class Server {
         }
         return inMail;
     }
-} //Fine classe Server-----------------------------------
+}
 
 

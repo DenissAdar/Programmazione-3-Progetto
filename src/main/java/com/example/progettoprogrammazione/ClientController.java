@@ -34,7 +34,7 @@ public class ClientController {
     private TextArea mailBodyTxt;
 
     @FXML
-    private ListView<?> mailList;
+    private ListView<Email> mailList;
 
     @FXML
     private TextField mittenteTxt;
@@ -89,7 +89,9 @@ public class ClientController {
         client = new Client();
         setUnvisible();
 
-        accountDisplay.textProperty().bind(client.giveAccountProperty())  ;
+        accountDisplay.textProperty().bind(client.giveAccountProperty()) ;
+        mailList.itemsProperty().bind(client.giveEmailProperty());
+
 
     }
 }

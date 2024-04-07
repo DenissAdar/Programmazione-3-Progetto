@@ -41,7 +41,7 @@ public class Email implements Serializable {
                 "message='" + message + '\'' +
                 ", object='" + object + '\'' +
                 ", sender='" + sender + '\'' +
-                ", recevier='" + receiver + '\'' +
+                ", receiver='" + receiver + '\'' +
                 '}';
     }
 /*
