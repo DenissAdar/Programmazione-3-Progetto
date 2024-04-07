@@ -62,8 +62,10 @@ public class Client {
             @Override
             public void run() {
                 socketUsername();
-                socketInMail();
                 //Crea metododi comunicazione per il pulsante inMail
+                //TODO bindare al pulsante
+                socketInMail();
+
             }
         });
 

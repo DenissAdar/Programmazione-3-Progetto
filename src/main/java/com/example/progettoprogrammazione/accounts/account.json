@@ -15,6 +15,13 @@
         "object": "MGaia-Mars",
         "text": "Testo dell'email Gaia-",
         "dateTime": "2024-03-19"
+      },
+      {
+        "from": "marius@example.com",
+        "to": "gaia@example.com",
+        "object": "MMars-Gaia",
+        "text": "Testo dell'email Gaia-",
+        "dateTime": "2024-03-19"
       }
     ]
   },
@@ -32,6 +39,13 @@
         "from": "denis@example.com",
         "to": "marius@example.com",
         "object": "MDen-Mars",
+        "text": "Testo dell'email 3",
+        "dateTime": "2024-03-21"
+      },
+      {
+        "from": "giulia@example.com",
+        "to": "denis@example.com",
+        "object": "MGiu-Den",
         "text": "Testo dell'email 3",
         "dateTime": "2024-03-21"
       },

@@ -33,6 +33,7 @@ public class Server {
 
     ArrayList<Email> inMail = new ArrayList<>();
     ArrayList<Email> outMail = new ArrayList<>();
+    private String prova_user;
 
 
     public Server(){
@@ -118,7 +119,6 @@ public class Server {
     /*Decide randomicamente quale username dare ad un client appena creato*/
     class ThreadAccount implements Runnable{//TODO FARE IN MODO DA RESTITUIRE L'ACCOUNT CHE CI SERVE IN ALTRE COSE
         ObjectOutputStream out;
-
         Socket socket;
         public String accountPicker()  {
             //todo: cambiare 3 con il numero degli elementi nell'array
@@ -139,7 +139,7 @@ public class Server {
             return accountList[randomNum];
         }
 
-        public ThreadAccount(ObjectOutputStream out, Socket socket,String account) {
+        public ThreadAccount(ObjectOutputStream out, Socket socket) {
             this.out = out;
             this.socket = socket;
         }
@@ -148,7 +148,7 @@ public class Server {
             try {
                 /*todo creare metodo per ottenere randomicamente un account e restituirlo come se fosse prova_user qua sotto*/
                 //todo den: fatto
-                String prova_user = accountPicker();
+                prova_user = accountPicker();
                 //account = prova_user;
                 out.writeObject(prova_user);
 
@@ -160,25 +160,16 @@ public class Server {
             }
         }
     }
-
-
-
-
-
-
-
-
-
     class ThreadInMail implements Runnable{
         ObjectOutputStream out;
-        String account;
+
         ArrayList<Email> emailList = new ArrayList<>();
 
-        public ThreadInMail(ObjectOutputStream out,String account){this.out=out;this.account=account;}
+        public ThreadInMail(ObjectOutputStream out){this.out=out;}
         @Override
         public void run(){
             try{
-                emailList = jSonReader("Entrata", account);
+                emailList = jSonReader("Entrata");
                 System.out.println(emailList);
                 out.writeObject(emailList);
                 Platform.runLater(() -> logList.add("Mail In Entrata ricevuta da"));
@@ -234,33 +225,21 @@ public class Server {
                 while (true) {
                     // Si blocca finchè non riceve qualcosa, va avanti SOLO SE LO RICEVE
                     socket = serverSocket.accept();
-                    System.out.println(socket);
-                    System.out.println(socket.getPort());
-
                     // Crea un nuovo oggetto che legge oggetti dal flusso di input derivato dalla connessione socket (client)
                     openStreams();
 
                     // Chi sta comunicando con il server, chi sta richiedendo quell'azione
                     account = (String) inputStream.readObject();
-                    System.out.println("Sono nel while del run, valore di account :" + account);
                     // Le azioni che vengono svolte
                     action = (String) inputStream.readObject();
 
                     // In base all'azione si crea un metodo thread runnable utilizzando execute
                     switch (action) {
                         case "account":
-                            executor.execute(new ThreadAccount(outputStream, socket, account));
-
-
-                            //todo TROVARE UN MODO PER USARE LA STRINGA DI ACCOUNT, SERVE PER SCEGLIERE LE MAIL DA MANDARE IN EXECUTE THREADINMAIL
-
-
-
-                            System.out.println("Sono nel case account, valore di account :" + account);
+                            executor.execute(new ThreadAccount(outputStream, socket));
                             break;
                         case "emailIn":
-                            System.out.println("Sono nel case emailIn, valore di account :" + account);
-                            executor.execute(new ThreadInMail(outputStream, account));
+                            executor.execute(new ThreadInMail(outputStream));
                             break;
                         case "emailOut":
                            // executor.execute(new ThreadOutMail(outputStream));
@@ -338,9 +317,10 @@ public class Server {
         }
     }
     //Metodo JsonReader che restituisce le mail in entrata o in uscita in base ad un valore che gli viene passato come parametro(ingresso,uscita)
-    public ArrayList<Email> jSonReader (String mailListType, String account){
+    public ArrayList<Email> jSonReader (String mailListType){
+
         try {
-            System.out.println("Sono entrato in JsonReader , Valore di account: " + account);
+            System.out.println("Sono entrato in JsonReader , Valore di account: " + prova_user);
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
 
@@ -349,7 +329,7 @@ public class Server {
                 String email = emailNode.get("email").asText();
                 JsonNode contenutoNode = emailNode.get("content");
 
-                if(Objects.equals(account,email)){
+                if(Objects.equals(prova_user,email)){
                     // Itera sui contenuti delle del nodo Email
                     for (JsonNode contentNode : contenutoNode) {
                         String sender = contentNode.get("from").asText();
@@ -359,11 +339,11 @@ public class Server {
                         String dateTime = contentNode.get("dateTime").asText();
                         if(mailListType.equals("Entrata")){
                             Email emailObj = new Email(sender, object,receiver, message);
-                            if(Objects.equals(account, receiver)) inMail.add(emailObj);
+                            if(Objects.equals(prova_user, receiver)) inMail.add(emailObj);
                         }
                         else if(mailListType.equals("Uscita")){
                             Email emailObj = new Email(sender, object,receiver, message);
-                            if(Objects.equals(account, sender)) inMail.add(emailObj);
+                            if(Objects.equals(prova_user, sender)) inMail.add(emailObj);
                         }
 
                     }

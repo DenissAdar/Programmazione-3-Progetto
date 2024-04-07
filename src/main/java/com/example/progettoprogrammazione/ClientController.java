@@ -25,8 +25,7 @@ public class ClientController {
     @FXML
     private Button forwardBtn;
 
-    @FXML
-    private Button inMailBtn;
+
 
     @FXML
     private Button inviaBtn;
@@ -48,6 +47,8 @@ public class ClientController {
 
     @FXML
     private Button outMailBtn;
+    @FXML
+    private Button inMailBtn;
     @FXML
     private Label test;
 
