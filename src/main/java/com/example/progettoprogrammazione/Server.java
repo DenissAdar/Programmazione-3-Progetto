@@ -131,13 +131,14 @@ public class Server {
     }
     class ThreadOutMail implements Runnable{
         ObjectOutputStream out;
+        String account;
         ArrayList<Email> emailList = new ArrayList<>();
-        public ThreadOutMail(ObjectOutputStream out){this.out=out;}
+        public ThreadOutMail(ObjectOutputStream out,String account){this.out=out;this.account=account;}
         @Override
         public void run(){
             try{
                 System.out.println("maillist prima di leggere : " + emailList);
-                emailList = jSonReader("Uscita","");
+                emailList = jSonReader("Uscita",account);
                 System.out.println("maillist dopo la lettura : " + emailList);
                 out.writeObject(emailList);
                 out.flush();
@@ -275,7 +276,7 @@ public class Server {
                 String email = emailNode.get("email").asText();
                 JsonNode contenutoNode = emailNode.get("content");
 
-                if(Objects.equals(prova_user,email)){
+                if(Objects.equals(account,email)){
                     // Itera sui contenuti delle del nodo Email
                     for (JsonNode contentNode : contenutoNode) {
                         String sender = contentNode.get("from").asText();
@@ -285,11 +286,11 @@ public class Server {
                         String dateTime = contentNode.get("dateTime").asText();
                         if(mailListType.equals("Entrata")){
                             Email emailObj = new Email(sender, object,receiver, message);
-                            if(Objects.equals(prova_user, receiver)) inMail.add(emailObj);
+                            if(Objects.equals(account, receiver)) inMail.add(emailObj);
                         }
                         else if(mailListType.equals("Uscita")){
                             Email emailObj = new Email(sender, object,receiver, message);
-                            if(Objects.equals(prova_user, sender)) inMail.add(emailObj);
+                            if(Objects.equals(account, sender)) inMail.add(emailObj);
                         }
 
                     }
