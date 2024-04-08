@@ -15,6 +15,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.ListProperty;
@@ -25,9 +26,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Server {
 
+    //private static AtomicInteger uniqueId = new AtomicInteger(0);
     private String jsonFilePath= "src/main/java/com/example/progettoprogrammazione/accounts/account.json";
 
     ServerSocket serverSocket;
@@ -45,6 +48,7 @@ public class Server {
             this.logListContent = FXCollections.observableList(new LinkedList<>());
             this.logList = new SimpleListProperty<>();
             this.logList.set(logListContent);
+
             logListContent.addListener(new ListChangeListener<String>() {
                 @Override
                 public void onChanged(Change<? extends String> change) {
@@ -52,39 +56,13 @@ public class Server {
                 }
             });
             /*TODO: CREARE E GESTIRE HASHMAP PER LA MUTUA ESCLUSIONE DEL FILE JSON DELLE MAIL*/
-            //doHashMap();
             serverSocket = new ServerSocket(6000);
             new Thread(new RunServer()).start();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-/*
-    private void doHashMap() {
-        try {
 
-            FileReader reader = new FileReader(jsonFilePath);
-
-            // Utilizziamo Gson per leggere il JSON
-            Gson gson = new Gson();
-
-            // Definiamo il tipo di oggetto Java in cui vogliamo deserializzare il JSON
-            Type type = new TypeToken<HashMap<String, String>>() {}.getType();
-
-            // Deserializziamo il JSON in una HashMap
-            HashMap<String, String> jsonMap = gson.fromJson(reader, type);
-
-            // Iteriamo sulla mappa deserializzata e creiamo la HashMap di oggetti File
-            for (Map.Entry<String, String> entry : jsonMap.entrySet()) {
-                String key = entry.getKey();
-                String filePath = entry.getValue();
-                File file = new File(filePath);
-                hashMap.put(key, file);
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }*/
 
     public ListProperty<String> getLogList(){
         return logList;
@@ -110,7 +88,7 @@ public class Server {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            int randomNum = ThreadLocalRandom.current().nextInt(0, accountList.length );
+            int randomNum = ThreadLocalRandom.current().nextInt(0, accountList.length);
             return accountList[randomNum];
         }
 
@@ -137,7 +115,6 @@ public class Server {
     class ThreadInMail implements Runnable{
         ObjectOutputStream out;
         ArrayList<Email> emailList = new ArrayList<>();
-
         public ThreadInMail(ObjectOutputStream out){this.out=out;}
         @Override
         public void run(){
