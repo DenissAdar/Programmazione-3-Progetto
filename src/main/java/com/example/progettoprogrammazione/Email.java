@@ -12,7 +12,7 @@ public class Email implements Serializable {
     private String receiver;
     private String idMail;
 
-    public Email(String message, String object, String sender, String receiver) {
+    public Email(String sender, String object, String receiver, String message) {
         this.message = message;
         this.object = object;
         this.sender = sender;
@@ -35,15 +35,21 @@ public class Email implements Serializable {
         return receiver;
     }
 
-    @Override
+/*    @Override
     public String toString() {
         return "Email{" +
-                "message='" + message + '\'' +
+                "Sender='" + sender + '\'' +
                 ", object='" + object + '\'' +
-                ", sender='" + sender + '\'' +
-                ", recevier='" + receiver + '\'' +
+                ", receiver='" + receiver + '\'' +
+                ", Message='" + message + '\'' +
                 '}';
+    }*/
+    @Override
+    public String toString(){
+        return object;
     }
+
+
 /*
     @Override
     public boolean equals(Object o) {
@@ -55,5 +61,12 @@ public class Email implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getMessage(), getObject(), getSender(), getRecevier());
+
     }*/
+
+
+
+
+
+
 }

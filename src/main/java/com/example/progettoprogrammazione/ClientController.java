@@ -1,5 +1,6 @@
 package com.example.progettoprogrammazione;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -24,8 +25,7 @@ public class ClientController {
     @FXML
     private Button forwardBtn;
 
-    @FXML
-    private Button inMailBtn;
+
 
     @FXML
     private Button inviaBtn;
@@ -34,7 +34,7 @@ public class ClientController {
     private TextArea mailBodyTxt;
 
     @FXML
-    private ListView<?> mailList;
+    private ListView<Email> mailList;
 
     @FXML
     private TextField mittenteTxt;
@@ -47,6 +47,8 @@ public class ClientController {
 
     @FXML
     private Button outMailBtn;
+    @FXML
+    private Button inMailBtn;
     @FXML
     private Label test;
 
@@ -61,6 +63,7 @@ public class ClientController {
 
     @FXML
     private Label dataLable;
+    private Client client;
 
     public void setUnvisible(){
 
@@ -71,9 +74,10 @@ public class ClientController {
         connectionNotification.setVisible(false);
         dataTxt.setVisible(false);
         dataLable.setVisible(false);
-
-
     }
+
+
+
     @FXML
     public void newMailCreation(){
         //Da bindare il mittente con la property giusta
@@ -82,8 +86,19 @@ public class ClientController {
         mailBodyTxt.clear();
         setUnvisible();
     }
+    @FXML
+    public void showInMail(){
+        client.socketInMail();
+    }
+
+    @FXML
+    public void showOutMail(){client.socketOutMail();}
     public void init(){
-        new Client("prototipo");
+        client = new Client();
         setUnvisible();
+
+        accountDisplay.textProperty().bind(client.getAccountProperty()) ;
+        mailList.itemsProperty().bind(client.getMailProperty());
+
     }
 }

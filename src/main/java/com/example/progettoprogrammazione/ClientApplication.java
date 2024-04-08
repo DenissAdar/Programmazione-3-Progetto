@@ -23,14 +23,9 @@ public class ClientApplication extends Application {
 
 }
 
-    public static void runClient(String host, int port) {
 
-        Client c = new Client("denis@example.com");
-        c.communicate(host, port);
-
-    }
     public static void main(String[] args) {
         launch();
-        runClient("127.0.0.1", 6000);
+
     }
 }
