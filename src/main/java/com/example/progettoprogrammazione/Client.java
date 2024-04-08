@@ -53,8 +53,6 @@ public class Client {
             @Override
             public void run() {
                 socketUsername();
-                //Crea metododi comunicazione per il pulsante inMail
-                //TODO bindare al pulsante
             }
         });
 
@@ -67,10 +65,6 @@ public class Client {
 
         MailProperty = new SimpleListProperty<Email>(MailContent);
         MailContent = FXCollections.observableList(new LinkedList<>());
-
-
-
-
         MailContent.addListener(new ListChangeListener<Email>() {
             @Override
             public void onChanged(Change<? extends Email> change) {
@@ -83,31 +77,34 @@ public class Client {
 
     }
 
-  /*   */
-    public SimpleStringProperty getSenderProperty(){return senderProperty;}
+    public SimpleStringProperty getSenderProperty(){
+        System.out.println("Valore di SenderProeprty" + senderProperty);
+        return senderProperty;}
     public SimpleStringProperty getReceiverProperty(){return receiverProperty;}
     public SimpleStringProperty getObjectProperty(){return objectProperty;}
     public SimpleStringProperty getMessageProperty(){return messageProperty;}
 
+    //LIST
     public ListProperty<Email> getMailProperty() {
         return MailProperty;
     }
+    public void socketSendMail(Email email){
+        try{
+            System.out.println("Inizio"+email.visualizzaMail());
+            socket = new Socket(InetAddress.getLocalHost(), 6000);
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+            outputStream.flush();
+            outputStream.writeObject(this.getAccount());
+            outputStream.writeObject("send");
+            outputStream.writeObject(email);
 
-    public void setAccountProperty() {
-        try {
-            accountProperty.setValue((String)account);
-        }catch (NullPointerException e){
-            System.out.println("Trovato NullPointer Exception ");
+
+        }catch(IOException  e) {
+            System.out.println("Non è stato possibile connettersi al server");
         }
     }
-    public ObjectProperty<String> getAccountProperty(){
-        return accountProperty;
-    }
 
-
-    // Crea metodo di comunicazione in mail
     public void socketInMail(){
-
         try{
             emailList.clear();
             System.out.println("----------------");
@@ -126,8 +123,6 @@ public class Client {
             System.out.println("Non è stato possibile connettersi al server");
         }
     }
-
-
     public void setMailProperty(){
         MailProperty.clear();
         MailContent.clear();
@@ -142,9 +137,6 @@ public class Client {
             System.out.println("Prova: " + MailProperty);
         }
     }
-
-
-
     public void socketOutMail(){
         try{
             emailList.clear();
@@ -161,13 +153,21 @@ public class Client {
             System.out.println("Non è stato possibile connettersi al server");
         }
     }
-
-
-
     public String getAccount() {
         return account;
     }
 
+    //-----------
+    public void setAccountProperty() {
+        try {
+            accountProperty.setValue((String)account);
+        }catch (NullPointerException e){
+            System.out.println("Trovato NullPointer Exception ");
+        }
+    }
+    public ObjectProperty<String> getAccountProperty(){
+        return accountProperty;
+    }
     public void socketUsername() {
         try {
             socket = new Socket(InetAddress.getLocalHost(), 6000);
@@ -182,15 +182,14 @@ public class Client {
             System.out.println("Non è stato possibile connettersi al server");
         }
     }
+    //-----------
+
     public void openStreams() throws IOException {
         System.out.println("Server Connesso");
         inputStream = new ObjectInputStream(socket.getInputStream());
         outputStream = new ObjectOutputStream(socket.getOutputStream());
         outputStream.flush();
     }
-
-
-
     public void closeStreams() {
         try {
             if(inputStream != null) {
@@ -204,14 +203,14 @@ public class Client {
             e.printStackTrace();
         }
     }
-
     public void chiusura(){
         try{
-            System.out.println("Sono nel metodo chiusura");
-        outputStream = new ObjectOutputStream(socket.getOutputStream());
-        outputStream.flush();
-        outputStream.writeObject("");
-        outputStream.writeObject("exit");
+            socket = new Socket(InetAddress.getLocalHost(), 6000);
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+            outputStream.flush();
+            outputStream.writeObject("");
+            outputStream.writeObject("exit");
+            closeStreams();
         }catch(IOException e) {
             System.out.println("Non è stato possibile connettersi al server");
         }

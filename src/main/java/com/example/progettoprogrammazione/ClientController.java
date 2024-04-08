@@ -8,6 +8,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 // Come funzionano i bottoni degli OnAction
 public class ClientController {
     @FXML
@@ -69,7 +73,7 @@ public class ClientController {
     private Client client;
 
     public void setUnvisible(){
-
+        inviaBtn.setVisible(false);
         replyBtn.setVisible(false);
         replyAllBtn.setVisible(false);
         forwardBtn.setVisible(false);
@@ -84,10 +88,17 @@ public class ClientController {
     @FXML
     public void newMailCreation(){
         //Da bindare il mittente con la property giusta
+        mittenteTxt.textProperty().setValue(accountDisplay.textProperty().getValue());
+        mittenteTxt.setEditable(false);
         destinatarioTxt.clear();
         oggettoTxt.clear();
         mailBodyTxt.clear();
         setUnvisible();
+        inviaBtn.setVisible(true);
+        destinatarioTxt.setEditable(true);
+        oggettoTxt.setEditable(true);
+        mailBodyTxt.setEditable(true);
+        dataTxt.setEditable(true);
     }
     @FXML
     public void showInMail(){
@@ -100,22 +111,39 @@ public class ClientController {
     @FXML
     public void displayMail(){
 
-        mailList.setOnMouseClicked(new ListViewHandler(){
-            @Override
-            public void handle(javafx.scene.input.MouseEvent event) {
-                System.out.println(mailList.getItems());
+        Email selectedMail = mailList.getSelectionModel().getSelectedItem();
 
-            }
-        });
+        dataLable.setVisible(true);
+        dataTxt.setVisible(true);
 
+        mittenteTxt.textProperty().setValue(selectedMail.getSender()) ;
+        destinatarioTxt.textProperty().setValue(selectedMail.getRecevier())  ;
+        oggettoTxt.textProperty().setValue(selectedMail.getObject()) ;
+        mailBodyTxt.textProperty().set(selectedMail.getMessage());
+        dataTxt.textProperty().setValue(selectedMail.getDate());
+
+        mittenteTxt.setEditable(false);
+        destinatarioTxt.setEditable(false);
+        oggettoTxt.setEditable(false);
+        mailBodyTxt.setEditable(false);
+        dataTxt.setEditable(false);
     }
     @FXML
     public void handleWindowClose(){
-        System.out.println("Chisura del Client");
         client.chiusura();
         Platform.exit();
     }
+    @FXML
+    public void sendMail(){
+        Date currentDate = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDateTime = dateFormat.format(currentDate);
+        dataTxt.textProperty().setValue(currentDateTime);
+        Email e = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue() , oggettoTxt.textProperty().getValue() , mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
+        System.out.println("LA NUOVA MAIL CREATA : " + e.visualizzaMail());
 
+        client.socketSendMail(e);
+    }
     public void init(){
         client = new Client();
         setUnvisible();
@@ -125,10 +153,5 @@ public class ClientController {
 
     }
 
-    class ListViewHandler implements EventHandler<MouseEvent> {
-        @Override
-        public void handle(MouseEvent event) {
-            //this method will be overrided in next step
-        }
-    }
+
 }

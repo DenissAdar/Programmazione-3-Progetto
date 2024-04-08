@@ -1,5 +1,6 @@
 package com.example.progettoprogrammazione;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
 // Creo i dati che sono dentro a "contenuto" del file json
@@ -10,13 +11,15 @@ public class Email implements Serializable {
     private String object;
     private String sender;
     private String receiver;
+    private String date;
     private String idMail;
 
-    public Email(String sender, String object, String receiver, String message) {
+    public Email(String sender, String receiver, String object,  String message, String date) {
         this.message = message;
         this.object = object;
         this.sender = sender;
         this.receiver = receiver;
+        this.date = date;
     }
 
     public String getMessage() {
@@ -34,16 +37,18 @@ public class Email implements Serializable {
     public String getRecevier() {
         return receiver;
     }
+    public String getDate(){return date;}
 
-/*    @Override
-    public String toString() {
+
+    public String visualizzaMail() {
         return "Email{" +
                 "Sender='" + sender + '\'' +
-                ", object='" + object + '\'' +
                 ", receiver='" + receiver + '\'' +
+                ", object='" + object + '\'' +
                 ", Message='" + message + '\'' +
+                ", Data='" + date + '\'' +
                 '}';
-    }*/
+    }
     @Override
     public String toString(){
         return object;

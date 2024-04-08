@@ -147,9 +147,19 @@ public class Server {
         }
     }
     class ThreadSend implements Runnable{
-        public ThreadSend(){}
+        ObjectOutputStream out;
+        ObjectInputStream in;
+        String account;
+        Email email;
+        public ThreadSend(ObjectInputStream in,ObjectOutputStream out,String account){this.in=in;this.out=out;this.account=account;}
         @Override
-        public void run(){}
+        public void run(){
+            try{
+                email = (Email) in.readObject();
+                Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getRecevier()));
+            }catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
+
+        }
     }
     class ThreadSendAll implements Runnable{
         public ThreadSendAll(){}
@@ -169,7 +179,9 @@ public class Server {
     class ThreadExit implements Runnable{
         public ThreadExit(){}
         @Override
-        public void run(){Platform.runLater(() -> logList.add(prova_user+" ha fatto il LOGOUT."));
+        public void run(){
+            System.out.println("Sono nel ThreadExit");
+            Platform.runLater(() -> logList.add(prova_user + " ha fatto il LOGOUT."));
         }
     }
 
@@ -202,6 +214,7 @@ public class Server {
                     // Le azioni che vengono svolte
                     action = (String) inputStream.readObject();
 
+
                     // In base all'azione si crea un metodo thread runnable utilizzando execute
                     switch (action) {
                         case "account":
@@ -214,7 +227,8 @@ public class Server {
                             executor.execute(new ThreadOutMail(outputStream,account));
                             break;
                         case "send":
-                            //executor.execute(new ThreadSend(outputStream));
+                            System.out.println("sono nel case send ");
+                            executor.execute(new ThreadSend(inputStream, outputStream, account));
                             break;
                         case "sendAll":
                             //executor.execute(new ThreadSendAll(outputStream));
@@ -226,6 +240,7 @@ public class Server {
                             //executor.execute(new ThreadDeleteAll(outputStream));
                             break;
                         case "exit":
+                            System.out.println("sono nel case");
                             executor.execute(new ThreadExit());
                             break;
 
@@ -285,11 +300,11 @@ public class Server {
                         String message = contentNode.get("text").asText();
                         String dateTime = contentNode.get("dateTime").asText();
                         if(mailListType.equals("Entrata")){
-                            Email emailObj = new Email(sender, object,receiver, message);
+                            Email emailObj = new Email(sender, object,receiver, message, dateTime);
                             if(Objects.equals(account, receiver)) inMail.add(emailObj);
                         }
                         else if(mailListType.equals("Uscita")){
-                            Email emailObj = new Email(sender, object,receiver, message);
+                            Email emailObj = new Email(sender, object,receiver, message, dateTime);
                             if(Objects.equals(account, sender)) inMail.add(emailObj);
                         }
 

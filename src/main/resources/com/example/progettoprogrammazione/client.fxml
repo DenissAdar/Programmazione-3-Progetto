@@ -11,7 +11,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="758.0" prefWidth="899.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.progettoprogrammazione.ClientController">
    <children>
-      <ListView fx:id="mailList" layoutX="21.0" layoutY="143.0" prefHeight="500.0" prefWidth="320.0" AnchorPane.leftAnchor="20.0"  />
+      <ListView fx:id="mailList" layoutX="21.0" layoutY="143.0" prefHeight="500.0" prefWidth="320.0" AnchorPane.leftAnchor="20.0"  onMouseClicked="#displayMail"/>
       <Label fx:id="connectionNotification" layoutX="88.0" layoutY="700.0" text="Errore di Connessione al Server" textFill="RED" />
       <Label fx:id="test" layoutX="475.0" layoutY="82.0" text="Mittente: " AnchorPane.leftAnchor="430.0" AnchorPane.topAnchor="90.0">
          <font>
@@ -41,7 +41,7 @@
       <Button fx:id="replyBtn" layoutX="422.0" layoutY="671.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="69.0" text="Reply" AnchorPane.topAnchor="671.0" />
       <Button fx:id="replyAllBtn" layoutX="515.0" layoutY="671.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="69.0" text="Reply All" AnchorPane.topAnchor="671.0" />
       <Button fx:id="deleteBtn" contentDisplay="CENTER" layoutX="805.0" layoutY="670.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="69.0" text="Elimina" textOverrun="CENTER_ELLIPSIS" AnchorPane.topAnchor="670.0" />
-      <Button fx:id="inviaBtn" layoutX="608.0" layoutY="670.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="98.0" text="Invia" textAlignment="CENTER" underline="true" AnchorPane.topAnchor="670.0" />
+      <Button fx:id="inviaBtn" layoutX="608.0" layoutY="670.0" mnemonicParsing="false" onAction="#sendMail" prefHeight="30.0" prefWidth="98.0" text="Invia" textAlignment="CENTER" underline="true" AnchorPane.topAnchor="670.0" />
       <Button fx:id="forwardBtn" layoutX="725.0" layoutY="670.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="69.0" text="Forward" AnchorPane.topAnchor="670.0" />
       <Separator layoutX="424.0" layoutY="7.0" orientation="VERTICAL" prefHeight="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="380.0" AnchorPane.topAnchor="80.0" />
       <Separator layoutY="81.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0" />
