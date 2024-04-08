@@ -35,7 +35,7 @@ public class Email implements Serializable {
         return receiver;
     }
 
-    @Override
+/*    @Override
     public String toString() {
         return "Email{" +
                 "Sender='" + sender + '\'' +
@@ -43,7 +43,13 @@ public class Email implements Serializable {
                 ", receiver='" + receiver + '\'' +
                 ", Message='" + message + '\'' +
                 '}';
+    }*/
+    @Override
+    public String toString(){
+        return object;
     }
+
+
 /*
     @Override
     public boolean equals(Object o) {
@@ -55,25 +61,6 @@ public class Email implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getMessage(), getObject(), getSender(), getRecevier());
-
-        Server Connesso
-Server Connesso
-Sono entrato in JsonReader , Valore di account: gaia@example.com
-Valore di Receiver in jsondenis@example.com
-Valore di Receiver in jsonmarius@example.com
-Valore di Receiver in jsongaia@example.com
-Attenzione qua ingresso [Email{Sender='marius@example.com', object='MARIUS', receiver='gaia@example.com', Message='TESTO3'}]
-Server Connesso
-Sono entrato in JsonReader , Valore di account: gaia@example.com
-Valore di Receiver in jsondenis@example.com
-Valore di Receiver in jsonmarius@example.com
-Valore di Receiver in jsongaia@example.com
-Attenzione qua uscita[Email{Sender='marius@example.com', object='MARIUS', receiver='gaia@example.com', Message='TESTO3'}, Email{Sender='gaia@example.com', object='GAIA', receiver='denis@example.com', Message='TESTO1'}, Email{Sender='gaia@example.com', object='GAIA2', receiver='marius@example.com', Message='TESTO2'}]
-
-
-
-
-
 
     }*/
 

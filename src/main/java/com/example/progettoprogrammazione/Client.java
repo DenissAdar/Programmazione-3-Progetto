@@ -5,9 +5,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.*;
-
 import java.net.InetAddress;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,8 +16,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableStringValue;
 import javafx.collections.FXCollections;
@@ -32,8 +28,6 @@ public class Client {
     private Socket socket = null;
     private ObjectOutputStream outputStream = null;
     private ObjectInputStream inputStream = null;
-    private int id;
-    private final int MAXATTEMPTS = 5;
 
     private String account;
     private ObjectProperty<String> accountProperty = new SimpleObjectProperty<>();

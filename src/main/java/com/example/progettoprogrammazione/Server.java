@@ -8,6 +8,12 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,7 +25,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import java.util.concurrent.ThreadLocalRandom;
-//IN MESSAGE CI STA IL MITTENTE
 
 public class Server {
 
@@ -47,12 +52,39 @@ public class Server {
                 }
             });
             /*TODO: CREARE E GESTIRE HASHMAP PER LA MUTUA ESCLUSIONE DEL FILE JSON DELLE MAIL*/
+            //doHashMap();
             serverSocket = new ServerSocket(6000);
             new Thread(new RunServer()).start();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+/*
+    private void doHashMap() {
+        try {
+
+            FileReader reader = new FileReader(jsonFilePath);
+
+            // Utilizziamo Gson per leggere il JSON
+            Gson gson = new Gson();
+
+            // Definiamo il tipo di oggetto Java in cui vogliamo deserializzare il JSON
+            Type type = new TypeToken<HashMap<String, String>>() {}.getType();
+
+            // Deserializziamo il JSON in una HashMap
+            HashMap<String, String> jsonMap = gson.fromJson(reader, type);
+
+            // Iteriamo sulla mappa deserializzata e creiamo la HashMap di oggetti File
+            for (Map.Entry<String, String> entry : jsonMap.entrySet()) {
+                String key = entry.getKey();
+                String filePath = entry.getValue();
+                File file = new File(filePath);
+                hashMap.put(key, file);
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }*/
 
     public ListProperty<String> getLogList(){
         return logList;

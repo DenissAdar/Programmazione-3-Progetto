@@ -74,9 +74,10 @@ public class ClientController {
         connectionNotification.setVisible(false);
         dataTxt.setVisible(false);
         dataLable.setVisible(false);
-
-
     }
+
+
+
     @FXML
     public void newMailCreation(){
         //Da bindare il mittente con la property giusta
@@ -89,6 +90,7 @@ public class ClientController {
     public void showInMail(){
         client.socketInMail();
     }
+
     @FXML
     public void showOutMail(){client.socketOutMail();}
     public void init(){
@@ -97,8 +99,6 @@ public class ClientController {
 
         accountDisplay.textProperty().bind(client.getAccountProperty()) ;
         mailList.itemsProperty().bind(client.getMailProperty());
-
-
 
     }
 }
