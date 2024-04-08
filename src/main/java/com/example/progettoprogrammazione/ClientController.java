@@ -96,7 +96,7 @@ public class ClientController {
         setUnvisible();
 
         accountDisplay.textProperty().bind(client.getAccountProperty()) ;
-        mailList.itemsProperty().bind(client.getEmailProperty());
+        mailList.itemsProperty().bind(client.getMailProperty());
 
 
 

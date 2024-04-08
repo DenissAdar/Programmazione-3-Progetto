@@ -29,28 +29,26 @@ import javafx.collections.ObservableList;
 // TODO Gaia - Dobbiamo iniziare a fare i thread per far funzionare il tutto
 public class Client {
 
-    Socket socket = null;
-    ObjectOutputStream outputStream = null;
-    ObjectInputStream inputStream = null;
+    private Socket socket = null;
+    private ObjectOutputStream outputStream = null;
+    private ObjectInputStream inputStream = null;
     private int id;
     private final int MAXATTEMPTS = 5;
 
     private String account;
     private ObjectProperty<String> accountProperty = new SimpleObjectProperty<>();
-    ArrayList<Email> inMailList = new ArrayList<>();
 
 
-    private ListProperty<Email> inMail;
-    private ListProperty<Email> outMail;
-    private ObservableList<Email> inMailContent;
-    private ObservableList<Email> outMailContent;
 
+    private ListProperty<Email> MailProperty;
+
+    private ObservableList<Email> MailContent;
     private SimpleStringProperty senderProperty;
     private SimpleStringProperty receiverProperty;
     private SimpleStringProperty objectProperty;
     private SimpleStringProperty messageProperty;
+    private ArrayList<Email> emailList = new ArrayList<>();
 
-    private ObjectInputStream in;
 
     Thread t1;
 
@@ -68,27 +66,18 @@ public class Client {
 
         t1.start();
 
-        //this.account = account;
         senderProperty = new SimpleStringProperty();
         receiverProperty = new SimpleStringProperty();
         objectProperty = new SimpleStringProperty();
         messageProperty = new SimpleStringProperty();
 
-        inMail = new SimpleListProperty<Email>(inMailContent);
-        inMailContent = FXCollections.observableList(new LinkedList<>());
+        MailProperty = new SimpleListProperty<Email>(MailContent);
+        MailContent = FXCollections.observableList(new LinkedList<>());
 
 
-        outMail = new SimpleListProperty<>(outMailContent);
-        outMailContent = FXCollections.observableList(new LinkedList<>());
 
-        inMailContent.addListener(new ListChangeListener<Email>() {
-            @Override
-            public void onChanged(Change<? extends Email> change) {
 
-            }
-        });
-
-        outMailContent.addListener(new ListChangeListener<Email>() {
+        MailContent.addListener(new ListChangeListener<Email>() {
             @Override
             public void onChanged(Change<? extends Email> change) {
 
@@ -96,130 +85,45 @@ public class Client {
         });
 
 
+
+
     }
-
-
-
-        //CONNESSIONE SERVER---------------------------------------------------------------------------------------------------------------
-        //todo vedi se si deve eliminare sta roba che qui non arriva mai
-        private void connectToServer(String host, int port) throws IOException {
-            socket = new Socket(host, port);
-            outputStream = new ObjectOutputStream(socket.getOutputStream());
-            outputStream.flush();
-            inputStream = new ObjectInputStream(socket.getInputStream());
-            System.out.println("[Client "+ getAccount() + "] Connesso");
-        }
-
-        public void communicate(String host, int port){
-            int attempts = 0;
-            boolean success = false;
-            while(attempts < MAXATTEMPTS && !success) {
-                attempts += 1;
-                System.out.println("[Client " + getAccount()+ "] Tentativo nr. " + attempts);
-                success = tryCommunication(host, port);
-                if(success)
-                    continue;
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        private boolean tryCommunication(String host, int port) {
-            try {
-                connectToServer(host, port);
-                outputStream.writeObject(getAccount());
-                outputStream.flush();
-                Thread.sleep(5000);
-                return true;
-            } catch (ConnectException ce) {
-                // nothing to be done
-                return false;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } finally {
-                closeConnections();
-            }
-        }
-
-    private void closeConnections() {
-        if (socket != null) {
-            try {
-                inputStream.close();
-                outputStream.close();
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    //CONNESSIONE SERVER---------------------------------------------------------------------------------------------------------------
-
   /*   */
     public SimpleStringProperty getSenderProperty(){return senderProperty;}
     public SimpleStringProperty getReceiverProperty(){return receiverProperty;}
     public SimpleStringProperty getObjectProperty(){return objectProperty;}
     public SimpleStringProperty getMessageProperty(){return messageProperty;}
-    public ListProperty<Email> getInMailProperty() {
-        return inMail;
-    }
-    //Aggiunto da DEN quando ho creato il metodo di controllo per l'inserimento in Lista
-    public ListProperty<Email> getOutMailProperty() {
-        return outMail;
+    public ListProperty<Email> getMailProperty() {
+        return MailProperty;
     }
 
-    // Metodo aggiorna le email in entrata o in uscita (fa il reload solo delle nuove) aggiorna in base a ciò che estrae dal server
-    public void setInOutEmail(ArrayList<Email> email, String inOut){
-        if(inOut == "in")
-        {
-            Platform.runLater(new Runnable()
-            {
-                @Override
-                public void run() {
-                    inMail.clear();
-                    inMail.addAll(email);
-
-                }
-            });
+    public void setAccountProperty() {
+        try {
+            accountProperty.setValue((String)account);
+        }catch (NullPointerException e){
+            System.out.println("Trovato NullPointer Exception ");
         }
-        else
-        {
-            Platform.runLater(new Runnable()
-            {
-                @Override
-                public void run() {
-                    outMail.clear();
-                    outMail.addAll(email);
-
-                }
-            });
-
-        }
-
-
-
+    }
+    public ObjectProperty<String> getAccountProperty(){
+        return accountProperty;
     }
 
-    ArrayList<Email> emailList = new ArrayList<>();
+
     // Crea metodo di comunicazione in mail
     public void socketInMail(){
 
         try{
+            emailList.clear();
             System.out.println("----------------");
-            socket = new Socket(InetAddress.getLocalHost(), 6000);
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            out.flush();
-            out.writeObject("");
-            out.writeObject("emailIn");
-            in = new ObjectInputStream(socket.getInputStream());
-            emailList = (ArrayList<Email>) in.readObject();
+           socket = new Socket(InetAddress.getLocalHost(), 6000);
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+            outputStream.flush();
+            outputStream.writeObject("");
+            outputStream.writeObject("emailIn");
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            emailList = (ArrayList<Email>) inputStream.readObject();
             Platform.runLater(()-> setMailProperty());
+
 
 
         }catch(IOException | ClassNotFoundException e) {
@@ -232,32 +136,36 @@ public class Client {
         //TODO ATTENZIONE!!!!
         // le due righe successive riescono a ripulire la listview, il problema e' che quando si ricarica si ricaricano anche le mail vecchie
         // (il che e' diverso dal fatto che le mail si aggiungono alla listview che non si ripulisce )
-        inMail.clear();
-        inMailContent.clear();
-        inMail.set(inMailContent);
-        if(inMailContent.isEmpty()) {
+        MailProperty.clear();
+        MailContent.clear();
+        MailProperty.set(MailContent);
+        System.out.println("EmailList quando sono entrano in setMailProperty " + emailList);
+
+        if(MailContent.isEmpty()) {
             for (int i = 0; i < emailList.size(); i++) {
                 System.out.println(":: " + emailList.get(i));
-                inMailContent.add(emailList.get(i));
+                MailContent.add(emailList.get(i));
             }
-            inMail.set(inMailContent);
-            System.out.println("Prova: " + inMail);
+            MailProperty.set(MailContent);
+            System.out.println("Prova: " + MailProperty);
         }
+        System.out.println("EmailList quando sto per uscire da setMailProeprty" + emailList);
     }
-    public ListProperty<Email> getEmailProperty() {
-        return inMail;
-    }
+
 
 
     public void socketOutMail(){
         try{
+            emailList.clear();
+            System.out.println("EmailList all'inizio di socket Out"+emailList);
             socket = new Socket(InetAddress.getLocalHost(), 6000);
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            out.flush();
-            out.writeObject("");
-            out.writeObject("emailOut");
-            in = new ObjectInputStream(socket.getInputStream());
-            emailList = (ArrayList<Email>) in.readObject();
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+            outputStream.flush();
+            outputStream.writeObject("");
+            outputStream.writeObject("emailOut");
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            emailList = (ArrayList<Email>) inputStream.readObject();
+            System.out.println("EmaiList dopo che ho caricato le cose dal server " + emailList);
             Platform.runLater(()-> setMailProperty());
 
         }catch(IOException | ClassNotFoundException e) {
@@ -270,30 +178,42 @@ public class Client {
     public String getAccount() {
         return account;
     }
+
     public void socketUsername() {
         try {
             socket = new Socket(InetAddress.getLocalHost(), 6000);
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            out.flush();
-            out.writeObject("");
-            out.writeObject("account");
-            in = new ObjectInputStream(socket.getInputStream());
-            account = (String) in.readObject();
+            outputStream= new ObjectOutputStream(socket.getOutputStream());
+            outputStream.flush();
+            outputStream.writeObject("");
+            outputStream.writeObject("account");
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            account = (String) inputStream.readObject();
             System.out.println(account + "è connesso anche al client");
             Platform.runLater( ()-> setAccountProperty());
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server");
         }
     }
-    public void setAccountProperty() {
-        try {
-            accountProperty.setValue((String)account);
-        }catch (NullPointerException e){
-            System.out.println("Trovato NullPointer Exception ");
-        }
-    }
-    public ObjectProperty<String> getAccountProperty(){
-        return accountProperty;
+    public void openStreams() throws IOException {
+        System.out.println("Server Connesso");
+        inputStream = new ObjectInputStream(socket.getInputStream());
+        outputStream = new ObjectOutputStream(socket.getOutputStream());
+        outputStream.flush();
     }
 
+    public void closeStreams() {
+        try {
+            if(inputStream != null) {
+                inputStream.close();
+            }
+
+            if(outputStream != null) {
+                outputStream.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
+
+

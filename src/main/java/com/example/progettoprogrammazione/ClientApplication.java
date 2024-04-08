@@ -23,14 +23,9 @@ public class ClientApplication extends Application {
 
 }
 
-    public static void runClient(String host, int port) {
-        //ho tolto il parametro che si da a client perchè tanto non serve inserire l'account
-        Client c = new Client();
-        c.communicate(host, port);
 
-    }
     public static void main(String[] args) {
         launch();
-        runClient("127.0.0.1", 6000);
+
     }
 }

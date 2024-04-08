@@ -32,7 +32,6 @@ public class Server {
     private ObservableList<String> logListContent;
 
     ArrayList<Email> inMail = new ArrayList<>();
-    ArrayList<Email> outMail = new ArrayList<>();
     private String prova_user;
 
 
@@ -47,8 +46,6 @@ public class Server {
 
                 }
             });
-
-
             /*TODO: CREARE E GESTIRE HASHMAP PER LA MUTUA ESCLUSIONE DEL FILE JSON DELLE MAIL*/
             serverSocket = new ServerSocket(6000);
             new Thread(new RunServer()).start();
@@ -61,62 +58,8 @@ public class Server {
         return logList;
     }
 
-    //Conessione---------------------------------------------------------------------------------
-    /*public void listen(int port) {
 
-        try {
-            int id = 1;
-            ServerSocket serverSocket = new ServerSocket(port);
-            while (true) {
-                System.out.println("ascolto");
-                Socket incoming = serverSocket.accept();
-                //Classe dei runnable thread---
-                Runnable r = new RunServer(incoming,id);
-                new Thread(r).start();
-                id++;
-                //serveClient(serverSocket);
-
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
-    //Conessione---------------------------------------------------------------------------------
-
-   /* public void jSonReader (){
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
-
-            // Itera sui nodi del file JSON
-            for (JsonNode emailNode : rootNode) {
-                String email = emailNode.get("email").asText();
-                JsonNode contenutoNode = emailNode.get("content");
-
-                // Itera sui contenuti delle email
-                for (JsonNode contentNode : contenutoNode) {
-                    String sender = contentNode.get("from").asText();
-                    String receiver = contentNode.get("to").asText();
-                    String object = contentNode.get("object").asText();
-                    String message = contentNode.get("text").asText();
-                    String dateTime = contentNode.get("dateTime").asText();
-
-                    // Crea un oggetto Email e lo aggiunge alla lista corretta
-                    Email emailObj = new Email(sender,  object,receiver, message);
-
-                    //Aggiunto da DEN quando ho creato il metodo di controllo per l'inserimento in Lista
-                    //if(Objects.equals(this.account, sender))       outMail.add(emailObj);
-                    //else if(Objects.equals(this.account, receiver)) inMail.add(emailObj);
-                }
-
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /*Decide randomicamente quale username dare ad un client appena creato*/
+    //Decide randomicamente quale username dare ad un client appena creato
     class ThreadAccount implements Runnable{//TODO FARE IN MODO DA RESTITUIRE L'ACCOUNT CHE CI SERVE IN ALTRE COSE
         ObjectOutputStream out;
         Socket socket;
@@ -149,7 +92,6 @@ public class Server {
                 /*todo creare metodo per ottenere randomicamente un account e restituirlo come se fosse prova_user qua sotto*/
                 //todo den: fatto
                 prova_user = accountPicker();
-                //account = prova_user;
                 out.writeObject(prova_user);
 
                 Platform.runLater(() -> logList.add(prova_user+" ha fatto l'accesso.")); /*loglist è l'elemento LOG dell'applicazione di sever lato grafico */
@@ -183,8 +125,9 @@ public class Server {
         @Override
         public void run(){
             try{
+                System.out.println("maillist prima di leggere : " + emailList);
                 emailList = jSonReader("Uscita");
-                System.out.println("Attenzione qua uscita"+emailList);
+                System.out.println("maillist dopo la lettura : " + emailList);
                 out.writeObject(emailList);
                 out.flush();
                 Platform.runLater(() -> logList.add("L'utente: " + prova_user + " ha richiesto le mail in uscita"));
@@ -303,7 +246,7 @@ public class Server {
     public ArrayList<Email> jSonReader (String mailListType){
 
         try {
-            System.out.println("Sono entrato in JsonReader , Valore di account: " + prova_user);
+            inMail.clear();
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
 
@@ -317,7 +260,6 @@ public class Server {
                     for (JsonNode contentNode : contenutoNode) {
                         String sender = contentNode.get("from").asText();
                         String receiver = contentNode.get("to").asText();
-                        System.out.println("Valore di Receiver in json" + receiver);
                         String object = contentNode.get("object").asText();
                         String message = contentNode.get("text").asText();
                         String dateTime = contentNode.get("dateTime").asText();
