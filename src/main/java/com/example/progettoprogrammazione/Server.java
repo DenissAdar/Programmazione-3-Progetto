@@ -39,7 +39,8 @@ public class Server {
     private ListProperty<String> logList; /*binding in sever controller*/
     private ObservableList<String> logListContent;
 
-    ArrayList<Email> inMail = new ArrayList<>();
+    //ArrayList<Email> inMail = new ArrayList<>();
+    ArrayList<Email> outMail = new ArrayList<>();
     private String prova_user;
 
 
@@ -114,12 +115,13 @@ public class Server {
     }
     class ThreadInMail implements Runnable{
         ObjectOutputStream out;
+        String account;
         ArrayList<Email> emailList = new ArrayList<>();
-        public ThreadInMail(ObjectOutputStream out){this.out=out;}
+        public ThreadInMail(ObjectOutputStream out, String account){this.out=out;this.account=account;}
         @Override
         public void run(){
             try{
-                emailList = jSonReader("Entrata");
+                emailList = jSonReader("Entrata",account);
                 System.out.println("Attenzione qua ingresso "+emailList);
                 out.writeObject(emailList);
                 out.flush();
@@ -135,7 +137,7 @@ public class Server {
         public void run(){
             try{
                 System.out.println("maillist prima di leggere : " + emailList);
-                emailList = jSonReader("Uscita");
+                emailList = jSonReader("Uscita","");
                 System.out.println("maillist dopo la lettura : " + emailList);
                 out.writeObject(emailList);
                 out.flush();
@@ -162,6 +164,12 @@ public class Server {
         public ThreadDeleteAll(){}
         @Override
         public void run(){}
+    }
+    class ThreadExit implements Runnable{
+        public ThreadExit(){}
+        @Override
+        public void run(){Platform.runLater(() -> logList.add(prova_user+" ha fatto il LOGOUT."));
+        }
     }
 
     class RunServer implements Runnable{
@@ -199,10 +207,10 @@ public class Server {
                             executor.execute(new ThreadAccount(outputStream, socket));
                             break;
                         case "emailIn":
-                            executor.execute(new ThreadInMail(outputStream));
+                            executor.execute(new ThreadInMail(outputStream,account));
                             break;
                         case "emailOut":
-                            executor.execute(new ThreadOutMail(outputStream));
+                            executor.execute(new ThreadOutMail(outputStream,account));
                             break;
                         case "send":
                             //executor.execute(new ThreadSend(outputStream));
@@ -215,6 +223,9 @@ public class Server {
                             break;
                         case "deleteAll":
                             //executor.execute(new ThreadDeleteAll(outputStream));
+                            break;
+                        case "exit":
+                            executor.execute(new ThreadExit());
                             break;
 
                         default:
@@ -252,8 +263,8 @@ public class Server {
         }
     }
     //Metodo JsonReader che restituisce le mail in entrata o in uscita in base ad un valore che gli viene passato come parametro(ingresso,uscita)
-    public ArrayList<Email> jSonReader (String mailListType){
-
+    public synchronized ArrayList<Email>  jSonReader (String mailListType, String account){
+        ArrayList<Email> inMail = new ArrayList<>();
         try {
             inMail.clear();
             ObjectMapper objectMapper = new ObjectMapper();

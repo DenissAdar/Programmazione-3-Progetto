@@ -11,7 +11,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="758.0" prefWidth="899.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.progettoprogrammazione.ClientController">
    <children>
-      <ListView fx:id="mailList" layoutX="21.0" layoutY="143.0" prefHeight="500.0" prefWidth="320.0" AnchorPane.leftAnchor="20.0" />
+      <ListView fx:id="mailList" layoutX="21.0" layoutY="143.0" prefHeight="500.0" prefWidth="320.0" AnchorPane.leftAnchor="20.0"  />
       <Label fx:id="connectionNotification" layoutX="88.0" layoutY="700.0" text="Errore di Connessione al Server" textFill="RED" />
       <Label fx:id="test" layoutX="475.0" layoutY="82.0" text="Mittente: " AnchorPane.leftAnchor="430.0" AnchorPane.topAnchor="90.0">
          <font>

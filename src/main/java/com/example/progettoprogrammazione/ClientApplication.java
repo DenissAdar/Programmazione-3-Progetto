@@ -18,9 +18,9 @@ public class ClientApplication extends Application {
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
-
-
-
+        /*stage.setOnCloseRequest(windowEvent -> {
+            controller.handleWindowClose();
+        });*/
 }
 
 

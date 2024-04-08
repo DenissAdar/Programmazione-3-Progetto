@@ -1,9 +1,12 @@
 package com.example.progettoprogrammazione;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 
 // Come funzionano i bottoni degli OnAction
 public class ClientController {
@@ -93,6 +96,26 @@ public class ClientController {
 
     @FXML
     public void showOutMail(){client.socketOutMail();}
+
+    @FXML
+    public void displayMail(){
+
+        mailList.setOnMouseClicked(new ListViewHandler(){
+            @Override
+            public void handle(javafx.scene.input.MouseEvent event) {
+                System.out.println(mailList.getItems());
+
+            }
+        });
+
+    }
+    @FXML
+    public void handleWindowClose(){
+        System.out.println("Chisura del Client");
+        client.chiusura();
+        Platform.exit();
+    }
+
     public void init(){
         client = new Client();
         setUnvisible();
@@ -100,5 +123,12 @@ public class ClientController {
         accountDisplay.textProperty().bind(client.getAccountProperty()) ;
         mailList.itemsProperty().bind(client.getMailProperty());
 
+    }
+
+    class ListViewHandler implements EventHandler<MouseEvent> {
+        @Override
+        public void handle(MouseEvent event) {
+            //this method will be overrided in next step
+        }
     }
 }

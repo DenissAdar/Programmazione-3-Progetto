@@ -82,11 +82,13 @@ public class Client {
 
 
     }
+
   /*   */
     public SimpleStringProperty getSenderProperty(){return senderProperty;}
     public SimpleStringProperty getReceiverProperty(){return receiverProperty;}
     public SimpleStringProperty getObjectProperty(){return objectProperty;}
     public SimpleStringProperty getMessageProperty(){return messageProperty;}
+
     public ListProperty<Email> getMailProperty() {
         return MailProperty;
     }
@@ -109,10 +111,10 @@ public class Client {
         try{
             emailList.clear();
             System.out.println("----------------");
-           socket = new Socket(InetAddress.getLocalHost(), 6000);
+            socket = new Socket(InetAddress.getLocalHost(), 6000);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
-            outputStream.writeObject("");
+            outputStream.writeObject(this.getAccount());
             outputStream.writeObject("emailIn");
             inputStream = new ObjectInputStream(socket.getInputStream());
             emailList = (ArrayList<Email>) inputStream.readObject();
@@ -127,13 +129,9 @@ public class Client {
 
 
     public void setMailProperty(){
-        //TODO ATTENZIONE!!!!
-        // le due righe successive riescono a ripulire la listview, il problema e' che quando si ricarica si ricaricano anche le mail vecchie
-        // (il che e' diverso dal fatto che le mail si aggiungono alla listview che non si ripulisce )
         MailProperty.clear();
         MailContent.clear();
         MailProperty.set(MailContent);
-        System.out.println("EmailList quando sono entrano in setMailProperty " + emailList);
 
         if(MailContent.isEmpty()) {
             for (int i = 0; i < emailList.size(); i++) {
@@ -143,7 +141,6 @@ public class Client {
             MailProperty.set(MailContent);
             System.out.println("Prova: " + MailProperty);
         }
-        System.out.println("EmailList quando sto per uscire da setMailProeprty" + emailList);
     }
 
 
@@ -151,15 +148,13 @@ public class Client {
     public void socketOutMail(){
         try{
             emailList.clear();
-            System.out.println("EmailList all'inizio di socket Out"+emailList);
             socket = new Socket(InetAddress.getLocalHost(), 6000);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
-            outputStream.writeObject("");
+            outputStream.writeObject(this.getAccount());
             outputStream.writeObject("emailOut");
             inputStream = new ObjectInputStream(socket.getInputStream());
             emailList = (ArrayList<Email>) inputStream.readObject();
-            System.out.println("EmaiList dopo che ho caricato le cose dal server " + emailList);
             Platform.runLater(()-> setMailProperty());
 
         }catch(IOException | ClassNotFoundException e) {
@@ -182,7 +177,6 @@ public class Client {
             outputStream.writeObject("account");
             inputStream = new ObjectInputStream(socket.getInputStream());
             account = (String) inputStream.readObject();
-            System.out.println(account + "è connesso anche al client");
             Platform.runLater( ()-> setAccountProperty());
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server");
@@ -195,6 +189,8 @@ public class Client {
         outputStream.flush();
     }
 
+
+
     public void closeStreams() {
         try {
             if(inputStream != null) {
@@ -206,6 +202,18 @@ public class Client {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void chiusura(){
+        try{
+            System.out.println("Sono nel metodo chiusura");
+        outputStream = new ObjectOutputStream(socket.getOutputStream());
+        outputStream.flush();
+        outputStream.writeObject("");
+        outputStream.writeObject("exit");
+        }catch(IOException e) {
+            System.out.println("Non è stato possibile connettersi al server");
         }
     }
 }
