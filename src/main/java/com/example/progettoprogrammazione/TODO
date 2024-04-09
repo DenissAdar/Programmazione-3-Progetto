@@ -13,7 +13,7 @@ REGOLE PER CODICE PULITO
 
 COSA MANCA DA FARE
 
-+ jsonWrite - ALl'invio di una mail questa deve essere scritta nel file json
++ jsonWrite - All'invio di una mail questa deve essere scritta nel file json
 
 + Controllo sull'invio della mail
   Una mail non può essere inviata ad un account che non esiste

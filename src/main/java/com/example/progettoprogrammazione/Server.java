@@ -13,6 +13,8 @@ import java.io.File;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -184,11 +186,14 @@ public class Server {
                 accounts = getAccountList(); //Ho un array di Account
 
                 for(int i=0;i<accounts.length;i++){
-                    if(email.getRecevier().equals(accounts[i])) flag=true;
+                    if(email.getRecevier().equals(accounts[i]))
+                        flag=true;
                 }
                 if(flag){
                     Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getRecevier()));
-                    //Metodo che mi carica la mail nel json
+
+                    // Metodo che mi carica la mail nel json
+                    jSonWriter(email,account);
                 }
                 else {
                     Platform.runLater(() -> logList.add("L'utente: " + account + " cerca di mandare un email all'utente " + email.getRecevier() + " che non esiste!"));
@@ -365,6 +370,8 @@ public class Server {
                         String object = contentNode.get("object").asText();
                         String message = contentNode.get("text").asText();
                         String dateTime = contentNode.get("dateTime").asText();
+
+
                         if(mailListType.equals("Entrata")){
                             Email emailObj = new Email(sender, object,receiver, message, dateTime);
                             if(Objects.equals(account, receiver)) inMail.add(emailObj);
@@ -383,20 +390,52 @@ public class Server {
         }
         return inMail;
     }
-/*   public synchronized void jSonWriter(Email email){
-        try{
-            ObjectMapper writeObjectMapper = new ObjectMapper();
-            JsonNode rootNode = writeObjectMapper.readTree(new File(jsonFilePath));
 
-            for (JsonNode emailNode : rootNode) {
-                String email = emailNode.get("email").asText();
-                JsonNode contenutoNode = emailNode.get("content");
 
-            }
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-    }  */
+    // TODO non lo inserisce nelle mail in entrata del destinatario
+     public synchronized void jSonWriter(Email newEmail, String account){
+
+         // Creazione dell'oggetto ObjectMapper
+         ObjectMapper writeObjectMapper = new ObjectMapper();
+
+         try {
+             // Carica il file JSON esistente
+             JsonNode rootNode = (JsonNode) writeObjectMapper.readTree(new File(jsonFilePath));
+
+             // Cerca l'account nel JSON
+             if (rootNode.isArray()) {
+                 ArrayNode accounts = (ArrayNode) rootNode;
+                 for (JsonNode accountNode : accounts) {
+                     String from = accountNode.path("email").asText();
+                     if (from.equals(account)) {
+
+                         // Trovato l'account, aggiungi la nuova email al nodo "content"
+                         ObjectNode newEmailNode = writeObjectMapper.createObjectNode();
+                         newEmailNode.put("from", newEmail.getSender());
+
+                         // TODO inverte oggetto e destinatario
+                         newEmailNode.put("to", newEmail.getRecevier());
+                         newEmailNode.put("object", newEmail.getObject());
+                         newEmailNode.put("text", newEmail.getMessage());
+                         newEmailNode.put("dateTime", newEmail.getDate());
+
+                         ArrayNode contentNode = (ArrayNode) accountNode.path("content");
+                         contentNode.add(newEmailNode);
+
+                         // Salva le modifiche nel file JSON
+                         writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
+                         System.out.println("Email aggiunta con successo per l'account: " + account);
+                     }
+
+                 }
+             }
+
+         } catch (IOException e) {
+             System.err.println("Errore durante la lettura/scrittura del file JSON: " + e.getMessage());
+         }
+     }
+
+
 }
 
 
