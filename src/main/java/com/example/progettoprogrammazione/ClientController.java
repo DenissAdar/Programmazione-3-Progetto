@@ -130,7 +130,7 @@ public class ClientController {
     }
     @FXML
     public void handleWindowClose(){
-        client.chiusura();
+        client.exit();
         Platform.exit();
     }
     @FXML

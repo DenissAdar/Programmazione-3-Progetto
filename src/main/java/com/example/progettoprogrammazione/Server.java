@@ -9,11 +9,6 @@ import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,10 +21,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Server {
-
+    private String[] accounts;
     //private static AtomicInteger uniqueId = new AtomicInteger(0);
     private String jsonFilePath= "src/main/java/com/example/progettoprogrammazione/accounts/account.json";
 
@@ -41,7 +35,7 @@ public class Server {
 
     //ArrayList<Email> inMail = new ArrayList<>();
     ArrayList<Email> outMail = new ArrayList<>();
-    private String prova_user;
+    private String randomUser;
 
 
     public Server(){
@@ -56,7 +50,7 @@ public class Server {
 
                 }
             });
-            /*TODO: CREARE E GESTIRE HASHMAP PER LA MUTUA ESCLUSIONE DEL FILE JSON DELLE MAIL*/
+
             serverSocket = new ServerSocket(6000);
             new Thread(new RunServer()).start();
         } catch (IOException e) {
@@ -70,15 +64,21 @@ public class Server {
     }
 
 
+    public void setAccountList(String[] accountList){
+        this.accounts = accountList;
+    }
+    public String[] getAccountList(){return accounts;}
     //Decide randomicamente quale username dare ad un client appena creato
-    class ThreadAccount implements Runnable{//TODO FARE IN MODO DA RESTITUIRE L'ACCOUNT CHE CI SERVE IN ALTRE COSE
+    class ThreadAccount implements Runnable{
         ObjectOutputStream out;
         Socket socket;
+
+        // Metodo che seleziona un account in maniera randomica
         public String accountPicker()  {
-            //todo: cambiare 3 con il numero degli elementi nell'array
-            String[] accountList = new String[2];
+            String[] accountList = new String[jsonCount()];
             int i=0;
-            //carico un array di account
+
+            // Carico un array di account
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
                 JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
@@ -90,6 +90,7 @@ public class Server {
                 throw new RuntimeException(e);
             }
             int randomNum = ThreadLocalRandom.current().nextInt(0, accountList.length);
+            setAccountList(accountList);
             return accountList[randomNum];
         }
 
@@ -100,12 +101,10 @@ public class Server {
         @Override
         public void run() {
             try {
-                /*todo creare metodo per ottenere randomicamente un account e restituirlo come se fosse prova_user qua sotto*/
-                //todo den: fatto
-                prova_user = accountPicker();
-                out.writeObject(prova_user);
+                randomUser = accountPicker();
+                out.writeObject(randomUser);
 
-                Platform.runLater(() -> logList.add(prova_user+" ha fatto l'accesso.")); /*loglist è l'elemento LOG dell'applicazione di sever lato grafico */
+                Platform.runLater(() -> logList.add(randomUser +" ha fatto l'accesso.")); /*loglist è l'elemento LOG dell'applicazione di sever lato grafico */
                 socket.close(); /*todo da rivedere chiusura*/
 
             } catch (IOException e) {
@@ -113,11 +112,18 @@ public class Server {
             }
         }
     }
+
+    // Metodo che gestisce le email in entrata
     class ThreadInMail implements Runnable{
         ObjectOutputStream out;
         String account;
         ArrayList<Email> emailList = new ArrayList<>();
-        public ThreadInMail(ObjectOutputStream out, String account){this.out=out;this.account=account;}
+
+        public ThreadInMail(ObjectOutputStream out, String account){
+            this.out = out;
+            this.account = account;
+        }
+
         @Override
         public void run(){
             try{
@@ -125,15 +131,22 @@ public class Server {
                 System.out.println("Attenzione qua ingresso "+emailList);
                 out.writeObject(emailList);
                 out.flush();
-                Platform.runLater(() -> logList.add("L'utente: " + prova_user + " ha richiesto le mail in ingresso"));
+                Platform.runLater(() -> logList.add("L'utente: " + randomUser + " ha richiesto le mail in ingresso"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
+
+    // Metodo che gestisce le email in uscita
     class ThreadOutMail implements Runnable{
         ObjectOutputStream out;
         String account;
         ArrayList<Email> emailList = new ArrayList<>();
-        public ThreadOutMail(ObjectOutputStream out,String account){this.out=out;this.account=account;}
+
+        public ThreadOutMail(ObjectOutputStream out,String account){
+            this.out = out;
+            this.account = account;
+        }
+
         @Override
         public void run(){
             try{
@@ -142,21 +155,46 @@ public class Server {
                 System.out.println("maillist dopo la lettura : " + emailList);
                 out.writeObject(emailList);
                 out.flush();
-                Platform.runLater(() -> logList.add("L'utente: " + prova_user + " ha richiesto le mail in uscita"));
+                Platform.runLater(() -> logList.add("L'utente: " + randomUser + " ha richiesto le mail in uscita"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
+
+
+    // Metodo che gestisce l'invio di una mail
     class ThreadSend implements Runnable{
         ObjectOutputStream out;
         ObjectInputStream in;
         String account;
         Email email;
-        public ThreadSend(ObjectInputStream in,ObjectOutputStream out,String account){this.in=in;this.out=out;this.account=account;}
+        String[] accounts;
+        boolean flag=false;
+
+        public ThreadSend(ObjectInputStream in,ObjectOutputStream out,String account)
+        {
+            this.in = in;
+            this.out = out;
+            this.account = account;
+        }
+
         @Override
         public void run(){
             try{
-                email = (Email) in.readObject();
-                Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getRecevier()));
+                email = (Email) in.readObject(); //Ho una Mail
+                accounts = getAccountList(); //Ho un array di Account
+
+                for(int i=0;i<accounts.length;i++){
+                    if(email.getRecevier().equals(accounts[i])) flag=true;
+                }
+                if(flag){
+                    Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getRecevier()));
+                    //Metodo che mi carica la mail nel json
+                }
+                else {
+                    Platform.runLater(() -> logList.add("L'utente: " + account + " cerca di mandare un email all'utente " + email.getRecevier() + " che non esiste!"));
+
+                }
+
             }catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
 
         }
@@ -176,14 +214,17 @@ public class Server {
         @Override
         public void run(){}
     }
+
+    // Metodo che gestisce la chiusura
     class ThreadExit implements Runnable{
         public ThreadExit(){}
         @Override
         public void run(){
             System.out.println("Sono nel ThreadExit");
-            Platform.runLater(() -> logList.add(prova_user + " ha fatto il LOGOUT."));
+            Platform.runLater(() -> logList.add(randomUser + " ha fatto il LOGOUT."));
         }
     }
+
 
     class RunServer implements Runnable{
         private Socket socket;
@@ -193,7 +234,6 @@ public class Server {
         private final SimpleStringProperty accountLog = new SimpleStringProperty();
 
         private Socket incoming;
-        private int id;
         private String action;
 
         public RunServer(){}
@@ -278,13 +318,39 @@ public class Server {
             }
         }
     }
-    //Metodo JsonReader che restituisce le mail in entrata o in uscita in base ad un valore che gli viene passato come parametro(ingresso,uscita)
+
+
+    /* -------------------------- GESTIONE JSON --------------------- ----- */
+
+
+    // Metodo che conta quanti account ci sono nel file json
+    public int jsonCount()
+    {
+        int count = 0;
+        try {
+            ObjectMapper countObjectMapper = new ObjectMapper();
+            JsonNode rootNode = countObjectMapper.readTree(new File(jsonFilePath));
+
+            // Itera sui nodi del file JSON
+            for (JsonNode emailNode : rootNode) {
+                String email = emailNode.get("email").asText();
+                count++;
+                System.out.println(count);
+            }
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    // Metodo JsonReader che restituisce le mail in entrata o in uscita in base ad un valore che gli viene passato come parametro (ingresso,uscita)
     public synchronized ArrayList<Email>  jSonReader (String mailListType, String account){
         ArrayList<Email> inMail = new ArrayList<>();
         try {
             inMail.clear();
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
+            ObjectMapper readObjectMapper = new ObjectMapper();
+            JsonNode rootNode = readObjectMapper.readTree(new File(jsonFilePath));
 
             // Itera sui nodi del file JSON
             for (JsonNode emailNode : rootNode) {
@@ -317,6 +383,20 @@ public class Server {
         }
         return inMail;
     }
+/*   public synchronized void jSonWriter(Email email){
+        try{
+            ObjectMapper writeObjectMapper = new ObjectMapper();
+            JsonNode rootNode = writeObjectMapper.readTree(new File(jsonFilePath));
+
+            for (JsonNode emailNode : rootNode) {
+                String email = emailNode.get("email").asText();
+                JsonNode contenutoNode = emailNode.get("content");
+
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }  */
 }
 
 

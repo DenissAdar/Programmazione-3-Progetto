@@ -1,0 +1,31 @@
+REGOLE PER CODICE PULITO
+
++ Prima e dopo gli uguali ci va lo spazio - Si den parlo con te
++ Coerenza con i nomi dei metodi e delle variabili - TUTTO INGLESE
++ Dopo che si fanno dei test eliminare i vari sout, e codice commentato, variabili commentate ecc.
++ Commenti che spiegano cosa fa ogni metodo - Li leviamo quando consegnamo il progetto
++ Costruttori si va a capo - Si den parlo con te
++ Si va a capo per dare più ordine
+
+
+
+
+
+COSA MANCA DA FARE
+
++ jsonWrite - ALl'invio di una mail questa deve essere scritta nel file json
+
++ Controllo sull'invio della mail
+  Una mail non può essere inviata ad un account che non esiste
+  L'oggetto della mail deve essere sempre presente come anche il testo
+  Il mittente deve essere fissato al client su cui ci troviamo
+
++
+
+
+
+
+
+EXTRA
+
++ Apertura dei client randomica - Non deve aprire due client con lo stesso account contemporaneamente

@@ -1,28 +1,20 @@
 package com.example.progettoprogrammazione;
 
-import com.example.progettoprogrammazione.Email;
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.*;
 import java.net.InetAddress;
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableStringValue;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
-// TODO Gaia - Dobbiamo iniziare a fare i thread per far funzionare il tutto
+
 public class Client {
 
     private Socket socket = null;
@@ -42,11 +34,8 @@ public class Client {
     private SimpleStringProperty objectProperty;
     private SimpleStringProperty messageProperty;
     private ArrayList<Email> emailList = new ArrayList<>();
-
-
     Thread t1;
 
-    //todo allora ho tolto account dal costruttore e lo vado a togliere anche dal controller quando lo definisco
     public Client(){
 
         t1 = new Thread(new Runnable() {
@@ -203,7 +192,7 @@ public class Client {
             e.printStackTrace();
         }
     }
-    public void chiusura(){
+    public void exit(){
         try{
             socket = new Socket(InetAddress.getLocalHost(), 6000);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
