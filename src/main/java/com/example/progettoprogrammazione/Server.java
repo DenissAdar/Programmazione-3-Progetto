@@ -178,7 +178,6 @@ public class Server {
             this.out = out;
             this.account = account;
         }
-
         @Override
         public void run(){
             try{
@@ -186,18 +185,15 @@ public class Server {
                 accounts = getAccountList(); //Ho un array di Account
 
                 for(int i=0;i<accounts.length;i++){
-                    if(email.getRecevier().equals(accounts[i]))
+                    if(email.getReceiver().equals(accounts[i]))
                         flag=true;
                 }
                 if(flag){
-                    Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getRecevier()));
-
-                    // Metodo che mi carica la mail nel json
                     jSonWriter(email,account);
+                    Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getReceiver()));
                 }
                 else {
-                    Platform.runLater(() -> logList.add("L'utente: " + account + " cerca di mandare un email all'utente " + email.getRecevier() + " che non esiste!"));
-
+                    Platform.runLater(() -> logList.add("L'utente: " + account + " cerca di mandare un email all'utente " + email.getReceiver() + " che non esiste!"));
                 }
 
             }catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
@@ -329,8 +325,7 @@ public class Server {
 
 
     // Metodo che conta quanti account ci sono nel file json
-    public int jsonCount()
-    {
+    public int jsonCount() {
         int count = 0;
         try {
             ObjectMapper countObjectMapper = new ObjectMapper();
@@ -373,11 +368,11 @@ public class Server {
 
 
                         if(mailListType.equals("Entrata")){
-                            Email emailObj = new Email(sender, object,receiver, message, dateTime);
+                            Email emailObj = new Email(sender, receiver, object, message, dateTime);
                             if(Objects.equals(account, receiver)) inMail.add(emailObj);
                         }
                         else if(mailListType.equals("Uscita")){
-                            Email emailObj = new Email(sender, object,receiver, message, dateTime);
+                            Email emailObj = new Email(sender, receiver, object, message, dateTime);
                             if(Objects.equals(account, sender)) inMail.add(emailObj);
                         }
 
@@ -397,7 +392,7 @@ public class Server {
 
          // Creazione dell'oggetto ObjectMapper
          ObjectMapper writeObjectMapper = new ObjectMapper();
-
+         ObjectNode newEmailNode;
          try {
              // Carica il file JSON esistente
              JsonNode rootNode = (JsonNode) writeObjectMapper.readTree(new File(jsonFilePath));
@@ -406,15 +401,16 @@ public class Server {
              if (rootNode.isArray()) {
                  ArrayNode accounts = (ArrayNode) rootNode;
                  for (JsonNode accountNode : accounts) {
-                     String from = accountNode.path("email").asText();
-                     if (from.equals(account)) {
-
+                     String registeredAccount = accountNode.path("email").asText();
+                     //den Questo e' un controllo che nella realta' non ha senso: perche' qui controlla che --account-- dato da client sia uguale a uno dei nodi degli account("email:")
+                     //ma account viene dato da un metodo account picker che lavora gia' su quel json per assegnare un nodo degli account("email:") ad --account--
+                     if (registeredAccount.equals(account)) {
                          // Trovato l'account, aggiungi la nuova email al nodo "content"
-                         ObjectNode newEmailNode = writeObjectMapper.createObjectNode();
+                         newEmailNode = writeObjectMapper.createObjectNode();
                          newEmailNode.put("from", newEmail.getSender());
 
                          // TODO inverte oggetto e destinatario
-                         newEmailNode.put("to", newEmail.getRecevier());
+                         newEmailNode.put("to", newEmail.getReceiver());
                          newEmailNode.put("object", newEmail.getObject());
                          newEmailNode.put("text", newEmail.getMessage());
                          newEmailNode.put("dateTime", newEmail.getDate());
@@ -425,6 +421,23 @@ public class Server {
                          // Salva le modifiche nel file JSON
                          writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
                          System.out.println("Email aggiunta con successo per l'account: " + account);
+                     }
+                     if (registeredAccount.equals(newEmail.getReceiver())){
+                         newEmailNode = writeObjectMapper.createObjectNode();
+                         newEmailNode.put("from", newEmail.getSender());
+
+                         // TODO inverte oggetto e destinatario
+                         newEmailNode.put("to", newEmail.getReceiver());
+                         newEmailNode.put("object", newEmail.getObject());
+                         newEmailNode.put("text", newEmail.getMessage());
+                         newEmailNode.put("dateTime", newEmail.getDate());
+
+                         ArrayNode contentNode = (ArrayNode) accountNode.path("content");
+                         contentNode.add(newEmailNode);
+
+                         // Salva le modifiche nel file JSON
+                         writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
+                         System.out.println("Email aggiunta con successo per l'account: " + newEmail.getReceiver());
                      }
 
                  }

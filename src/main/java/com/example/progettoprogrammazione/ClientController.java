@@ -1,15 +1,10 @@
 package com.example.progettoprogrammazione;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 // Come funzionano i bottoni degli OnAction
@@ -72,15 +67,15 @@ public class ClientController {
     private Label dataLable;
     private Client client;
 
-    public void setUnvisible(){
-        inviaBtn.setVisible(false);
-        replyBtn.setVisible(false);
-        replyAllBtn.setVisible(false);
-        forwardBtn.setVisible(false);
-        deleteBtn.setVisible(false);
-        connectionNotification.setVisible(false);
-        dataTxt.setVisible(false);
-        dataLable.setVisible(false);
+    public void setVisibility(Boolean flag){
+        inviaBtn.setVisible(flag);
+        replyBtn.setVisible(flag);
+        replyAllBtn.setVisible(flag);
+        forwardBtn.setVisible(flag);
+        deleteBtn.setVisible(flag);
+
+        dataTxt.setVisible(flag);
+        dataLable.setVisible(flag);
     }
 
 
@@ -93,7 +88,7 @@ public class ClientController {
         destinatarioTxt.clear();
         oggettoTxt.clear();
         mailBodyTxt.clear();
-        setUnvisible();
+        setVisibility(false);
         inviaBtn.setVisible(true);
         destinatarioTxt.setEditable(true);
         oggettoTxt.setEditable(true);
@@ -112,12 +107,12 @@ public class ClientController {
     public void displayMail(){
 
         Email selectedMail = mailList.getSelectionModel().getSelectedItem();
-
         dataLable.setVisible(true);
         dataTxt.setVisible(true);
 
         mittenteTxt.textProperty().setValue(selectedMail.getSender()) ;
-        destinatarioTxt.textProperty().setValue(selectedMail.getRecevier())  ;
+        destinatarioTxt.textProperty().setValue(selectedMail.getReceiver())  ;
+
         oggettoTxt.textProperty().setValue(selectedMail.getObject()) ;
         mailBodyTxt.textProperty().set(selectedMail.getMessage());
         dataTxt.textProperty().setValue(selectedMail.getDate());
@@ -127,6 +122,9 @@ public class ClientController {
         oggettoTxt.setEditable(false);
         mailBodyTxt.setEditable(false);
         dataTxt.setEditable(false);
+
+        setVisibility(true);
+        inviaBtn.setVisible(false);
     }
     @FXML
     public void handleWindowClose(){
@@ -145,8 +143,9 @@ public class ClientController {
         client.socketSendMail(e);
     }
     public void init(){
+        connectionNotification.setVisible(false);
         client = new Client();
-        setUnvisible();
+        setVisibility(false);
 
         accountDisplay.textProperty().bind(client.getAccountProperty()) ;
         mailList.itemsProperty().bind(client.getMailProperty());

@@ -1,7 +1,5 @@
 package com.example.progettoprogrammazione;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Objects;
 
 // Creo i dati che sono dentro a "contenuto" del file json
 public class Email implements Serializable {
@@ -34,7 +32,7 @@ public class Email implements Serializable {
         return sender;
     }
 
-    public String getRecevier() {
+    public String getReceiver() {
         return receiver;
     }
     public String getDate(){return date;}
