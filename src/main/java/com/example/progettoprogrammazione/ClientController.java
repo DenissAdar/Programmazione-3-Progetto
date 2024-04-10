@@ -142,6 +142,13 @@ public class ClientController {
 
         client.socketSendMail(e);
     }
+    @FXML
+    public void deleteMail(){
+        Email em = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue(),
+                oggettoTxt.textProperty().getValue(), mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue()
+        );
+        client.socketDeleteMail(em);
+    }
     public void init(){
         connectionNotification.setVisible(false);
         client = new Client();

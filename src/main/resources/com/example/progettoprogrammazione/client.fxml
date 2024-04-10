@@ -40,7 +40,7 @@
       <TextArea fx:id="mailBodyTxt" layoutX="419.0" layoutY="245.0" prefHeight="396.0" prefWidth="455.0" AnchorPane.leftAnchor="420.0" AnchorPane.topAnchor="250.0" />
       <Button fx:id="replyBtn" layoutX="422.0" layoutY="671.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="69.0" text="Reply" AnchorPane.topAnchor="671.0" />
       <Button fx:id="replyAllBtn" layoutX="515.0" layoutY="671.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="69.0" text="Reply All" AnchorPane.topAnchor="671.0" />
-      <Button fx:id="deleteBtn" contentDisplay="CENTER" layoutX="805.0" layoutY="670.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="69.0" text="Elimina" textOverrun="CENTER_ELLIPSIS" AnchorPane.topAnchor="670.0" />
+      <Button fx:id="deleteBtn" contentDisplay="CENTER" layoutX="805.0" layoutY="670.0" onAction="#deleteMail" mnemonicParsing="false" prefHeight="30.0" prefWidth="69.0" text="Elimina" textOverrun="CENTER_ELLIPSIS" AnchorPane.topAnchor="670.0" />
       <Button fx:id="inviaBtn" layoutX="608.0" layoutY="670.0" mnemonicParsing="false" onAction="#sendMail" prefHeight="30.0" prefWidth="98.0" text="Invia" textAlignment="CENTER" underline="true" AnchorPane.topAnchor="670.0" />
       <Button fx:id="forwardBtn" layoutX="725.0" layoutY="670.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="69.0" text="Forward" AnchorPane.topAnchor="670.0" />
       <Separator layoutX="424.0" layoutY="7.0" orientation="VERTICAL" prefHeight="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="380.0" AnchorPane.topAnchor="80.0" />

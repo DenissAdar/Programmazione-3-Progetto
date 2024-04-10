@@ -92,6 +92,21 @@ public class Client {
             System.out.println("Non è stato possibile connettersi al server");
         }
     }
+    public void socketDeleteMail(Email email){
+        try{
+            System.out.println("Inizio"+email.visualizzaMail());
+            socket = new Socket(InetAddress.getLocalHost(), 6000);
+            outputStream = new ObjectOutputStream(socket.getOutputStream());
+            outputStream.flush();
+            outputStream.writeObject(this.getAccount());
+            outputStream.writeObject("delete");
+            outputStream.writeObject(email);
+
+
+        }catch(IOException  e) {
+            System.out.println("Non è stato possibile connettersi al server");
+        }
+    }
 
     public void socketInMail(){
         try{

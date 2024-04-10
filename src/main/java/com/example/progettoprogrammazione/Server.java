@@ -1,5 +1,16 @@
 package com.example.progettoprogrammazione;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Iterator;
+
+
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -152,9 +163,7 @@ public class Server {
         @Override
         public void run(){
             try{
-                System.out.println("maillist prima di leggere : " + emailList);
                 emailList = jSonReader("Uscita",account);
-                System.out.println("maillist dopo la lettura : " + emailList);
                 out.writeObject(emailList);
                 out.flush();
                 Platform.runLater(() -> logList.add("L'utente: " + randomUser + " ha richiesto le mail in uscita"));
@@ -206,9 +215,28 @@ public class Server {
         public void run(){}
     }
     class ThreadDelete implements Runnable{
-        public ThreadDelete(){}
+        ObjectOutputStream out;
+        ObjectInputStream in;
+        String account;
+        Email email;
+        String[] accounts;
+        boolean flag=false;
+
+        public ThreadDelete(ObjectInputStream in,ObjectOutputStream out,String account) {
+            this.in = in;
+            this.out = out;
+            this.account = account;
+        }
         @Override
-        public void run(){}
+        public void run(){
+            try{
+                email = (Email) in.readObject(); //Ho una Mail
+                jSonDeleter(email , account);
+                //todo Cambiare la scritta del log, non mi interessa d
+                Platform.runLater(() -> logList.add(account + " ha cancellato una mail ricevuta con oggetto "+email.getObject() + " con successo!"));
+            }
+            catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
+        }
     }
     class ThreadDeleteAll implements Runnable{
         public ThreadDeleteAll(){}
@@ -268,20 +296,18 @@ public class Server {
                             executor.execute(new ThreadOutMail(outputStream,account));
                             break;
                         case "send":
-                            System.out.println("sono nel case send ");
                             executor.execute(new ThreadSend(inputStream, outputStream, account));
                             break;
                         case "sendAll":
                             //executor.execute(new ThreadSendAll(outputStream));
                             break;
                         case "delete":
-                            //executor.execute(new ThreadDelete(outputStream));
+                            executor.execute(new ThreadDelete(inputStream, outputStream, account));
                             break;
                         case "deleteAll":
                             //executor.execute(new ThreadDeleteAll(outputStream));
                             break;
                         case "exit":
-                            System.out.println("sono nel case");
                             executor.execute(new ThreadExit());
                             break;
 
@@ -387,7 +413,6 @@ public class Server {
     }
 
 
-    // TODO non lo inserisce nelle mail in entrata del destinatario
      public synchronized void jSonWriter(Email newEmail, String account){
 
          // Creazione dell'oggetto ObjectMapper
@@ -447,6 +472,38 @@ public class Server {
              System.err.println("Errore durante la lettura/scrittura del file JSON: " + e.getMessage());
          }
      }
+
+     public synchronized void jSonDeleter(Email newEmail, String account) throws JSONException, IOException {
+     String jsonString = new String(Files.readAllBytes(Paths.get(jsonFilePath)));
+     JSONArray jsonArray = new JSONArray(jsonString);
+
+     // Scorrere l'array JSON
+     for (int i = 0; i < jsonArray.length(); i++) {
+         JSONObject jsonObject = jsonArray.getJSONObject(i);
+         String email = jsonObject.getString("email");
+         // Verificare se l'email corrente corrisponde all'account specificato
+         if (email.equals(account)) {
+             JSONArray contentArray = jsonObject.getJSONArray("content");
+             // Scorrere il contenuto (content) dell'email
+             for (int j = 0; j < contentArray.length(); j++) {
+                 JSONObject contentObject = contentArray.getJSONObject(j);
+                 System.out.println("Contenuto di contentObject : " + contentObject);
+                 // Verificare se i campi dell'oggetto Email corrispondono ai campi del JSON
+                 if (contentObject.getString("from").equals(newEmail.getSender()) &&
+                         contentObject.getString("to").equals(newEmail.getReceiver()) &&
+                         contentObject.getString("object").equals(newEmail.getObject()) &&
+                         contentObject.getString("text").equals(newEmail.getMessage()) &&
+                         contentObject.getString("dateTime").equals(newEmail.getDate())) {
+
+                     // Rimuovere il nodo content se i campi corrispondono
+                     contentArray.remove(j);
+                     j--; // Aggiornare l'indice dopo la rimozione
+                 }
+             }
+         }
+     }
+     Files.write(Paths.get(jsonFilePath), jsonArray.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+ }
 
 
 }
