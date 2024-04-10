@@ -95,6 +95,12 @@ public class ClientController {
         mailBodyTxt.setEditable(true);
         dataTxt.setEditable(true);
     }
+    public void clearCampi(){
+        destinatarioTxt.clear();
+        oggettoTxt.clear();
+        mailBodyTxt.clear();
+        setVisibility(false);
+    }
     @FXML
     public void showInMail(){
         client.socketInMail();
@@ -139,7 +145,7 @@ public class ClientController {
         dataTxt.textProperty().setValue(currentDateTime);
         Email e = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue() , oggettoTxt.textProperty().getValue() , mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
         System.out.println("LA NUOVA MAIL CREATA : " + e.visualizzaMail());
-
+        clearCampi();
         client.socketSendMail(e);
     }
     @FXML
@@ -147,6 +153,7 @@ public class ClientController {
         Email em = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue(),
                 oggettoTxt.textProperty().getValue(), mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue()
         );
+        clearCampi();
         client.socketDeleteMail(em);
     }
     public void init(){
