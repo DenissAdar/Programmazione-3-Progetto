@@ -77,8 +77,23 @@ public class Client {
     public ListProperty<Email> getMailProperty() {
         return MailProperty;
     }
+
+
+
+    //todo MARIUS
+
+    String errore="";
+    public void setErroreInMittente(String s){
+         this.errore = s;
+    }
+    public String getErroreInMittente(){
+        return this.errore;
+    }
+    //todo MARIUS
+
     public void socketSendMail(Email email){
         try{
+            String s;
             System.out.println("Inizio"+email.visualizzaMail());
             socket = new Socket(InetAddress.getLocalHost(), 6000);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -86,7 +101,9 @@ public class Client {
             outputStream.writeObject(this.getAccount());
             outputStream.writeObject("send");
             outputStream.writeObject(email);
-
+            //todo MARIUS
+            //s = String.valueOf(inputStream.read());
+            //setErroreInMittente("ciao");
 
         }catch(IOException  e) {
             System.out.println("Non è stato possibile connettersi al server");
@@ -212,7 +229,7 @@ public class Client {
             socket = new Socket(InetAddress.getLocalHost(), 6000);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
-            outputStream.writeObject("");
+            outputStream.writeObject(this.getAccount());
             outputStream.writeObject("exit");
             closeStreams();
         }catch(IOException e) {

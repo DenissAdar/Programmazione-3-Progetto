@@ -20,6 +20,6 @@ public class ServerController {
         server = new Server();
         serverList.itemsProperty().bind(server.getLogList());
         //server.listen(6000);
-        //ServerLog.textProperty().bind(server.getAccountLogProperty());
+       // ServerLog.textProperty().bind(server.getAccountLogProperty());
     }
 }

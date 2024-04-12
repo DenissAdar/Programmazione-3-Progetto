@@ -7,16 +7,12 @@ import org.json.JSONObject;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Iterator;
-
+import java.util.*;
 
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.io.File;
@@ -37,10 +33,14 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Server {
     private String[] accounts;
-    //private static AtomicInteger uniqueId = new AtomicInteger(0);
+
     private String jsonFilePath= "src/main/java/com/example/progettoprogrammazione/accounts/account.json";
 
+    //private Set<String> openedAccounts = new HashSet<>();
+    private ArrayList<String> openedAccounts = new ArrayList<>();
+
     ServerSocket serverSocket;
+
     ThreadPoolExecutor executor;
 
     private ListProperty<String> logList; /*binding in sever controller*/
@@ -48,8 +48,8 @@ public class Server {
 
     //ArrayList<Email> inMail = new ArrayList<>();
     ArrayList<Email> outMail = new ArrayList<>();
-    private String randomUser;
 
+    private String randomUser;
 
     public Server(){
         try {
@@ -76,7 +76,7 @@ public class Server {
         return logList;
     }
 
-
+    // TODO vedere se servono ancora sti due metodi
     public void setAccountList(String[] accountList){
         this.accounts = accountList;
     }
@@ -84,30 +84,24 @@ public class Server {
         return accounts;
     }
 
-    //Decide randomicamente quale username dare ad un client appena creato
+
     class ThreadAccount implements Runnable{
         ObjectOutputStream out;
         Socket socket;
 
         // TODO Metodo che seleziona un account in maniera randomica - Da rivedere.
         public String accountPicker()  {
-            String[] accountList = new String[jsonCount()];
-            int i=0;
+            String[] accountList = getAccountListFromJson();
+            String selectedAccount;
 
-            // Carico un array di account
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
-                for(JsonNode emailNode: rootNode){
-                    accountList[i] = emailNode.get("email").asText();
-                    i++;
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            int randomNum = ThreadLocalRandom.current().nextInt(0, accountList.length);
-            setAccountList(accountList);
-            return accountList[randomNum];
+            do{
+                int randomNum = ThreadLocalRandom.current().nextInt(0,accountList.length);
+                selectedAccount = accountList[randomNum];
+            }while (openedAccounts.contains(selectedAccount));
+
+            openedAccounts.add(selectedAccount);
+            System.out.println(openedAccounts);
+            return selectedAccount;
         }
 
         public ThreadAccount(ObjectOutputStream out, Socket socket) {
@@ -129,6 +123,12 @@ public class Server {
         }
     }
 
+    public synchronized void closeAccount(String account){
+
+        openedAccounts.remove(account);
+        System.out.println("-------Sono in close account e restano tra gli aperti " + openedAccounts);
+    }
+
     // Metodo che gestisce le email in entrata
     class ThreadInMail implements Runnable{
         ObjectOutputStream out;
@@ -147,7 +147,7 @@ public class Server {
                 System.out.println("Attenzione qua ingresso "+emailList);
                 out.writeObject(emailList);
                 out.flush();
-                Platform.runLater(() -> logList.add("L'utente: " + randomUser + " ha richiesto le mail in ingresso"));
+                Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in ingresso"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
@@ -169,7 +169,7 @@ public class Server {
                 emailList = jSonReader("Uscita",account);
                 out.writeObject(emailList);
                 out.flush();
-                Platform.runLater(() -> logList.add("L'utente: " + randomUser + " ha richiesto le mail in uscita"));
+                Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in uscita"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
@@ -184,8 +184,7 @@ public class Server {
         String[] accounts;
         boolean flag=false;
 
-        public ThreadSend(ObjectInputStream in,ObjectOutputStream out,String account)
-        {
+        public ThreadSend(ObjectInputStream in,ObjectOutputStream out,String account) {
             this.in = in;
             this.out = out;
             this.account = account;
@@ -205,6 +204,8 @@ public class Server {
                     Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getReceiver()));
                 }
                 else {
+                    //todo MARIUS
+
                     Platform.runLater(() -> logList.add("L'utente: " + account + " cerca di mandare un email all'utente " + email.getReceiver() + " che non esiste!"));
                 }
 
@@ -249,15 +250,19 @@ public class Server {
 
     // Metodo che gestisce la chiusura
     class ThreadExit implements Runnable{
-        public ThreadExit(){}
+        String account;
+
+        public ThreadExit(String account){
+            this.account = account;
+        }
         @Override
         public void run(){
-            System.out.println("Sono nel ThreadExit");
-            Platform.runLater(() -> logList.add(randomUser + " ha fatto il LOGOUT."));
+            System.out.println("Sono nel ThreadExit e sto ch");
+            closeAccount(account);
+            Platform.runLater(() -> logList.add(account + " ha fatto il LOGOUT."));
+
         }
     }
-
-
     class RunServer implements Runnable{
         private Socket socket;
         private ObjectInputStream inputStream;
@@ -311,11 +316,11 @@ public class Server {
                             //executor.execute(new ThreadDeleteAll(outputStream));
                             break;
                         case "exit":
-                            executor.execute(new ThreadExit());
+                            executor.execute(new ThreadExit(account));
                             break;
 
                         default:
-                            System.out.println("default");
+                            System.out.println("Azione non supportata");
                             break;
                     }
                 }
@@ -505,8 +510,24 @@ public class Server {
              }
          }
      }
-     Files.write(Paths.get(jsonFilePath), jsonArray.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
- }
+         Files.write(Paths.get(jsonFilePath), jsonArray.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+    }
+
+     public String[] getAccountListFromJson() {
+         List<String> accounts = new ArrayList<>();
+         ObjectMapper objectMapper = new ObjectMapper();
+
+         try {
+             JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
+             for(JsonNode emailNode: rootNode){
+                 accounts.add(emailNode.get("email").asText());
+
+             }
+         } catch (IOException e) {
+             throw new RuntimeException(e);
+         }
+         return accounts.toArray(new String[0]);
+     }
 
 
 }

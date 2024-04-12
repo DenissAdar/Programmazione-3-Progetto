@@ -147,6 +147,8 @@ public class ClientController {
         System.out.println("LA NUOVA MAIL CREATA : " + e.visualizzaMail());
         clearCampi();
         client.socketSendMail(e);
+        //todo MARIUS
+        //connectionNotification.textProperty().set(client.getErroreInMittente());
     }
     @FXML
     public void deleteMail(){
