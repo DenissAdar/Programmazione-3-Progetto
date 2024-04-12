@@ -13,19 +13,21 @@ REGOLE PER CODICE PULITO
 
 COSA MANCA DA FARE
 
-+ jsonWrite - All'invio di una mail questa deve essere scritta nel file json
-
 + Controllo sull'invio della mail
   Una mail non può essere inviata ad un account che non esiste
   L'oggetto della mail deve essere sempre presente come anche il testo
   Il mittente deve essere fissato al client su cui ci troviamo
 
-+
++ Modificare accountPicker in modo da utlizzare accountList
+  Apertura dei client randomica - Non deve aprire due client con lo stesso account contemporaneamente
 
++ ReplyAll
+
++ DeleteAll
 
 
 
 
 EXTRA
 
-+ Apertura dei client randomica - Non deve aprire due client con lo stesso account contemporaneamente
++

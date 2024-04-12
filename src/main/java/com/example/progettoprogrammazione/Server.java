@@ -80,13 +80,16 @@ public class Server {
     public void setAccountList(String[] accountList){
         this.accounts = accountList;
     }
-    public String[] getAccountList(){return accounts;}
+    public String[] getAccountList(){
+        return accounts;
+    }
+
     //Decide randomicamente quale username dare ad un client appena creato
     class ThreadAccount implements Runnable{
         ObjectOutputStream out;
         Socket socket;
 
-        // Metodo che seleziona un account in maniera randomica
+        // TODO Metodo che seleziona un account in maniera randomica - Da rivedere.
         public String accountPicker()  {
             String[] accountList = new String[jsonCount()];
             int i=0;
