@@ -82,30 +82,44 @@ public class Server {
     }
     public String[] getAccountList(){return accounts;}
     //Decide randomicamente quale username dare ad un client appena creato
+    // Metodo che seleziona un account in maniera randomica
+    String[] accountList = new String[jsonCount()];
+    public String accountPicker()  {
+        int i=0;
+
+        // Carico un array di account
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
+            for(JsonNode emailNode: rootNode){
+                accountList[i] = emailNode.get("email").asText();
+                i++;
+            }
+           // setAccountList(accountList);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        int randomNum = ThreadLocalRandom.current().nextInt(0, accountList.length);
+        setAccountList(accountList);
+        return accountList[randomNum];
+        /*for(int j=0; j<getAccountList().length ; j++){
+            if (accountList[randomNum] != getAccountList()[j]) {
+                return accountList[randomNum];
+            }
+        }
+        throw new RuntimeException();*/
+
+
+
+    }
+
+
+
     class ThreadAccount implements Runnable{
         ObjectOutputStream out;
         Socket socket;
 
-        // Metodo che seleziona un account in maniera randomica
-        public String accountPicker()  {
-            String[] accountList = new String[jsonCount()];
-            int i=0;
 
-            // Carico un array di account
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
-                for(JsonNode emailNode: rootNode){
-                    accountList[i] = emailNode.get("email").asText();
-                    i++;
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            int randomNum = ThreadLocalRandom.current().nextInt(0, accountList.length);
-            setAccountList(accountList);
-            return accountList[randomNum];
-        }
 
         public ThreadAccount(ObjectOutputStream out, Socket socket) {
             this.out = out;
@@ -170,8 +184,6 @@ public class Server {
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
-
-
     // Metodo che gestisce l'invio di una mail
     class ThreadSend implements Runnable{
         ObjectOutputStream out;
@@ -221,7 +233,6 @@ public class Server {
         Email email;
         String[] accounts;
         boolean flag=false;
-
         public ThreadDelete(ObjectInputStream in,ObjectOutputStream out,String account) {
             this.in = in;
             this.out = out;
@@ -232,7 +243,6 @@ public class Server {
             try{
                 email = (Email) in.readObject(); //Ho una Mail
                 jSonDeleter(email , account);
-                //todo Cambiare la scritta del log, non mi interessa d
                 Platform.runLater(() -> logList.add(account + " ha cancellato una mail ricevuta con oggetto "+email.getObject() + " con successo!"));
             }
             catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
@@ -243,8 +253,6 @@ public class Server {
         @Override
         public void run(){}
     }
-
-    // Metodo che gestisce la chiusura
     class ThreadExit implements Runnable{
         public ThreadExit(){}
         @Override
