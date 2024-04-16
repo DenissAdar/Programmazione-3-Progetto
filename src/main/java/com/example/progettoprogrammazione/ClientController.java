@@ -73,15 +73,7 @@ public class ClientController {
     private Label dataLable;
     private Client client;
 
-    public void setNewMailProperties(String s){
-        client.setReceiverProperty(s);
-        client.setObjectProperty(s);
-        client.setMessageProperty(s);
-        System.out.println(client.getSenderProperty());
-        System.out.println(client.getReceiverProperty());
-        System.out.println(client.getObjectProperty());
-        System.out.println(client.getMessageProperty());
-    }
+
     @FXML
     public void forwardBtn() throws IOException {
        /* Parent root = FXMLLoader.load(getClass().getResource("server.fxml"));
@@ -90,10 +82,22 @@ public class ClientController {
         stage.show();*/
         //client.getForwardAccounts();
     }
+    @FXML
+    public void replyMail(){
+        String mittente = mittenteTxt.textProperty().getValue();
+        String destinatario = destinatarioTxt.textProperty().getValue();
+        newMailCreation();
+        mittenteTxt.textProperty().set(destinatario);
+        destinatarioTxt.textProperty().set(mittente);
+        oggettoTxt.clear();
+
+
+
+    }
     public void setVisibility(Boolean flag){
 
         inviaBtn.setVisible(flag);
-        replyBtn.setVisible(flag);
+       // replyBtn.setVisible(flag);
         replyAllBtn.setVisible(flag);
         forwardBtn.setVisible(flag);
         deleteBtn.setVisible(flag);
@@ -106,15 +110,18 @@ public class ClientController {
 
     @FXML
     public void newMailCreation(){
-        mittenteTxt.textProperty().bind(client.getAccountProperty());
+
+        mittenteTxt.textProperty().set(client.getAccount());
         client.setSenderProperty(mittenteTxt.textProperty().get());
+
         mittenteTxt.setEditable(false);
         destinatarioTxt.setEditable(true);
         oggettoTxt.setEditable(true);
         mailBodyTxt.setEditable(true);
         dataTxt.setEditable(true);
+        clearFields();
+        replyBtn.setVisible(false);
 
-        setNewMailProperties("");
         setVisibility(false);
         inviaBtn.setVisible(true);
 
@@ -128,10 +135,14 @@ public class ClientController {
     @FXML
     public void showInMail(){
         client.socketInMail();
+        replyBtn.setVisible(true);
+
     }
 
     @FXML
-    public void showOutMail(){client.socketOutMail();}
+    public void showOutMail(){client.socketOutMail();
+        replyBtn.setVisible(false);
+    }
 
     @FXML
     public void displayMail(){
@@ -140,22 +151,17 @@ public class ClientController {
         if(selectedMail == null){
             System.out.println("Selezionato mail inesistente");
         }else {
+
             dataLable.setVisible(true);
             dataTxt.setVisible(true);
 
-            client.setSenderProperty(selectedMail.getSender());
-            mittenteTxt.textProperty().bind(client.getSenderProperty());
+            mittenteTxt.textProperty().setValue(selectedMail.getSender());
 
+            destinatarioTxt.textProperty().set(selectedMail.getReceiver());
 
-            client.setReceiverProperty(selectedMail.getReceiver());
-            destinatarioTxt.textProperty().bind(client.getReceiverProperty());
+            oggettoTxt.textProperty().set(selectedMail.getObject());
 
-            client.setObjectProperty(selectedMail.getObject());
-            oggettoTxt.textProperty().bind(client.getObjectProperty());
-
-
-            client.setMessageProperty(selectedMail.getMessage());
-            mailBodyTxt.textProperty().bind(client.getMessageProperty());
+            mailBodyTxt.textProperty().set(selectedMail.getMessage());
 
             dataTxt.textProperty().setValue(selectedMail.getDate());
 
@@ -206,6 +212,8 @@ public class ClientController {
         connectionNotification.setVisible(false);
         client = new Client();
         setVisibility(false);
+        replyBtn.setVisible(false);
+
 
         accountDisplay.textProperty().bind(client.getAccountProperty()) ;
         mailList.itemsProperty().bind(client.getMailProperty());

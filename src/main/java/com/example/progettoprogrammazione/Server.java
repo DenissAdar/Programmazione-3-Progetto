@@ -210,9 +210,23 @@ public class Server {
         }
     }
     class ThreadSendAll implements Runnable{
-        public ThreadSendAll(){}
+        ObjectInputStream in;
+        String account;
+        Email email;
+        boolean flag=false;
+        public ThreadSendAll(ObjectInputStream in,String account)
+        {
+            this.in = in;
+            this.account = account;
+        }
         @Override
-        public void run(){}
+        public void run(){
+            try{
+                email = (Email) in.readObject();
+                //stringa tipo denis@example.com,gaia@example.com
+            }catch (IOException | ClassNotFoundException e){throw new RuntimeException(e);}
+
+        }
     }
     class ThreadDelete implements Runnable{
         ObjectOutputStream out;
