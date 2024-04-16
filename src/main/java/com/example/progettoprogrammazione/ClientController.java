@@ -2,12 +2,20 @@ package com.example.progettoprogrammazione;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-// Come funzionano i bottoni degli OnAction
+/**
+ * @Authors: Deniss,Marius,Gaia
+ */
+
 public class ClientController {
     @FXML
     private Label accountDisplay;
@@ -26,8 +34,6 @@ public class ClientController {
 
     @FXML
     private Button forwardBtn;
-
-
 
     @FXML
     private Button inviaBtn;
@@ -67,7 +73,25 @@ public class ClientController {
     private Label dataLable;
     private Client client;
 
+    public void setNewMailProperties(String s){
+        client.setReceiverProperty(s);
+        client.setObjectProperty(s);
+        client.setMessageProperty(s);
+        System.out.println(client.getSenderProperty());
+        System.out.println(client.getReceiverProperty());
+        System.out.println(client.getObjectProperty());
+        System.out.println(client.getMessageProperty());
+    }
+    @FXML
+    public void forwardBtn() throws IOException {
+       /* Parent root = FXMLLoader.load(getClass().getResource("server.fxml"));
+        Stage stage = new Stage();
+        stage.setScene(new Scene(root));
+        stage.show();*/
+        //client.getForwardAccounts();
+    }
     public void setVisibility(Boolean flag){
+
         inviaBtn.setVisible(flag);
         replyBtn.setVisible(flag);
         replyAllBtn.setVisible(flag);
@@ -82,20 +106,20 @@ public class ClientController {
 
     @FXML
     public void newMailCreation(){
-        //Da bindare il mittente con la property giusta
-        mittenteTxt.textProperty().setValue(accountDisplay.textProperty().getValue());
+        mittenteTxt.textProperty().bind(client.getAccountProperty());
+        client.setSenderProperty(mittenteTxt.textProperty().get());
         mittenteTxt.setEditable(false);
-        destinatarioTxt.clear();
-        oggettoTxt.clear();
-        mailBodyTxt.clear();
-        setVisibility(false);
-        inviaBtn.setVisible(true);
         destinatarioTxt.setEditable(true);
         oggettoTxt.setEditable(true);
         mailBodyTxt.setEditable(true);
         dataTxt.setEditable(true);
+
+        setNewMailProperties("");
+        setVisibility(false);
+        inviaBtn.setVisible(true);
+
     }
-    public void clearCampi(){
+    public void clearFields(){
         destinatarioTxt.clear();
         oggettoTxt.clear();
         mailBodyTxt.clear();
@@ -111,26 +135,41 @@ public class ClientController {
 
     @FXML
     public void displayMail(){
+        // TODO Manca bindare la data che sono gay e non ho molto sbatti di f
+        Email selectedMail  = mailList.getSelectionModel().getSelectedItem();
+        if(selectedMail == null){
+            System.out.println("Selezionato mail inesistente");
+        }else {
+            dataLable.setVisible(true);
+            dataTxt.setVisible(true);
 
-        Email selectedMail = mailList.getSelectionModel().getSelectedItem();
-        dataLable.setVisible(true);
-        dataTxt.setVisible(true);
+            client.setSenderProperty(selectedMail.getSender());
+            mittenteTxt.textProperty().bind(client.getSenderProperty());
 
-        mittenteTxt.textProperty().setValue(selectedMail.getSender()) ;
-        destinatarioTxt.textProperty().setValue(selectedMail.getReceiver())  ;
 
-        oggettoTxt.textProperty().setValue(selectedMail.getObject()) ;
-        mailBodyTxt.textProperty().set(selectedMail.getMessage());
-        dataTxt.textProperty().setValue(selectedMail.getDate());
+            client.setReceiverProperty(selectedMail.getReceiver());
+            destinatarioTxt.textProperty().bind(client.getReceiverProperty());
 
-        mittenteTxt.setEditable(false);
-        destinatarioTxt.setEditable(false);
-        oggettoTxt.setEditable(false);
-        mailBodyTxt.setEditable(false);
-        dataTxt.setEditable(false);
+            client.setObjectProperty(selectedMail.getObject());
+            oggettoTxt.textProperty().bind(client.getObjectProperty());
 
-        setVisibility(true);
-        inviaBtn.setVisible(false);
+
+            client.setMessageProperty(selectedMail.getMessage());
+            mailBodyTxt.textProperty().bind(client.getMessageProperty());
+
+            dataTxt.textProperty().setValue(selectedMail.getDate());
+
+            mittenteTxt.setEditable(false);
+            destinatarioTxt.setEditable(false);
+            oggettoTxt.setEditable(false);
+            mailBodyTxt.setEditable(false);
+            dataTxt.setEditable(false);
+
+            setVisibility(true);
+            inviaBtn.setVisible(false);
+        }
+
+
     }
     @FXML
     public void handleWindowClose(){
@@ -138,14 +177,19 @@ public class ClientController {
         Platform.exit();
     }
     @FXML
-    public void sendMail(){
+    public String getDate(){
         Date currentDate = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String currentDateTime = dateFormat.format(currentDate);
-        dataTxt.textProperty().setValue(currentDateTime);
+        return currentDateTime;
+    }
+    @FXML
+    public void sendMail(){
+
+        dataTxt.textProperty().setValue(getDate());
         Email e = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue() , oggettoTxt.textProperty().getValue() , mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
         System.out.println("LA NUOVA MAIL CREATA : " + e.visualizzaMail());
-        clearCampi();
+        clearFields();
         client.socketSendMail(e);
         //todo MARIUS
         //connectionNotification.textProperty().set(client.getErroreInMittente());
@@ -155,7 +199,7 @@ public class ClientController {
         Email em = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue(),
                 oggettoTxt.textProperty().getValue(), mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue()
         );
-        clearCampi();
+        clearFields();
         client.socketDeleteMail(em);
     }
     public void init(){

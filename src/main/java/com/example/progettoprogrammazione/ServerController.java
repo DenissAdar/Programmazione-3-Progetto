@@ -7,6 +7,11 @@ import javafx.scene.control.TextArea;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+/**
+ * @Authors: Deniss,Marius,Gaia
+ */
+
 public class ServerController {
 
     @FXML
