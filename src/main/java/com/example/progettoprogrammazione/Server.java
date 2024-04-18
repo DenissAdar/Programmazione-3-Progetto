@@ -46,8 +46,6 @@ public class Server {
     private ListProperty<String> logList; /*binding in sever controller*/
     private ObservableList<String> logListContent;
 
-    //ArrayList<Email> inMail = new ArrayList<>();
-    ArrayList<Email> outMail = new ArrayList<>();
     private String randomUser;
 
 
@@ -321,6 +319,9 @@ public class Server {
                         case "deleteAll":
                             //executor.execute(new ThreadDeleteAll(outputStream));
                             break;
+                        case "getForwardAccounts":
+                            executor.execute(new ThreadForwardAccounts(outputStream,account));
+                            break;
                         case "exit":
                             executor.execute(new ThreadExit());
                             break;
@@ -360,7 +361,34 @@ public class Server {
         }
     }
 
+    class ThreadForwardAccounts implements Runnable {
+        ObjectOutputStream outputStream;
+        String account;
 
+        public ThreadForwardAccounts(ObjectOutputStream out, String a) {
+            this.outputStream = out;
+            this.account = a;
+        }
+
+        @Override
+        public void run() {
+            ArrayList<String> forwardAccounts = new ArrayList<>();
+            try {
+                forwardAccounts.clear();
+                ObjectMapper readObjectMapper = new ObjectMapper();
+                JsonNode rootNode = readObjectMapper.readTree(new File(jsonFilePath));
+
+                // Itera sui nodi del file JSON
+                for (JsonNode emailNode : rootNode) {
+                    forwardAccounts.add(emailNode.get("email").asText());
+                }
+                outputStream.writeObject(forwardAccounts);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
     /* -------------------------- GESTIONE JSON --------------------- ----- */
 
 

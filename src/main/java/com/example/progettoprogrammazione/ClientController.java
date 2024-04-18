@@ -1,6 +1,7 @@
 package com.example.progettoprogrammazione;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,6 +11,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -73,25 +75,31 @@ public class ClientController {
     private Label dataLable;
     private Client client;
 
-
     @FXML
-    public void forwardBtn() throws IOException {
-       /* Parent root = FXMLLoader.load(getClass().getResource("server.fxml"));
+    private ListView forwardList;
+    @FXML
+    public void forwardBtn() throws IOException, ClassNotFoundException {
+        Parent root = FXMLLoader.load(getClass().getResource("forward.fxml"));
         Stage stage = new Stage();
         stage.setScene(new Scene(root));
-        stage.show();*/
-        //client.getForwardAccounts();
+        stage.show();
+        client.getForwardAccounts();
+        forwardList.itemsProperty().bind(client.getAccountListProperty());
+
     }
     @FXML
     public void replyMail(){
         String mittente = mittenteTxt.textProperty().getValue();
         String destinatario = destinatarioTxt.textProperty().getValue();
+        String oggetto = "R:" + oggettoTxt.textProperty().getValue();
+        String oldBody = mailBodyTxt.textProperty().getValue();
         newMailCreation();
         mittenteTxt.textProperty().set(destinatario);
         destinatarioTxt.textProperty().set(mittente);
-        oggettoTxt.clear();
-
-
+        oggettoTxt.textProperty().set(oggetto);
+        oggettoTxt.setEditable(false);
+        destinatarioTxt.setEditable(false);
+        mittenteTxt.setEditable(false);
 
     }
     public void setVisibility(Boolean flag){
@@ -105,9 +113,6 @@ public class ClientController {
         dataTxt.setVisible(flag);
         dataLable.setVisible(flag);
     }
-
-
-
     @FXML
     public void newMailCreation(){
 
@@ -119,6 +124,7 @@ public class ClientController {
         oggettoTxt.setEditable(true);
         mailBodyTxt.setEditable(true);
         dataTxt.setEditable(true);
+
         clearFields();
         replyBtn.setVisible(false);
 
@@ -140,8 +146,11 @@ public class ClientController {
     }
 
     @FXML
-    public void showOutMail(){client.socketOutMail();
+    public void showOutMail(){
         replyBtn.setVisible(false);
+        replyAllBtn.setVisible(false);
+        client.socketOutMail();
+
     }
 
     @FXML
@@ -208,6 +217,7 @@ public class ClientController {
         clearFields();
         client.socketDeleteMail(em);
     }
+
     public void init(){
         connectionNotification.setVisible(false);
         client = new Client();
