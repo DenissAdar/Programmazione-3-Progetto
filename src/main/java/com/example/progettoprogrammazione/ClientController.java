@@ -76,15 +76,19 @@ public class ClientController {
     private Client client;
 
     @FXML
-    private ListView forwardList;
-    @FXML
-    public void forwardBtn() throws IOException, ClassNotFoundException {
-        Parent root = FXMLLoader.load(getClass().getResource("forward.fxml"));
-        Stage stage = new Stage();
-        stage.setScene(new Scene(root));
-        stage.show();
-        client.getForwardAccounts();
-        forwardList.itemsProperty().bind(client.getAccountListProperty());
+    public void forwardBtn(){
+        String oggetto = "FWD:" + oggettoTxt.textProperty().getValue();
+        mittenteTxt.textProperty().set(client.getAccount());
+        oggettoTxt.textProperty().set(oggetto);
+        destinatarioTxt.clear();
+        destinatarioTxt.setEditable(true);
+        mailBodyTxt.setEditable(false);
+
+        forwardBtn.setVisible(false);
+        replyBtn.setVisible(false);
+        replyAllBtn.setVisible(false);
+        deleteBtn.setVisible(false);
+        inviaBtn.setVisible(true);
 
     }
     @FXML
@@ -115,6 +119,7 @@ public class ClientController {
     }
     @FXML
     public void newMailCreation(){
+
 
         mittenteTxt.textProperty().set(client.getAccount());
         client.setSenderProperty(mittenteTxt.textProperty().get());
@@ -181,6 +186,9 @@ public class ClientController {
             dataTxt.setEditable(false);
 
             setVisibility(true);
+            if(selectedMail.getSender().equals(client.getAccount())){
+                replyAllBtn.setVisible(false);
+            }
             inviaBtn.setVisible(false);
         }
 
@@ -200,12 +208,26 @@ public class ClientController {
     }
     @FXML
     public void sendMail(){
-
         dataTxt.textProperty().setValue(getDate());
-        Email e = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue() , oggettoTxt.textProperty().getValue() , mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
-        System.out.println("LA NUOVA MAIL CREATA : " + e.visualizzaMail());
-        clearFields();
-        client.socketSendMail(e);
+        String[] arrayStringhe = destinatarioTxt.textProperty().getValue().split(",");
+        if(arrayStringhe.length>1){
+            for(int i =0;i< arrayStringhe.length;i++){
+
+                Email e = new Email(mittenteTxt.textProperty().getValue(), arrayStringhe[i] , oggettoTxt.textProperty().getValue() , mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
+                System.out.println("Mail numero : "+ i +" creata , eccola: " + e.visualizzaMail());
+                 // clearFields();
+                client.socketSendMail(e);
+            }
+            clearFields();
+        }else{
+            Email e = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue() , oggettoTxt.textProperty().getValue() , mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
+            System.out.println("LA NUOVA MAIL CREATA : " + e.visualizzaMail());
+            clearFields();
+            client.socketSendMail(e);
+        }
+
+
+
         //todo MARIUS
         //connectionNotification.textProperty().set(client.getErroreInMittente());
     }

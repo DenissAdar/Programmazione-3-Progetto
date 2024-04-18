@@ -471,7 +471,10 @@ public class Server {
                      String registeredAccount = accountNode.path("email").asText();
                      //den Questo e' un controllo che nella realta' non ha senso: perche' qui controlla che --account-- dato da client sia uguale a uno dei nodi degli account("email:")
                      //ma account viene dato da un metodo account picker che lavora gia' su quel json per assegnare un nodo degli account("email:") ad --account--
-                     if (registeredAccount.equals(account)) {
+
+                     //qua dobbiamo fare un controllo che se dest e mit diversi tra di loro  fa i due if sotto sennò fa altro
+                     if(newEmail.getSender()!=newEmail.getReceiver()){
+                         if (registeredAccount.equals(account)) {
                          // Trovato l'account, aggiungi la nuova email al nodo "content"
                          newEmailNode = writeObjectMapper.createObjectNode();
                          newEmailNode.put("from", newEmail.getSender());
@@ -487,24 +490,38 @@ public class Server {
 
                          // Salva le modifiche nel file JSON
                          writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
-                         System.out.println("Email aggiunta con successo per l'account: " + account);
+                         //System.out.println("Email aggiunta con successo per l'account: " + account);
+                             System.out.println("Sono nel nodo if" );
                      }
-                     if (registeredAccount.equals(newEmail.getReceiver())){
+                         if (registeredAccount.equals(newEmail.getReceiver())){
+                             newEmailNode = writeObjectMapper.createObjectNode();
+                             newEmailNode.put("from", newEmail.getSender());
+
+                             // TODO inverte oggetto e destinatario
+                             newEmailNode.put("to", newEmail.getReceiver());
+                             newEmailNode.put("object", newEmail.getObject());
+                             newEmailNode.put("text", newEmail.getMessage());
+                             newEmailNode.put("dateTime", newEmail.getDate());
+
+                             ArrayNode contentNode = (ArrayNode) accountNode.path("content");
+                             contentNode.add(newEmailNode);
+
+                             // Salva le modifiche nel file JSON
+                             writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
+                             //System.out.println("Email aggiunta con successo per l'account: " + newEmail.getReceiver());
+                             System.out.println("Sono nel nodo if" );
+                         }}
+                     else{
                          newEmailNode = writeObjectMapper.createObjectNode();
                          newEmailNode.put("from", newEmail.getSender());
-
-                         // TODO inverte oggetto e destinatario
                          newEmailNode.put("to", newEmail.getReceiver());
                          newEmailNode.put("object", newEmail.getObject());
                          newEmailNode.put("text", newEmail.getMessage());
                          newEmailNode.put("dateTime", newEmail.getDate());
-
                          ArrayNode contentNode = (ArrayNode) accountNode.path("content");
                          contentNode.add(newEmailNode);
-
-                         // Salva le modifiche nel file JSON
                          writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
-                         System.out.println("Email aggiunta con successo per l'account: " + newEmail.getReceiver());
+                         System.out.println("Sono nel nodo else del Writer") ;
                      }
 
                  }
