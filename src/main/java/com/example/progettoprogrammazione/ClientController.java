@@ -109,7 +109,7 @@ public class ClientController {
     public void setVisibility(Boolean flag){
 
         inviaBtn.setVisible(flag);
-       // replyBtn.setVisible(flag);
+        replyBtn.setVisible(flag);
         replyAllBtn.setVisible(flag);
         forwardBtn.setVisible(flag);
         deleteBtn.setVisible(flag);
@@ -146,7 +146,8 @@ public class ClientController {
     @FXML
     public void showInMail(){
         client.socketInMail();
-        replyBtn.setVisible(true);
+        setVisibility(true);
+        inviaBtn.setVisible(false);
 
     }
 
@@ -170,13 +171,9 @@ public class ClientController {
             dataTxt.setVisible(true);
 
             mittenteTxt.textProperty().setValue(selectedMail.getSender());
-
             destinatarioTxt.textProperty().set(selectedMail.getReceiver());
-
             oggettoTxt.textProperty().set(selectedMail.getObject());
-
             mailBodyTxt.textProperty().set(selectedMail.getMessage());
-
             dataTxt.textProperty().setValue(selectedMail.getDate());
 
             mittenteTxt.setEditable(false);
@@ -186,7 +183,8 @@ public class ClientController {
             dataTxt.setEditable(false);
 
             setVisibility(true);
-            if(selectedMail.getSender().equals(client.getAccount())){
+            if(selectedMail.getSender().equals(accountDisplay.textProperty().getValue())){
+                replyBtn.setVisible(false);
                 replyAllBtn.setVisible(false);
             }
             inviaBtn.setVisible(false);
@@ -245,7 +243,6 @@ public class ClientController {
         client = new Client();
         setVisibility(false);
         replyBtn.setVisible(false);
-
 
         accountDisplay.textProperty().bind(client.getAccountProperty()) ;
         mailList.itemsProperty().bind(client.getMailProperty());

@@ -473,7 +473,7 @@ public class Server {
                      //ma account viene dato da un metodo account picker che lavora gia' su quel json per assegnare un nodo degli account("email:") ad --account--
 
                      //qua dobbiamo fare un controllo che se dest e mit diversi tra di loro  fa i due if sotto sennò fa altro
-                     if(newEmail.getSender()!=newEmail.getReceiver()){
+                     if(!Objects.equals(newEmail.getSender(), newEmail.getReceiver())){
                          if (registeredAccount.equals(account)) {
                          // Trovato l'account, aggiungi la nuova email al nodo "content"
                          newEmailNode = writeObjectMapper.createObjectNode();
@@ -491,7 +491,10 @@ public class Server {
                          // Salva le modifiche nel file JSON
                          writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
                          //System.out.println("Email aggiunta con successo per l'account: " + account);
-                             System.out.println("Sono nel nodo if" );
+                             System.out.println("Sono nel nodo if1" );
+                             System.out.println("Valore di Mittente " + newEmail.getSender());
+                             System.out.println("Valore di Dest " + newEmail.getReceiver());
+                             System.out.println("Valore di uguaglianza" + newEmail.getSender().equals(newEmail.getReceiver()));
                      }
                          if (registeredAccount.equals(newEmail.getReceiver())){
                              newEmailNode = writeObjectMapper.createObjectNode();
@@ -509,19 +512,24 @@ public class Server {
                              // Salva le modifiche nel file JSON
                              writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
                              //System.out.println("Email aggiunta con successo per l'account: " + newEmail.getReceiver());
-                             System.out.println("Sono nel nodo if" );
+                             System.out.println("Sono nel nodo if2" );
+                             System.out.println("Valore di Mittente " + newEmail.getSender());
+                             System.out.println("Valore di Dest " + newEmail.getReceiver());
+                             System.out.println("Valore di uguaglianza" + newEmail.getSender().equals(newEmail.getReceiver()));
                          }}
                      else{
-                         newEmailNode = writeObjectMapper.createObjectNode();
-                         newEmailNode.put("from", newEmail.getSender());
-                         newEmailNode.put("to", newEmail.getReceiver());
-                         newEmailNode.put("object", newEmail.getObject());
-                         newEmailNode.put("text", newEmail.getMessage());
-                         newEmailNode.put("dateTime", newEmail.getDate());
-                         ArrayNode contentNode = (ArrayNode) accountNode.path("content");
-                         contentNode.add(newEmailNode);
-                         writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
-                         System.out.println("Sono nel nodo else del Writer") ;
+                         if (registeredAccount.equals(account)) {
+                             newEmailNode = writeObjectMapper.createObjectNode();
+                             newEmailNode.put("from", newEmail.getSender());
+                             newEmailNode.put("to", newEmail.getReceiver());
+                             newEmailNode.put("object", newEmail.getObject());
+                             newEmailNode.put("text", newEmail.getMessage());
+                             newEmailNode.put("dateTime", newEmail.getDate());
+                             ArrayNode contentNode = (ArrayNode) accountNode.path("content");
+                             contentNode.add(newEmailNode);
+                             writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
+                             System.out.println("Sono nel nodo else del Writer");
+                         }
                      }
 
                  }
