@@ -37,7 +37,6 @@ public class Email implements Serializable {
     }
     public String getDate(){return date;}
 
-
     public String visualizzaMail() {
         return "Email{" +
                 "Sender='" + sender + '\'' +

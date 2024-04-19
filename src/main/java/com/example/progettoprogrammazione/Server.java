@@ -34,21 +34,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import java.util.concurrent.ThreadLocalRandom;
-
+import java.util.Arrays;
 public class Server {
-    private String[] accounts;
+    //private String[] accounts;
+    ArrayList<String> accounts = new ArrayList<>();
+    ArrayList<String> logged_accounts = new ArrayList<>();
     //private static AtomicInteger uniqueId = new AtomicInteger(0);
     private String jsonFilePath= "src/main/java/com/example/progettoprogrammazione/accounts/account.json";
-
     ServerSocket serverSocket;
     ThreadPoolExecutor executor;
-
     private ListProperty<String> logList; /*binding in sever controller*/
     private ObservableList<String> logListContent;
-
-    private String randomUser;
-
-
+    //private String[] lista;
     public Server(){
         try {
             this.logListContent = FXCollections.observableList(new LinkedList<>());
@@ -68,17 +65,28 @@ public class Server {
             throw new RuntimeException(e);
         }
     }
-
-
     public ListProperty<String> getLogList(){
         return logList;
     }
+    public void setAccountList(){
+        //lista = new String[jsonCount()];
+        int i=0;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
 
+            for(JsonNode emailNode: rootNode){
+                accounts.add(emailNode.get("email").asText());
+                //lista[i] = emailNode.get("email").asText();
+                //i++;
+            }
 
-    public void setAccountList(String[] accountList){
-        this.accounts = accountList;
+          // return lista;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
-    public String[] getAccountList(){return accounts;}
+    public ArrayList<String> getAccountList(){return accounts;}
     //Decide randomicamente quale username dare ad un client appena creato
     class ThreadAccount implements Runnable{
         ObjectOutputStream out;
@@ -86,23 +94,15 @@ public class Server {
 
         // Metodo che seleziona un account in maniera randomica
         public String accountPicker()  {
-            String[] accountList = new String[jsonCount()];
-            int i=0;
+            String accountScelto;
 
-            // Carico un array di account
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
-                for(JsonNode emailNode: rootNode){
-                    accountList[i] = emailNode.get("email").asText();
-                    i++;
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            int randomNum = ThreadLocalRandom.current().nextInt(0, accountList.length);
-            setAccountList(accountList);
-            return accountList[randomNum];
+            do {
+                accountScelto = accounts.get(ThreadLocalRandom.current().nextInt(0, accounts.size()));
+            }while (logged_accounts.contains(accountScelto));
+
+            logged_accounts.add(accountScelto);
+
+            return accountScelto;
         }
 
         public ThreadAccount(ObjectOutputStream out, Socket socket) {
@@ -112,7 +112,8 @@ public class Server {
         @Override
         public void run() {
             try {
-                randomUser = accountPicker();
+                String randomUser = accountPicker();
+
                 out.writeObject(randomUser);
 
                 Platform.runLater(() -> logList.add(randomUser +" ha fatto l'accesso.")); /*loglist è l'elemento LOG dell'applicazione di sever lato grafico */
@@ -142,7 +143,7 @@ public class Server {
                 System.out.println("Attenzione qua ingresso "+emailList);
                 out.writeObject(emailList);
                 out.flush();
-                Platform.runLater(() -> logList.add("L'utente: " + randomUser + " ha richiesto le mail in ingresso"));
+                Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in ingresso"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
@@ -164,11 +165,10 @@ public class Server {
                 emailList = jSonReader("Uscita",account);
                 out.writeObject(emailList);
                 out.flush();
-                Platform.runLater(() -> logList.add("L'utente: " + randomUser + " ha richiesto le mail in uscita"));
+                Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in uscita"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
-
 
     // Metodo che gestisce l'invio di una mail
     class ThreadSend implements Runnable{
@@ -176,8 +176,8 @@ public class Server {
         ObjectInputStream in;
         String account;
         Email email;
-        String[] accounts;
-        boolean flag=false;
+        //String[] accounts;
+        //boolean flag=false;
 
         public ThreadSend(ObjectInputStream in,ObjectOutputStream out,String account)
         {
@@ -189,13 +189,14 @@ public class Server {
         public void run(){
             try{
                 email = (Email) in.readObject(); //Ho una Mail
-                accounts = getAccountList(); //Ho un array di Account
+                System.out.println(email.visualizzaMail());
 
-                for(int i=0;i<accounts.length;i++){
+                /*for(int i=0;i<accounts.length;i++){
                     if(email.getReceiver().equals(accounts[i]))
                         flag=true;
-                }
-                if(flag){
+                }*/
+
+                if(accounts.contains(email.getReceiver())){
                     jSonWriter(email,account);
                     Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getReceiver()));
                 }
@@ -211,7 +212,6 @@ public class Server {
         ObjectInputStream in;
         String account;
         Email email;
-        boolean flag=false;
         public ThreadSendAll(ObjectInputStream in,String account)
         {
             this.in = in;
@@ -221,6 +221,7 @@ public class Server {
         public void run(){
             try{
                 email = (Email) in.readObject();
+
                 //stringa tipo denis@example.com,gaia@example.com
             }catch (IOException | ClassNotFoundException e){throw new RuntimeException(e);}
 
@@ -258,14 +259,19 @@ public class Server {
 
     // Metodo che gestisce la chiusura
     class ThreadExit implements Runnable{
-        public ThreadExit(){}
+
+        String exitUser;
+        public ThreadExit(String exitUser){
+            this.exitUser = exitUser;
+        }
         @Override
         public void run(){
             System.out.println("Sono nel ThreadExit");
-            Platform.runLater(() -> logList.add(randomUser + " ha fatto il LOGOUT."));
+            logged_accounts.remove(exitUser);
+
+            Platform.runLater(() -> logList.add(exitUser + " ha fatto il LOGOUT."));
         }
     }
-
 
     class RunServer implements Runnable{
         private Socket socket;
@@ -282,6 +288,8 @@ public class Server {
         @Override
         public void run() {
             try {
+                setAccountList();
+
                 executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5); /*serve a richimare i thread funzioni più avanti ---> executor.execute(new ThreadUser(out));*/
 
                 while (true) {
@@ -323,7 +331,7 @@ public class Server {
                             executor.execute(new ThreadForwardAccounts(outputStream,account));
                             break;
                         case "exit":
-                            executor.execute(new ThreadExit());
+                            executor.execute(new ThreadExit(account));
                             break;
 
                         default:
@@ -453,7 +461,6 @@ public class Server {
         }
         return inMail;
     }
-
 
      public synchronized void jSonWriter(Email newEmail, String account){
 

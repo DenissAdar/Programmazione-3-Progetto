@@ -120,7 +120,6 @@ public class ClientController {
     @FXML
     public void newMailCreation(){
 
-
         mittenteTxt.textProperty().set(client.getAccount());
         client.setSenderProperty(mittenteTxt.textProperty().get());
 
@@ -208,6 +207,8 @@ public class ClientController {
     public void sendMail(){
         dataTxt.textProperty().setValue(getDate());
         String[] arrayStringhe = destinatarioTxt.textProperty().getValue().split(",");
+        /*ArrayList<String> p = new ArrayList<>();
+        p = destinatarioTxt.textProperty().getValue().split(",");*/
         if(arrayStringhe.length>1){
             for(int i =0;i< arrayStringhe.length;i++){
 

@@ -203,7 +203,7 @@ public class Client {
     //-----------
     public void setAccountProperty() {
         try {
-            accountProperty.setValue((String)account);
+            accountProperty.setValue(account);
         }catch (NullPointerException e){
             System.out.println("Trovato NullPointer Exception ");
         }
