@@ -206,24 +206,16 @@ public class ClientController {
     @FXML
     public void sendMail(){
         dataTxt.textProperty().setValue(getDate());
-        String[] arrayStringhe = destinatarioTxt.textProperty().getValue().split(",");
+
         /*ArrayList<String> p = new ArrayList<>();
         p = destinatarioTxt.textProperty().getValue().split(",");*/
-        if(arrayStringhe.length>1){
-            for(int i =0;i< arrayStringhe.length;i++){
 
-                Email e = new Email(mittenteTxt.textProperty().getValue(), arrayStringhe[i] , oggettoTxt.textProperty().getValue() , mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
-                System.out.println("Mail numero : "+ i +" creata , eccola: " + e.visualizzaMail());
-                 // clearFields();
-                client.socketSendMail(e);
-            }
-            clearFields();
-        }else{
-            Email e = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue() , oggettoTxt.textProperty().getValue() , mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
-            System.out.println("LA NUOVA MAIL CREATA : " + e.visualizzaMail());
-            clearFields();
-            client.socketSendMail(e);
-        }
+        Email e = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue() , oggettoTxt.textProperty().getValue() , mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
+
+        // clearFields();
+        clearFields();
+        client.socketSendMail(e);
+
 
 
 

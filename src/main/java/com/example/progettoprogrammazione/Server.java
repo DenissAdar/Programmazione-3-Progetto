@@ -176,6 +176,7 @@ public class Server {
         ObjectInputStream in;
         String account;
         Email email;
+        ArrayList<String> receivers = new ArrayList<>();
         //String[] accounts;
         //boolean flag=false;
 
@@ -190,19 +191,23 @@ public class Server {
             try{
                 email = (Email) in.readObject(); //Ho una Mail
                 System.out.println(email.visualizzaMail());
-
+                String[] singleReceiver = email.getReceiver().split(",");
+                for(int i = 0;i<singleReceiver.length;i++){
+                    if(accounts.contains(singleReceiver[i])){
+                        email.setReceiver(singleReceiver[i]);
+                        jSonWriter(email,account);
+                        Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getReceiver()));
+                    }
+                    else {
+                        Platform.runLater(() -> logList.add("L'utente: " + account + " cerca di mandare un email all'utente " + email.getReceiver() + " che non esiste!"));
+                    };
+                }
                 /*for(int i=0;i<accounts.length;i++){
                     if(email.getReceiver().equals(accounts[i]))
                         flag=true;
                 }*/
 
-                if(accounts.contains(email.getReceiver())){
-                    jSonWriter(email,account);
-                    Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getReceiver()));
-                }
-                else {
-                    Platform.runLater(() -> logList.add("L'utente: " + account + " cerca di mandare un email all'utente " + email.getReceiver() + " che non esiste!"));
-                }
+
 
             }catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
 
@@ -326,9 +331,6 @@ public class Server {
                             break;
                         case "deleteAll":
                             //executor.execute(new ThreadDeleteAll(outputStream));
-                            break;
-                        case "getForwardAccounts":
-                            executor.execute(new ThreadForwardAccounts(outputStream,account));
                             break;
                         case "exit":
                             executor.execute(new ThreadExit(account));

@@ -35,6 +35,9 @@ public class Email implements Serializable {
     public String getReceiver() {
         return receiver;
     }
+    public void setReceiver(String s){
+        this.receiver = s;
+    }
     public String getDate(){return date;}
 
     public String visualizzaMail() {
