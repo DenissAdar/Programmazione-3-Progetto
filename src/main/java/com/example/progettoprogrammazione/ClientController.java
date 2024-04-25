@@ -2,6 +2,7 @@ package com.example.progettoprogrammazione;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -96,7 +97,7 @@ public class ClientController {
         String mittente = mittenteTxt.textProperty().getValue();
         String destinatario = destinatarioTxt.textProperty().getValue();
         String oggetto = "R:" + oggettoTxt.textProperty().getValue();
-        String oldBody = mailBodyTxt.textProperty().getValue();
+
         newMailCreation();
         mittenteTxt.textProperty().set(destinatario);
         destinatarioTxt.textProperty().set(mittente);
@@ -104,6 +105,12 @@ public class ClientController {
         oggettoTxt.setEditable(false);
         destinatarioTxt.setEditable(false);
         mittenteTxt.setEditable(false);
+
+    }
+
+
+    public void replyAllMail() {
+        //replyMail();
 
     }
     public void setVisibility(Boolean flag){

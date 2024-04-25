@@ -24,11 +24,7 @@ public class Client {
     private String account;
     private ObjectProperty<String> accountProperty = new SimpleObjectProperty<>();
 
-
-
     private ListProperty<Email> MailProperty;
-    private ListProperty<String> ForwardAccounts;
-    private ObservableList<String> accountList;
     private ObservableList<Email> MailContent;
     private SimpleStringProperty senderProperty;
     private SimpleStringProperty receiverProperty;
@@ -167,35 +163,7 @@ public class Client {
             System.out.println("Non è stato possibile connettersi al server");
         }
     }
-    public void getForwardAccounts() throws IOException, ClassNotFoundException {
 
-        socket = new Socket(InetAddress.getLocalHost(), 6000);
-        outputStream = new ObjectOutputStream(socket.getOutputStream());
-        outputStream.flush();
-        outputStream.writeObject(this.getAccount());
-        outputStream.writeObject("getForwardAccounts");
-        inputStream = new ObjectInputStream(socket.getInputStream());
-        accounts = (ArrayList<String>) inputStream.readObject();
-        Platform.runLater(() -> setAccountListProperty());
-
-    }
-    public ListProperty<String> getAccountListProperty(){
-        return ForwardAccounts;
-    }
-    public void setAccountListProperty(){
-        ForwardAccounts.clear();
-        accountList.clear();
-        ForwardAccounts.set(accountList);
-
-        if(accountList.isEmpty()) {
-            for (int i = 0; i < accounts.size(); i++) {
-
-                accountList.add(accounts.get(i));
-            }
-            ForwardAccounts.set(accountList);
-
-        }
-    }
     public String getAccount() {
         return account;
     }

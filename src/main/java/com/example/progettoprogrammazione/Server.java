@@ -36,7 +36,7 @@ import javafx.collections.ObservableList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.Arrays;
 public class Server {
-    //private String[] accounts;
+
     ArrayList<String> accounts = new ArrayList<>();
     ArrayList<String> logged_accounts = new ArrayList<>();
     //private static AtomicInteger uniqueId = new AtomicInteger(0);
@@ -45,7 +45,7 @@ public class Server {
     ThreadPoolExecutor executor;
     private ListProperty<String> logList; /*binding in sever controller*/
     private ObservableList<String> logListContent;
-    //private String[] lista;
+
     public Server(){
         try {
             this.logListContent = FXCollections.observableList(new LinkedList<>());
@@ -256,11 +256,6 @@ public class Server {
             catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
         }
     }
-    class ThreadDeleteAll implements Runnable{
-        public ThreadDeleteAll(){}
-        @Override
-        public void run(){}
-    }
 
     // Metodo che gestisce la chiusura
     class ThreadExit implements Runnable{
@@ -371,34 +366,6 @@ public class Server {
         }
     }
 
-    class ThreadForwardAccounts implements Runnable {
-        ObjectOutputStream outputStream;
-        String account;
-
-        public ThreadForwardAccounts(ObjectOutputStream out, String a) {
-            this.outputStream = out;
-            this.account = a;
-        }
-
-        @Override
-        public void run() {
-            ArrayList<String> forwardAccounts = new ArrayList<>();
-            try {
-                forwardAccounts.clear();
-                ObjectMapper readObjectMapper = new ObjectMapper();
-                JsonNode rootNode = readObjectMapper.readTree(new File(jsonFilePath));
-
-                // Itera sui nodi del file JSON
-                for (JsonNode emailNode : rootNode) {
-                    forwardAccounts.add(emailNode.get("email").asText());
-                }
-                outputStream.writeObject(forwardAccounts);
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
     /* -------------------------- GESTIONE JSON --------------------- ----- */
 
 
