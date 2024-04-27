@@ -190,24 +190,28 @@ public class Server {
         public void run(){
             try{
                 email = (Email) in.readObject(); //Ho una Mail
-                System.out.println(email.visualizzaMail());
-                String[] singleReceiver = email.getReceiver().split(",");
-                for(int i = 0;i<singleReceiver.length;i++){
-                    if(accounts.contains(singleReceiver[i])){
-                        email.setReceiver(singleReceiver[i]);
+
+
+                if(email.getReceiver().contains(",")){
+                    String[] singleReceiver = email.getReceiver().split(",");
+                    for(int i = 0; i < singleReceiver.length ; i++){
+                        jSonWriterMultiplo(email,account,singleReceiver[i]);
+                        String s = singleReceiver[i];
+                        Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + s));
+                    }
+
+
+
+                }
+                else {
+                    if(accounts.contains(email.getReceiver())){
                         jSonWriter(email,account);
                         Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getReceiver()));
                     }
                     else {
                         Platform.runLater(() -> logList.add("L'utente: " + account + " cerca di mandare un email all'utente " + email.getReceiver() + " che non esiste!"));
-                    };
+                    }
                 }
-                /*for(int i=0;i<accounts.length;i++){
-                    if(email.getReceiver().equals(accounts[i]))
-                        flag=true;
-                }*/
-
-
 
             }catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
 
@@ -407,6 +411,7 @@ public class Server {
                     for (JsonNode contentNode : contenutoNode) {
                         String sender = contentNode.get("from").asText();
                         String receiver = contentNode.get("to").asText();
+
                         String object = contentNode.get("object").asText();
                         String message = contentNode.get("text").asText();
                         String dateTime = contentNode.get("dateTime").asText();
@@ -414,7 +419,7 @@ public class Server {
 
                         if(mailListType.equals("Entrata")){
                             Email emailObj = new Email(sender, receiver, object, message, dateTime);
-                            if(Objects.equals(account, receiver)) inMail.add(emailObj);
+                            if(!(Objects.equals(account, sender))|| (Objects.equals(account, receiver))) inMail.add(emailObj);
                         }
                         else if(mailListType.equals("Uscita")){
                             Email emailObj = new Email(sender, receiver, object, message, dateTime);
@@ -445,17 +450,11 @@ public class Server {
                  ArrayNode accounts = (ArrayNode) rootNode;
                  for (JsonNode accountNode : accounts) {
                      String registeredAccount = accountNode.path("email").asText();
-                     //den Questo e' un controllo che nella realta' non ha senso: perche' qui controlla che --account-- dato da client sia uguale a uno dei nodi degli account("email:")
-                     //ma account viene dato da un metodo account picker che lavora gia' su quel json per assegnare un nodo degli account("email:") ad --account--
-
-                     //qua dobbiamo fare un controllo che se dest e mit diversi tra di loro  fa i due if sotto sennò fa altro
-                     if(!Objects.equals(newEmail.getSender(), newEmail.getReceiver())){
+                       if(!Objects.equals(newEmail.getSender(), newEmail.getReceiver())){
                          if (registeredAccount.equals(account)) {
                          // Trovato l'account, aggiungi la nuova email al nodo "content"
                          newEmailNode = writeObjectMapper.createObjectNode();
                          newEmailNode.put("from", newEmail.getSender());
-
-                         // TODO inverte oggetto e destinatario
                          newEmailNode.put("to", newEmail.getReceiver());
                          newEmailNode.put("object", newEmail.getObject());
                          newEmailNode.put("text", newEmail.getMessage());
@@ -466,17 +465,11 @@ public class Server {
 
                          // Salva le modifiche nel file JSON
                          writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
-                         //System.out.println("Email aggiunta con successo per l'account: " + account);
-                             System.out.println("Sono nel nodo if1" );
-                             System.out.println("Valore di Mittente " + newEmail.getSender());
-                             System.out.println("Valore di Dest " + newEmail.getReceiver());
-                             System.out.println("Valore di uguaglianza" + newEmail.getSender().equals(newEmail.getReceiver()));
                      }
                          if (registeredAccount.equals(newEmail.getReceiver())){
                              newEmailNode = writeObjectMapper.createObjectNode();
                              newEmailNode.put("from", newEmail.getSender());
 
-                             // TODO inverte oggetto e destinatario
                              newEmailNode.put("to", newEmail.getReceiver());
                              newEmailNode.put("object", newEmail.getObject());
                              newEmailNode.put("text", newEmail.getMessage());
@@ -487,11 +480,7 @@ public class Server {
 
                              // Salva le modifiche nel file JSON
                              writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
-                             //System.out.println("Email aggiunta con successo per l'account: " + newEmail.getReceiver());
-                             System.out.println("Sono nel nodo if2" );
-                             System.out.println("Valore di Mittente " + newEmail.getSender());
-                             System.out.println("Valore di Dest " + newEmail.getReceiver());
-                             System.out.println("Valore di uguaglianza" + newEmail.getSender().equals(newEmail.getReceiver()));
+
                          }}
                      else{
                          if (registeredAccount.equals(account)) {
@@ -504,7 +493,6 @@ public class Server {
                              ArrayNode contentNode = (ArrayNode) accountNode.path("content");
                              contentNode.add(newEmailNode);
                              writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
-                             System.out.println("Sono nel nodo else del Writer");
                          }
                      }
 
@@ -515,6 +503,78 @@ public class Server {
              System.err.println("Errore durante la lettura/scrittura del file JSON: " + e.getMessage());
          }
      }
+
+    public synchronized void jSonWriterMultiplo(Email newEmail, String account, String receiver){
+        String destinatario = receiver;
+        System.out.println("+++++++++++"+destinatario);
+        System.out.println("+++++++++++"+newEmail.getReceiver());
+        ObjectMapper writeObjectMapper = new ObjectMapper();
+        ObjectNode newEmailNode;
+        try {
+            JsonNode rootNode = (JsonNode) writeObjectMapper.readTree(new File(jsonFilePath));
+            if (rootNode.isArray()) {
+                ArrayNode accounts = (ArrayNode) rootNode;
+                for (JsonNode accountNode : accounts) {
+                    String registeredAccount = accountNode.path("email").asText();
+                    if(!Objects.equals(newEmail.getSender(), destinatario)){
+                        if (registeredAccount.equals(account)) {
+                            // Trovato l'account, aggiungi la nuova email al nodo "content"
+                            System.out.println("Sono prima che si scriva sul mittente ");
+                            newEmailNode = writeObjectMapper.createObjectNode();
+                            newEmailNode.put("from", newEmail.getSender());
+                            newEmailNode.put("to", newEmail.getReceiver());
+                            newEmailNode.put("object", newEmail.getObject());
+                            newEmailNode.put("text", newEmail.getMessage());
+                            newEmailNode.put("dateTime", newEmail.getDate());
+
+                            ArrayNode contentNode = (ArrayNode) accountNode.path("content");
+
+                            contentNode.add(newEmailNode);
+
+                            // Salva le modifiche nel file JSON
+                            writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
+                        }
+                        if (registeredAccount.equals(destinatario)){
+                            System.out.println("Sono prima che si scriva sul destinatario ");
+                            newEmailNode = writeObjectMapper.createObjectNode();
+                            newEmailNode.put("from", newEmail.getSender());
+
+                            newEmailNode.put("to", newEmail.getReceiver());
+                            newEmailNode.put("object", newEmail.getObject());
+                            newEmailNode.put("text", newEmail.getMessage());
+                            newEmailNode.put("dateTime", newEmail.getDate());
+
+                            ArrayNode contentNode = (ArrayNode) accountNode.path("content");
+                            contentNode.add(newEmailNode);
+
+                            // Salva le modifiche nel file JSON
+                            writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
+
+                        }}
+                    else{
+                        if (registeredAccount.equals(account)) {
+                            newEmailNode = writeObjectMapper.createObjectNode();
+                            newEmailNode.put("from", newEmail.getSender());
+                            newEmailNode.put("to", newEmail.getReceiver());
+                            newEmailNode.put("object", newEmail.getObject());
+                            newEmailNode.put("text", newEmail.getMessage());
+                            newEmailNode.put("dateTime", newEmail.getDate());
+                            ArrayNode contentNode = (ArrayNode) accountNode.path("content");
+                            contentNode.add(newEmailNode);
+                            writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
+                        }
+                    }
+                }
+            }
+
+
+
+        }catch(IOException e){
+            System.err.println("Errore durante la lettura/scrittura del file JSON: " + e.getMessage());
+        }
+
+
+    }
 
      public synchronized void jSonDeleter(Email newEmail, String account) throws JSONException, IOException {
      String jsonString = new String(Files.readAllBytes(Paths.get(jsonFilePath)));

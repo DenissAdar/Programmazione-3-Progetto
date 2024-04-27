@@ -1,5 +1,6 @@
 package com.example.progettoprogrammazione;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 // Creo i dati che sono dentro a "contenuto" del file json
 public class Email implements Serializable {
@@ -10,7 +11,7 @@ public class Email implements Serializable {
     private String sender;
     private String receiver;
     private String date;
-    private String idMail;
+private String idMail;
 
     public Email(String sender, String receiver, String object,  String message, String date) {
         this.message = message;

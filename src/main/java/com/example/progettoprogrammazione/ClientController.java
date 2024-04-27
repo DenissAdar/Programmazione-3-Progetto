@@ -110,8 +110,18 @@ public class ClientController {
 
 
     public void replyAllMail() {
-        //replyMail();
+        String oldSender = mittenteTxt.textProperty().getValue();
+        String destinatari = destinatarioTxt.textProperty().getValue();
+        String oggetto = "R-All:" + oggettoTxt.textProperty().getValue();
+        destinatari = destinatari.replace(accountDisplay.textProperty().getValue(),oldSender);
 
+        newMailCreation();
+        mittenteTxt.textProperty().setValue(accountDisplay.textProperty().getValue());
+        destinatarioTxt.textProperty().setValue(destinatari);
+        oggettoTxt.textProperty().setValue(oggetto);
+        oggettoTxt.setEditable(false);
+        destinatarioTxt.setEditable(false);
+        mittenteTxt.setEditable(false);
     }
     public void setVisibility(Boolean flag){
 
@@ -195,7 +205,6 @@ public class ClientController {
             }
             inviaBtn.setVisible(false);
         }
-
 
     }
     @FXML
