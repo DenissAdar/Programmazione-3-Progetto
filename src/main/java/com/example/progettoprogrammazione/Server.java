@@ -147,7 +147,6 @@ public class Server {
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
-
     // Metodo che gestisce le email in uscita
     class ThreadOutMail implements Runnable{
         ObjectOutputStream out;
@@ -169,7 +168,6 @@ public class Server {
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
-
     // Metodo che gestisce l'invio di una mail
     class ThreadSend implements Runnable{
         ObjectOutputStream out;
@@ -177,8 +175,7 @@ public class Server {
         String account;
         Email email;
         ArrayList<String> receivers = new ArrayList<>();
-        //String[] accounts;
-        //boolean flag=false;
+
 
         public ThreadSend(ObjectInputStream in,ObjectOutputStream out,String account)
         {
@@ -190,8 +187,6 @@ public class Server {
         public void run(){
             try{
                 email = (Email) in.readObject(); //Ho una Mail
-
-
                 if(email.getReceiver().contains(",")){
                     String[] singleReceiver = email.getReceiver().split(",");
                     for(int i = 0; i < singleReceiver.length ; i++){
@@ -199,9 +194,6 @@ public class Server {
                         String s = singleReceiver[i];
                         Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + s));
                     }
-
-
-
                 }
                 else {
                     if(accounts.contains(email.getReceiver())){
@@ -217,25 +209,6 @@ public class Server {
 
         }
     }
-    class ThreadSendAll implements Runnable{
-        ObjectInputStream in;
-        String account;
-        Email email;
-        public ThreadSendAll(ObjectInputStream in,String account)
-        {
-            this.in = in;
-            this.account = account;
-        }
-        @Override
-        public void run(){
-            try{
-                email = (Email) in.readObject();
-
-                //stringa tipo denis@example.com,gaia@example.com
-            }catch (IOException | ClassNotFoundException e){throw new RuntimeException(e);}
-
-        }
-    }
     class ThreadDelete implements Runnable{
         ObjectOutputStream out;
         ObjectInputStream in;
@@ -248,6 +221,7 @@ public class Server {
             this.in = in;
             this.out = out;
             this.account = account;
+            System.out.println("------------"+account);
         }
         @Override
         public void run(){
@@ -265,14 +239,12 @@ public class Server {
     class ThreadExit implements Runnable{
 
         String exitUser;
-        public ThreadExit(String exitUser){
-            this.exitUser = exitUser;
+        public ThreadExit(String account){
+            this.exitUser = account;
         }
         @Override
         public void run(){
-            System.out.println("Sono nel ThreadExit");
             logged_accounts.remove(exitUser);
-
             Platform.runLater(() -> logList.add(exitUser + " ha fatto il LOGOUT."));
         }
     }
@@ -322,15 +294,10 @@ public class Server {
                         case "send":
                             executor.execute(new ThreadSend(inputStream, outputStream, account));
                             break;
-                        case "sendAll":
-                            //executor.execute(new ThreadSendAll(outputStream));
-                            break;
                         case "delete":
                             executor.execute(new ThreadDelete(inputStream, outputStream, account));
                             break;
-                        case "deleteAll":
-                            //executor.execute(new ThreadDeleteAll(outputStream));
-                            break;
+
                         case "exit":
                             executor.execute(new ThreadExit(account));
                             break;
@@ -506,8 +473,6 @@ public class Server {
 
     public synchronized void jSonWriterMultiplo(Email newEmail, String account, String receiver){
         String destinatario = receiver;
-        System.out.println("+++++++++++"+destinatario);
-        System.out.println("+++++++++++"+newEmail.getReceiver());
         ObjectMapper writeObjectMapper = new ObjectMapper();
         ObjectNode newEmailNode;
         try {

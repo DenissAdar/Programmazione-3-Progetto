@@ -165,6 +165,8 @@ public class ClientController {
         setVisibility(true);
         inviaBtn.setVisible(false);
 
+        //dataLable.setVisible(false);
+        //dataTxt.setVisible(false);
     }
 
     @FXML

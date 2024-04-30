@@ -219,7 +219,7 @@ public class Client {
             socket = new Socket(InetAddress.getLocalHost(), 6000);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
-            outputStream.writeObject("");
+            outputStream.writeObject(this.getAccount());
             outputStream.writeObject("exit");
             closeStreams();
         }catch(IOException e) {
