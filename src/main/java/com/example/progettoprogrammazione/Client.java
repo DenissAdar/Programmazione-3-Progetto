@@ -2,6 +2,7 @@ package com.example.progettoprogrammazione;
 
 import javafx.application.Platform;
 import javafx.beans.property.*;
+
 import java.net.InetAddress;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -15,13 +16,16 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 
 
-public class Client {
+public class Client{
 
     private Socket socket = null;
     private ObjectOutputStream outputStream = null;
     private ObjectInputStream inputStream = null;
 
-    private String account;
+    private String account = "";
+
+    private ObjectProperty<String> label = new SimpleObjectProperty<>();
+
     private ObjectProperty<String> accountProperty = new SimpleObjectProperty<>();
 
     private ListProperty<Email> MailProperty;
@@ -35,15 +39,6 @@ public class Client {
     Thread t1;
 
     public Client(){
-
-        t1 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                socketUsername();
-            }
-        });
-
-        t1.start();
 
         senderProperty = new SimpleStringProperty();
         receiverProperty = new SimpleStringProperty();
@@ -60,13 +55,54 @@ public class Client {
         });
 
 
+        t1 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true)
+                {
+                    try{
+                        while (account.isEmpty()){
+                            socketUsername();
+                        }
+                        /*if(!connectionVerification()){
+                            //TODO Dire alla lable di accendersi
 
+
+                        }*/
+
+                        Thread.sleep(10000);
+                    }catch (InterruptedException e) {
+                        System.out.println("Errore thread costruttore client");
+                    }
+
+                }
+
+            }
+        });
+        t1.setDaemon(true);
+        t1.start();
+
+    }
+
+    public boolean connectionVerification(){
+        try {
+            socket = new Socket(InetAddress.getLocalHost(), 6000);
+            if(socket.isClosed()){
+                System.out.println("Socket è chiuso");
+                //TODO comunicarlo alla label
+                return false;
+            }
+            return true;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
     public SimpleStringProperty getSenderProperty(){
         System.out.println("Valore di SenderProeprty" + senderProperty);
-        return senderProperty;}
+        return senderProperty;
+    }
 
     public void setSenderProperty(String s){senderProperty.set(s);}
     public SimpleStringProperty getReceiverProperty(){return receiverProperty;}
@@ -78,14 +114,17 @@ public class Client {
     public SimpleStringProperty getMessageProperty(){return messageProperty;}
     public void setMessageProperty(String s){messageProperty.set(s);}
 
-
+    //TODO CI STO LAVORANDO E' LA LABEL di errore
+    public ObjectProperty<String> getErrorLabelProperty(){
+        return label;
+    }
     //LIST
     public ListProperty<Email> getMailProperty() {
         return MailProperty;
     }
     public void socketSendMail(Email email){
         try{
-            System.out.println("Inizio"+email.visualizzaMail());
+            System.out.println("Inizio "+email.visualizzaMail());
             socket = new Socket(InetAddress.getLocalHost(), 6000);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
@@ -96,21 +135,23 @@ public class Client {
 
         }catch(IOException  e) {
             System.out.println("Non è stato possibile connettersi al server");
+            //TODO comunicarlo alla label
         }
     }
     public void socketDeleteMail(Email email){
         try{
-            System.out.println("Inizio"+email.visualizzaMail());
+            System.out.println("Inizio "+email.visualizzaMail());
             socket = new Socket(InetAddress.getLocalHost(), 6000);
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
             outputStream.writeObject(this.getAccount());
             outputStream.writeObject("delete");
             outputStream.writeObject(email);
-
+            setError("");
 
         }catch(IOException  e) {
             System.out.println("Non è stato possibile connettersi al server");
+            setError("Errore nella richiesta di Eliminazione della Mail");
         }
     }
 
@@ -126,11 +167,12 @@ public class Client {
             inputStream = new ObjectInputStream(socket.getInputStream());
             emailList = (ArrayList<Email>) inputStream.readObject();
             Platform.runLater(()-> setMailProperty());
-
+            setError("");
 
 
         }catch(IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server");
+            setError("Errore nella richiesta delle Mail in Entrata");
         }
     }
     public void setMailProperty(){
@@ -158,9 +200,11 @@ public class Client {
             inputStream = new ObjectInputStream(socket.getInputStream());
             emailList = (ArrayList<Email>) inputStream.readObject();
             Platform.runLater(()-> setMailProperty());
+            setError("");
 
         }catch(IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server");
+            setError("Errore nella richiesta delle Mail in Uscita");
         }
     }
 
@@ -189,11 +233,14 @@ public class Client {
             inputStream = new ObjectInputStream(socket.getInputStream());
             account = (String) inputStream.readObject();
             Platform.runLater( ()-> setAccountProperty());
+            setError("");
+
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server");
+            setError("Errore di associazione di user");
         }
-    }
-    //-----------
+
+}
 
     public void openStreams() throws IOException {
         System.out.println("Server Connesso");
@@ -221,12 +268,23 @@ public class Client {
             outputStream.flush();
             outputStream.writeObject(this.getAccount());
             outputStream.writeObject("exit");
-            closeStreams();
+            inputStream = new ObjectInputStream(socket.getInputStream());
+
+            boolean response = (boolean) inputStream.readObject();
+
+             if (response)
+                 closeStreams();
+
         }catch(IOException e) {
             System.out.println("Non è stato possibile connettersi al server");
+        } catch (ClassNotFoundException e) {
+            System.out.println("Non è stato possibile chiudere");
         }
     }
 
+    public void setError(String error){
+        Platform.runLater(() -> label.set(error));
+    }
 }
 
 

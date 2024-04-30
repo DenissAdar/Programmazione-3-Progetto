@@ -7,8 +7,6 @@ import org.json.JSONObject;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Iterator;
-
 
 
 import java.io.*;
@@ -34,7 +32,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.Arrays;
+
 public class Server {
 
     ArrayList<String> accounts = new ArrayList<>();
@@ -190,7 +188,7 @@ public class Server {
                 if(email.getReceiver().contains(",")){
                     String[] singleReceiver = email.getReceiver().split(",");
                     for(int i = 0; i < singleReceiver.length ; i++){
-                        jSonWriterMultiplo(email,account,singleReceiver[i]);
+                        jSonWriterMultiple(email,account,singleReceiver[i]);
                         String s = singleReceiver[i];
                         Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + s));
                     }
@@ -237,15 +235,23 @@ public class Server {
 
     // Metodo che gestisce la chiusura
     class ThreadExit implements Runnable{
-
+        ObjectOutputStream out;
         String exitUser;
-        public ThreadExit(String account){
+        public ThreadExit(ObjectOutputStream out, String account){
             this.exitUser = account;
+            this.out = out;
         }
         @Override
         public void run(){
-            logged_accounts.remove(exitUser);
-            Platform.runLater(() -> logList.add(exitUser + " ha fatto il LOGOUT."));
+            try {
+                logged_accounts.remove(exitUser);
+                Platform.runLater(() -> logList.add(exitUser + " ha fatto il LOGOUT."));
+
+                out.writeObject(true);
+                out.flush();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -299,7 +305,7 @@ public class Server {
                             break;
 
                         case "exit":
-                            executor.execute(new ThreadExit(account));
+                            executor.execute(new ThreadExit(outputStream, account));
                             break;
 
                         default:
@@ -316,10 +322,15 @@ public class Server {
             }
         }
         public void openStreams() throws IOException {
-            System.out.println("Server Connesso");
-            inputStream = new ObjectInputStream(socket.getInputStream());
-            outputStream = new ObjectOutputStream(socket.getOutputStream());
-            outputStream.flush();
+            try {
+                System.out.println("Server Connesso");
+                outputStream = new ObjectOutputStream(socket.getOutputStream());
+                outputStream.flush();
+                inputStream = new ObjectInputStream(socket.getInputStream());
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
 
         public void closeStreams() {
@@ -403,7 +414,7 @@ public class Server {
         return inMail;
     }
 
-     public synchronized void jSonWriter(Email newEmail, String account){
+    public synchronized void jSonWriter(Email newEmail, String account){
 
          // Creazione dell'oggetto ObjectMapper
          ObjectMapper writeObjectMapper = new ObjectMapper();
@@ -471,7 +482,7 @@ public class Server {
          }
      }
 
-    public synchronized void jSonWriterMultiplo(Email newEmail, String account, String receiver){
+    public synchronized void jSonWriterMultiple(Email newEmail, String account, String receiver){
         String destinatario = receiver;
         ObjectMapper writeObjectMapper = new ObjectMapper();
         ObjectNode newEmailNode;

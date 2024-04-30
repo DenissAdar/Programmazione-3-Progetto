@@ -1,18 +1,10 @@
 package com.example.progettoprogrammazione;
 
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -252,11 +244,12 @@ public class ClientController {
     public void init(){
         connectionNotification.setVisible(false);
         client = new Client();
-        setVisibility(false);
+        setVisibility(true);
         replyBtn.setVisible(false);
 
         accountDisplay.textProperty().bind(client.getAccountProperty()) ;
         mailList.itemsProperty().bind(client.getMailProperty());
+        connectionNotification.textProperty().bind(client.getErrorLabelProperty());
 
     }
 

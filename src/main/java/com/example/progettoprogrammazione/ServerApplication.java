@@ -20,9 +20,9 @@ public class ServerApplication extends Application {
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
-        controller.init();
-
+        //controller.init();
     }
+
     public static void main(String[] args) {
         launch();
 
