@@ -1,5 +1,6 @@
 package com.example.progettoprogrammazione;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
@@ -13,6 +14,11 @@ import java.net.Socket;
  */
 
 public class ServerController {
+/*    @FXML
+    public void handleWindowClose(){
+        server.exit();
+        Platform.exit();
+    }*/
 
     @FXML
     private TextArea ServerLog;
@@ -23,6 +29,7 @@ public class ServerController {
     public void init()
     {
         server = new Server();
+        System.out.println("Avviato new server");
         serverList.itemsProperty().bind(server.getLogList());
         //server.listen(6000);
        // ServerLog.textProperty().bind(server.getAccountLogProperty());

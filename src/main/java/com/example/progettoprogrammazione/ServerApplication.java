@@ -20,7 +20,10 @@ public class ServerApplication extends Application {
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
-        //controller.init();
+        controller.init();
+ /*       stage.setOnCloseRequest(windowEvent -> {
+            controller.handleWindowClose();
+        });*/
     }
 
     public static void main(String[] args) {

@@ -99,8 +99,6 @@ public class ClientController {
         mittenteTxt.setEditable(false);
 
     }
-
-
     public void replyAllMail() {
         String oldSender = mittenteTxt.textProperty().getValue();
         String destinatari = destinatarioTxt.textProperty().getValue();
@@ -216,13 +214,13 @@ public class ClientController {
     @FXML
     public void sendMail(){
         dataTxt.textProperty().setValue(getDate());
+        Email e;
 
         /*ArrayList<String> p = new ArrayList<>();
         p = destinatarioTxt.textProperty().getValue().split(",");*/
+        if(oggettoTxt.textProperty().getValue().isEmpty())oggettoTxt.textProperty().set("(No Subject)");
+        e = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue() , oggettoTxt.textProperty().getValue() , mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
 
-        Email e = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue() , oggettoTxt.textProperty().getValue() , mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
-
-        // clearFields();
         clearFields();
         client.socketSendMail(e);
 
@@ -242,7 +240,6 @@ public class ClientController {
     }
 
     public void init(){
-        connectionNotification.setVisible(false);
         client = new Client();
         setVisibility(true);
         replyBtn.setVisible(false);

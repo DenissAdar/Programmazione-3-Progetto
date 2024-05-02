@@ -56,7 +56,6 @@ public class Server {
 
                 }
             });
-
             serverSocket = new ServerSocket(6000);
             new Thread(new RunServer()).start();
         } catch (IOException e) {
@@ -265,11 +264,14 @@ public class Server {
         private Socket incoming;
         private String action;
 
-        public RunServer(){}
+        public RunServer(){
+            System.out.println("ciao");
+        }
 
         @Override
         public void run() {
             try {
+
                 setAccountList();
 
                 executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5); /*serve a richimare i thread funzioni più avanti ---> executor.execute(new ThreadUser(out));*/
@@ -321,7 +323,7 @@ public class Server {
                 closeStreams();
             }
         }
-        public void openStreams() throws IOException {
+        public void openStreams() {
             try {
                 System.out.println("Server Connesso");
                 outputStream = new ObjectOutputStream(socket.getOutputStream());
