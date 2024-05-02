@@ -53,7 +53,7 @@ public class Server {
             this.logListContent = FXCollections.observableList(new LinkedList<>());
             this.logList = new SimpleListProperty<>();
             this.logList.set(logListContent);
-
+            Thread.currentThread().setName("principale");
             logListContent.addListener(new ListChangeListener<String>() {
                 @Override
                 public void onChanged(Change<? extends String> change) {
@@ -115,6 +115,7 @@ public class Server {
         public ThreadAccount(ObjectOutputStream out, Socket socket) {
             this.out = out;
             this.socket = socket;
+            Thread.currentThread().setName("5");
         }
 
         @Override
@@ -125,7 +126,7 @@ public class Server {
                 out.writeObject(randomUser);
 
                 Platform.runLater(() -> logList.add(randomUser +" ha fatto l'accesso.")); /*loglist è l'elemento LOG dell'applicazione di sever lato grafico */
-                socket.close(); /*todo da rivedere chiusura*/
+                this.socket.close(); /*todo da rivedere chiusura*/
 
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -185,8 +186,8 @@ public class Server {
         ArrayList<String> receivers = new ArrayList<>();
 
 
-        public ThreadSend(ObjectInputStream in,ObjectOutputStream out,String account)
-        {
+        public ThreadSend(ObjectInputStream in,ObjectOutputStream out,String account){
+            Thread.currentThread().setName("4");
             this.in = in;
             this.out = out;
             this.account = account;
@@ -226,6 +227,7 @@ public class Server {
         boolean flag=false;
 
         public ThreadDelete(ObjectInputStream in,ObjectOutputStream out,String account) {
+            Thread.currentThread().setName("3");
             this.in = in;
             this.out = out;
             this.account = account;
@@ -248,6 +250,7 @@ public class Server {
         ObjectOutputStream out;
         String exitUser;
         public ThreadExit(ObjectOutputStream out, String account){
+            Thread.currentThread().setName("2");
             this.exitUser = account;
             this.out = out;
         }
@@ -272,7 +275,9 @@ public class Server {
         private Socket incoming;
         private String action;
 
-        public RunServer(){}
+        public RunServer(){
+            Thread.currentThread().setName("1");
+        }
 
         @Override
         public void run() {
@@ -358,6 +363,8 @@ public class Server {
             if(socketOutputStream != null) {
                 socketOutputStream.close();
             }
+
+            executor.shutdown();
         } catch (IOException e) {
             e.printStackTrace();
         }

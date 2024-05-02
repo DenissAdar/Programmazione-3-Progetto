@@ -14,12 +14,6 @@ import java.net.Socket;
  */
 
 public class ServerController {
-   /*@FXML
-    public void handleWindowClose(){
-        server.exit();
-        Platform.exit();
-    }*/
-
     @FXML
     private TextArea ServerLog;
     private Server server ;
