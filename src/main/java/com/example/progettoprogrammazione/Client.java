@@ -65,12 +65,6 @@ public class Client{
                         while (account.isEmpty()){
                             socketUsername();
                         }
-                        /*if(!connectionVerification()){
-                            //TODO Dire alla lable di accendersi
-
-
-                        }*/
-
                         Thread.sleep(10000);
                     }catch (InterruptedException e) {
                         System.out.println("Errore thread costruttore client");
@@ -128,19 +122,15 @@ public class Client{
             Email e = email;
             System.out.println("Inizio "+email.visualizzaMail());
             socket = new Socket(InetAddress.getLocalHost(), 6000);
-            //TODO FARE IN MODO CHE LA LABEL AVVERTI LO USER CHE LA MAIL NON è STATA MANDATA
-            //TODO NON SO PERCHE, MA NON MI CAMBIA IL VALORE DI LABEL
             if(Objects.equals(e.getReceiver(), "")){
                 setError("Mail non mandata perchè non c'è il Destinatario");
-                System.out.println(label.getValue()+"CIAO");
-            }
-            System.out.println(label.getValue());
+            }else   setError("");
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
             outputStream.writeObject(this.getAccount());
             outputStream.writeObject("send");
             outputStream.writeObject(email);
-            setError("");
+            socket.close();
 
         }catch(IOException  e) {
             System.out.println("Non è stato possibile connettersi al server");
@@ -158,7 +148,7 @@ public class Client{
             outputStream.writeObject("delete");
             outputStream.writeObject(email);
             setError("");
-
+            socket.close();
         }catch(IOException  e) {
             System.out.println("Non è stato possibile connettersi al server");
             setError("Errore nella richiesta di Eliminazione della Mail, Server non connesso");
@@ -177,8 +167,7 @@ public class Client{
             emailList = (ArrayList<Email>) inputStream.readObject();
             Platform.runLater(()-> setMailProperty());
             setError("");
-
-
+            socket.close();
         }catch(IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server");
             setError("Errore nella richiesta delle Mail in Entrata, Server non connesso");
@@ -191,11 +180,9 @@ public class Client{
 
         if(MailContent.isEmpty()) {
             for (int i = 0; i < emailList.size(); i++) {
-                System.out.println(":: " + emailList.get(i));
                 MailContent.add(emailList.get(i));
             }
             MailProperty.set(MailContent);
-            System.out.println("Prova: " + MailProperty);
         }
     }
     public void socketOutMail(){
@@ -210,6 +197,7 @@ public class Client{
             emailList = (ArrayList<Email>) inputStream.readObject();
             Platform.runLater(()-> setMailProperty());
             setError("");
+            socket.close();
 
         }catch(IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server");
@@ -232,23 +220,21 @@ public class Client{
     public ObjectProperty<String> getAccountProperty(){
         return accountProperty;
     }
-    public void socketUsername() {
+    public void socketUsername(){
         try {
             socket = new Socket(InetAddress.getLocalHost(), 6000);
             outputStream= new ObjectOutputStream(socket.getOutputStream());
-
             outputStream.flush();
-
             outputStream.writeObject("");
             outputStream.writeObject("account");
             inputStream = new ObjectInputStream(socket.getInputStream());
             account = (String) inputStream.readObject();
             Platform.runLater( ()-> setAccountProperty());
             setError("");
+            socket.close();
 
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server in socket username");
-            e.printStackTrace();
             setError("Errore di associazione di user, Server non connesso");
         }
 
@@ -281,21 +267,21 @@ public class Client{
             outputStream.writeObject(this.getAccount());
             outputStream.writeObject("exit");
             inputStream = new ObjectInputStream(socket.getInputStream());
-
             boolean response = (boolean) inputStream.readObject();
-
              if (response)
                  closeStreams();
-
+            socket.close();
         }catch(IOException e) {
             System.out.println("Non è stato possibile connettersi al server");
         } catch (ClassNotFoundException e) {
             System.out.println("Non è stato possibile chiudere");
+
         }
     }
 
     public void setError(String error){
         Platform.runLater(() -> label.set(error));
+
     }
 }
 

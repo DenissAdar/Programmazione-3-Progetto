@@ -14,7 +14,7 @@ import java.net.Socket;
  */
 
 public class ServerController {
-/*    @FXML
+   /*@FXML
     public void handleWindowClose(){
         server.exit();
         Platform.exit();
@@ -31,7 +31,15 @@ public class ServerController {
         server = new Server();
         System.out.println("Avviato new server");
         serverList.itemsProperty().bind(server.getLogList());
-        //server.listen(6000);
-       // ServerLog.textProperty().bind(server.getAccountLogProperty());
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Shutting down server...");
+            server.exit();
+            System.out.println("Server shut down.");
+        }));
+    }
+
+    public void close() {
+        server.exit();
     }
 }
