@@ -25,14 +25,12 @@ public class ServerApplication extends Application {
 
     @Override
     public void stop() throws Exception {
-        //controller.handleWindowClose();
         controller.close();
         super.stop();
     }
 
     public static void main(String[] args) {
         launch();
-        System.exit(0);
     }
 }
 
