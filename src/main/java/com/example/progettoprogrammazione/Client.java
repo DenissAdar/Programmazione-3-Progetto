@@ -62,10 +62,21 @@ public class Client{
                 while (true)
                 {
                     try{
-                        while (account.isEmpty()){
-                            socketUsername();
+                       // while (account.isEmpty()){
+                        while(account.isEmpty()){
+                            System.out.println("Eccomi");
+                            if(socketUsername())
+                                System.out.println("Assegnamento a boon fine");
+                            else {
+                                System.out.println("Assegnamento non andato a buon fine");
+                                Thread.sleep(1000);
+                                Platform.exit();
+                            }
+
+                           //socketUsername();
                         }
-                        Thread.sleep(10000);
+                       // Thread.sleep(10000);
+
                     }catch (InterruptedException e) {
                         System.out.println("Errore thread costruttore client");
                     }
@@ -220,8 +231,9 @@ public class Client{
     public ObjectProperty<String> getAccountProperty(){
         return accountProperty;
     }
-    public void socketUsername(){
+    public boolean socketUsername(){
         try {
+            System.out.println("Sono in socketUSer");
             socket = new Socket(InetAddress.getLocalHost(), 6000);
             outputStream= new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
@@ -229,13 +241,25 @@ public class Client{
             outputStream.writeObject("account");
             inputStream = new ObjectInputStream(socket.getInputStream());
             account = (String) inputStream.readObject();
-            Platform.runLater( ()-> setAccountProperty());
-            setError("");
-            socket.close();
+            System.out.println(account);
+            System.out.println(Objects.equals(account, ""));
+            if(Objects.equals(account, "")){
+                System.out.println("Ciao");
+                Platform.exit();
+                socket.close();
+                return false;
+            }
+            else{
+                Platform.runLater( ()-> setAccountProperty());
+                setError("");
+                socket.close();
+                return true;
+            }
 
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server in socket username");
             setError("Errore di associazione di user, Server non connesso");
+            return false;
         }
 
 }

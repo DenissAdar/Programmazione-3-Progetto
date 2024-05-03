@@ -102,13 +102,15 @@ public class Server {
         // Metodo che seleziona un account in maniera randomica
         public String accountPicker()  {
             String accountScelto;
-
+            //TODO RISOLVERE QUI ENTRA IN UN LOOP INFINITO, NON VA BENE
+            // DEVE RETURNARE "" SE LOGGED ACCOUNTS
+            // RISOLVERE IN MODO MIGLIORE
             do {
                 accountScelto = accounts.get(ThreadLocalRandom.current().nextInt(0, accounts.size()));
+                System.out.println("Account scelto" + accountScelto);
+                if(logged_accounts.size()==3){return "";}
             }while (logged_accounts.contains(accountScelto));
-
             logged_accounts.add(accountScelto);
-
             return accountScelto;
         }
 
@@ -121,9 +123,8 @@ public class Server {
         public void run() {
             try {
                 String randomUser = accountPicker();
-
+                System.out.println(randomUser);
                 out.writeObject(randomUser);
-
                 Platform.runLater(() -> logList.add(randomUser +" ha fatto l'accesso.")); /*loglist è l'elemento LOG dell'applicazione di sever lato grafico */
                 socket.close(); /*todo da rivedere chiusura*/
 
@@ -278,7 +279,8 @@ public class Server {
         public void run() {
             try {
                 setAccountList();
-                executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5); /*serve a richimare i thread funzioni più avanti ---> executor.execute(new ThreadUser(out));*/
+                executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
+                /*serve a richimare i thread funzioni più avanti ---> executor.execute(new ThreadUser(out));*/
                 while (true) {
                     // Si blocca finchè non riceve qualcosa, va avanti SOLO SE LO RICEVE
                     socket = serverSocket.accept();

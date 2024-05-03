@@ -1,1 +1,206 @@
-[{"email":"gaia@example.com","content":[{"dateTime":"2024-04-30","from":"marius@example.com","to":"gaia@example.com","text":"PrimaMail","object":"PrimaMail"},{"dateTime":"2024-04-30","from":"gaia@example.com","to":"marius@example.com","text":"Risposta","object":"R:PrimaMail"},{"dateTime":"2024-04-30","from":"marius@example.com","to":"gaia@example.com","text":"Prova","object":"R-All:R:PrimaMail"},{"dateTime":"2024-04-30","from":"marius@example.com","to":"gaia@example.com,denis@example.com","text":"Prova2Dest","object":"Prova2Dest"},{"dateTime":"2024-04-30","from":"gaia@example.com","to":"marius@example.com,denis@example.com","text":"Ciao den e marius","object":"R-All:Prova2Dest"},{"dateTime":"2024-04-30","from":"gaia@example.com","to":"marius@example.com,denis@example.com","text":"Ciao den e marius","object":"R-All:Prova2Dest"},{"from":"denis@example.com","to":"gaia@example.com","object":"(No Subject)","text":"ciao","dateTime":"2024-05-02"},{"from":"gaia@example.com","to":"denis@example.com","object":"(No Subject)","text":"","dateTime":"2024-05-02"},{"from":"denis@example.com","to":"gaia@example.com","object":"(No Subject)","text":"","dateTime":"2024-05-02"}]},{"email":"denis@example.com","content":[{"dateTime":"2024-04-30","from":"marius@example.com","to":"gaia@example.com,denis@example.com","text":"Prova2Dest","object":"Prova2Dest"},{"dateTime":"2024-04-30","from":"gaia@example.com","to":"marius@example.com,denis@example.com","text":"Ciao den e marius","object":"R-All:Prova2Dest"},{"dateTime":"2024-04-30","from":"marius@example.com","to":"denis@example.com","text":"Risposta","object":"FWD:R:PrimaMail"},{"dateTime":"2024-05-02","from":"denis@example.com","to":"marius@example.com","text":"Hey","object":"Ciao"},{"from":"denis@example.com","to":"gaia@example.com","object":"(No Subject)","text":"ciao","dateTime":"2024-05-02"},{"from":"marius@example.com","to":"denis@example.com","object":"(No Subject)","text":"","dateTime":"2024-05-02"},{"from":"marius@example.com","to":"denis@example.com","object":"(No Subject)","text":"","dateTime":"2024-05-02"},{"from":"gaia@example.com","to":"denis@example.com","object":"(No Subject)","text":"","dateTime":"2024-05-02"},{"from":"denis@example.com","to":"gaia@example.com","object":"(No Subject)","text":"","dateTime":"2024-05-02"}]},{"email":"marius@example.com","content":[{"dateTime":"2024-04-30","from":"marius@example.com","to":"gaia@example.com","text":"PrimaMail","object":"PrimaMail"},{"dateTime":"2024-04-30","from":"marius@example.com","to":"gaia@example.com","text":"Prova","object":"R-All:R:PrimaMail"},{"dateTime":"2024-04-30","from":"marius@example.com","to":"gaia@example.com,denis@example.com","text":"Prova2Dest","object":"Prova2Dest"},{"dateTime":"2024-04-30","from":"marius@example.com","to":"gaia@example.com,denis@example.com","text":"Prova2Dest","object":"Prova2Dest"},{"dateTime":"2024-04-30","from":"marius@example.com","to":"denis@example.com","text":"Risposta","object":"FWD:R:PrimaMail"},{"dateTime":"2024-05-02","from":"denis@example.com","to":"marius@example.com","text":"Hey","object":"Ciao"},{"dateTime":"2024-05-02","from":"denis@example.com","to":"marius@example.com","text":"","object":""},{"from":"marius@example.com","to":"denis@example.com","object":"(No Subject)","text":"","dateTime":"2024-05-02"},{"from":"marius@example.com","to":"denis@example.com","object":"(No Subject)","text":"","dateTime":"2024-05-02"}]}]
+[
+  {
+    "email": "gaia@example.com",
+    "content": [
+      {
+        "dateTime": "2024-04-30",
+        "from": "marius@example.com",
+        "to": "gaia@example.com",
+        "text": "PrimaMail",
+        "object": "PrimaMail"
+      },
+      {
+        "dateTime": "2024-04-30",
+        "from": "gaia@example.com",
+        "to": "marius@example.com",
+        "text": "Risposta",
+        "object": "R:PrimaMail"
+      },
+      {
+        "dateTime": "2024-04-30",
+        "from": "marius@example.com",
+        "to": "gaia@example.com",
+        "text": "Prova",
+        "object": "R-All:R:PrimaMail"
+      },
+      {
+        "dateTime": "2024-04-30",
+        "from": "marius@example.com",
+        "to": "gaia@example.com,denis@example.com",
+        "text": "Prova2Dest",
+        "object": "Prova2Dest"
+      },
+      {
+        "dateTime": "2024-04-30",
+        "from": "gaia@example.com",
+        "to": "marius@example.com,denis@example.com",
+        "text": "Ciao den e marius",
+        "object": "R-All:Prova2Dest"
+      },
+      {
+        "dateTime": "2024-04-30",
+        "from": "gaia@example.com",
+        "to": "marius@example.com,denis@example.com",
+        "text": "Ciao den e marius",
+        "object": "R-All:Prova2Dest"
+      },
+      {
+        "from": "denis@example.com",
+        "to": "gaia@example.com",
+        "object": "(No Subject)",
+        "text": "ciao",
+        "dateTime": "2024-05-02"
+      },
+      {
+        "from": "gaia@example.com",
+        "to": "denis@example.com",
+        "object": "(No Subject)",
+        "text": "",
+        "dateTime": "2024-05-02"
+      },
+      {
+        "from": "denis@example.com",
+        "to": "gaia@example.com",
+        "object": "(No Subject)",
+        "text": "",
+        "dateTime": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "email": "denis@example.com",
+    "content": [
+      {
+        "dateTime": "2024-04-30",
+        "from": "marius@example.com",
+        "to": "gaia@example.com,denis@example.com",
+        "text": "Prova2Dest",
+        "object": "Prova2Dest"
+      },
+      {
+        "dateTime": "2024-04-30",
+        "from": "gaia@example.com",
+        "to": "marius@example.com,denis@example.com",
+        "text": "Ciao den e marius",
+        "object": "R-All:Prova2Dest"
+      },
+      {
+        "dateTime": "2024-04-30",
+        "from": "marius@example.com",
+        "to": "denis@example.com",
+        "text": "Risposta",
+        "object": "FWD:R:PrimaMail"
+      },
+      {
+        "dateTime": "2024-05-02",
+        "from": "denis@example.com",
+        "to": "marius@example.com",
+        "text": "Hey",
+        "object": "Ciao"
+      },
+      {
+        "from": "denis@example.com",
+        "to": "gaia@example.com",
+        "object": "(No Subject)",
+        "text": "ciao",
+        "dateTime": "2024-05-02"
+      },
+      {
+        "from": "marius@example.com",
+        "to": "denis@example.com",
+        "object": "(No Subject)",
+        "text": "",
+        "dateTime": "2024-05-02"
+      },
+      {
+        "from": "marius@example.com",
+        "to": "denis@example.com",
+        "object": "(No Subject)",
+        "text": "",
+        "dateTime": "2024-05-02"
+      },
+      {
+        "from": "gaia@example.com",
+        "to": "denis@example.com",
+        "object": "(No Subject)",
+        "text": "",
+        "dateTime": "2024-05-02"
+      },
+      {
+        "from": "denis@example.com",
+        "to": "gaia@example.com",
+        "object": "(No Subject)",
+        "text": "",
+        "dateTime": "2024-05-02"
+      }
+    ]
+  },
+  {
+    "email": "marius@example.com",
+    "content": [
+      {
+        "dateTime": "2024-04-30",
+        "from": "marius@example.com",
+        "to": "gaia@example.com",
+        "text": "PrimaMail",
+        "object": "PrimaMail"
+      },
+      {
+        "dateTime": "2024-04-30",
+        "from": "marius@example.com",
+        "to": "gaia@example.com",
+        "text": "Prova",
+        "object": "R-All:R:PrimaMail"
+      },
+      {
+        "dateTime": "2024-04-30",
+        "from": "marius@example.com",
+        "to": "gaia@example.com,denis@example.com",
+        "text": "Prova2Dest",
+        "object": "Prova2Dest"
+      },
+      {
+        "dateTime": "2024-04-30",
+        "from": "marius@example.com",
+        "to": "gaia@example.com,denis@example.com",
+        "text": "Prova2Dest",
+        "object": "Prova2Dest"
+      },
+      {
+        "dateTime": "2024-04-30",
+        "from": "marius@example.com",
+        "to": "denis@example.com",
+        "text": "Risposta",
+        "object": "FWD:R:PrimaMail"
+      },
+      {
+        "dateTime": "2024-05-02",
+        "from": "denis@example.com",
+        "to": "marius@example.com",
+        "text": "Hey",
+        "object": "Ciao"
+      },
+      {
+        "dateTime": "2024-05-02",
+        "from": "denis@example.com",
+        "to": "marius@example.com",
+        "text": "",
+        "object": ""
+      },
+      {
+        "from": "marius@example.com",
+        "to": "denis@example.com",
+        "object": "(No Subject)",
+        "text": "",
+        "dateTime": "2024-05-02"
+      },
+      {
+        "from": "marius@example.com",
+        "to": "denis@example.com",
+        "object": "(No Subject)",
+        "text": "",
+        "dateTime": "2024-05-02"
+      }
+    ]
+  }
+]
