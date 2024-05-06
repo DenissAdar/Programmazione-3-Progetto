@@ -184,8 +184,8 @@
         "dateTime": "2024-05-02",
         "from": "denis@example.com",
         "to": "marius@example.com",
-        "text": "",
-        "object": ""
+        "text": "bonjour",
+        "object": "bonjour"
       },
       {
         "from": "marius@example.com",

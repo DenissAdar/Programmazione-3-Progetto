@@ -1,6 +1,8 @@
 package com.example.progettoprogrammazione;
 
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -151,6 +153,7 @@ public class ClientController {
     }
     @FXML
     public void showInMail(){
+        client.setMailSide("in");
         client.socketInMail();
         setVisibility(true);
         inviaBtn.setVisible(false);
@@ -161,6 +164,7 @@ public class ClientController {
 
     @FXML
     public void showOutMail(){
+        client.setMailSide("out");
         replyBtn.setVisible(false);
         replyAllBtn.setVisible(false);
         client.socketOutMail();
@@ -247,6 +251,8 @@ public class ClientController {
         accountDisplay.textProperty().bind(client.getAccountProperty()) ;
         mailList.itemsProperty().bind(client.getMailProperty());
         connectionNotification.textProperty().bind(client.getErrorLabelProperty());
+
+        //showInMail();
 
     }
 

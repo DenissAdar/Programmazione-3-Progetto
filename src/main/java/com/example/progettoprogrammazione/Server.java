@@ -140,17 +140,24 @@ public class Server {
         ObjectOutputStream out;
         String account;
         ArrayList<Email> emailList = new ArrayList<>();
+        ArrayList<Email> clientCurrentEmailList;
 
-        public ThreadInMail(ObjectOutputStream out, String account){
+        public ThreadInMail(ObjectOutputStream out, String account, ArrayList<Email> clientCurrentEmailList){
             this.out = out;
             this.account = account;
+            this.clientCurrentEmailList = clientCurrentEmailList;
         }
 
         @Override
         public void run(){
             try{
                 emailList = jSonReader("Entrata",account);
-                System.out.println("Attenzione qua ingresso "+emailList);
+                for (int i = 0; i < emailList.size(); i++){
+                    if (clientCurrentEmailList.contains(emailList.get(i))){
+                        emailList.remove(i);
+                        i--;
+                    }
+                }
                 out.writeObject(emailList);
                 out.flush();
                 Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in ingresso"));
@@ -162,16 +169,24 @@ public class Server {
         ObjectOutputStream out;
         String account;
         ArrayList<Email> emailList = new ArrayList<>();
+        ArrayList<Email> clientCurrentEmail;
 
-        public ThreadOutMail(ObjectOutputStream out,String account){
+        public ThreadOutMail(ObjectOutputStream out, String account, ArrayList<Email> clientCurrentEmail){
             this.out = out;
             this.account = account;
+            this.clientCurrentEmail = clientCurrentEmail;
         }
 
         @Override
         public void run(){
             try{
                 emailList = jSonReader("Uscita",account);
+                for (int i = 0; i < emailList.size(); i++){
+                    if (clientCurrentEmail.contains(emailList.get(i))){
+                        emailList.remove(i);
+                        i--;
+                    }
+                }
                 out.writeObject(emailList);
                 out.flush();
                 Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in uscita"));
@@ -277,7 +292,7 @@ public class Server {
         private String action;
 
         public RunServer(){
-            Thread.currentThread().setName("1");
+
         }
 
         @Override
@@ -307,10 +322,11 @@ public class Server {
                             executor.execute(new ThreadAccount(socketOutputStream, socket));
                             break;
                         case "emailIn":
-                            executor.execute(new ThreadInMail(socketOutputStream,account));
+
+                            executor.execute(new ThreadInMail(socketOutputStream,account,(ArrayList<Email>) socketInputStream.readObject()));
                             break;
                         case "emailOut":
-                            executor.execute(new ThreadOutMail(socketOutputStream,account));
+                            executor.execute(new ThreadOutMail(socketOutputStream,account,(ArrayList<Email>) socketInputStream.readObject()));
                             break;
                         case "send":
                             executor.execute(new ThreadSend(socketInputStream, socketOutputStream, account));
