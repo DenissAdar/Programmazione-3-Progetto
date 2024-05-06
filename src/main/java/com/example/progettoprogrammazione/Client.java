@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -29,8 +30,8 @@ public class Client{
 
     private ObjectProperty<String> accountProperty = new SimpleObjectProperty<>();
 
-    private ListProperty<Email> MailProperty;
-    private ObservableList<Email> MailContent;
+    /*private ListProperty<Email> MailProperty;
+    private ObservableList<Email> MailContent;*/
     private SimpleStringProperty senderProperty;
     private SimpleStringProperty receiverProperty;
     private SimpleStringProperty objectProperty;
@@ -40,24 +41,35 @@ public class Client{
     private ArrayList<String> accounts = new ArrayList<>();
     private ArrayList<Email> inCurrentEmailList = new ArrayList<>();
     private ArrayList<Email> outCurrentEmailList = new ArrayList<>();
-    private String mailSide = "in";
     Thread t1;
 
+    private boolean firstConnection = true;
+    private ListProperty<Email> inbox;
+    private ObservableList<Email> inboxContent;
+    private ListProperty<Email> outbox;
+    private ObservableList<Email> outboxContent;
+
     public Client(){
+
+        this.inboxContent = FXCollections.observableList(new LinkedList<>());
+        this.inbox = new SimpleListProperty<>(inboxContent);
+
+        this.outboxContent = FXCollections.observableList(new LinkedList<>());
+        this.outbox = new SimpleListProperty<>(outboxContent);
 
         senderProperty = new SimpleStringProperty();
         receiverProperty = new SimpleStringProperty();
         objectProperty = new SimpleStringProperty();
         messageProperty = new SimpleStringProperty();
 
-        MailProperty = new SimpleListProperty<Email>(MailContent);
+        /*MailProperty = new SimpleListProperty<Email>(MailContent);
         MailContent = FXCollections.observableList(new LinkedList<>());
         MailContent.addListener(new ListChangeListener<Email>() {
             @Override
             public void onChanged(Change<? extends Email> change) {
 
             }
-        });
+        });*/
 
 
         t1 = new Thread(new Runnable() {
@@ -68,18 +80,8 @@ public class Client{
                     try{
                        // while (account.isEmpty()){
                         while(account.isEmpty()){
-                            System.out.println("Eccomi");
-                            if(socketUsername())
-                                System.out.println("Assegnamento a boon fine");
-                            else {
-                                System.out.println("Assegnamento non andato a buon fine");
-                                Thread.sleep(1000);
-                                Platform.exit();
-                            }
-
-                           //socketUsername();
+                            socketUsername();
                         }
-
                         socketInMail();
                         socketOutMail();
                        Thread.sleep(10000);
@@ -131,9 +133,11 @@ public class Client{
         return label;
     }
     //LIST
-    public ListProperty<Email> getMailProperty() {
-        return MailProperty;
-
+    public ListProperty<Email> getInMailProperty() {
+        return inbox;
+    }
+    public ListProperty<Email> getOutMailProperty() {
+        return outbox;
     }
     /*public ListProperty<Email> getMailProperty() {
         return MailProperty;
@@ -175,7 +179,6 @@ public class Client{
             setError("Errore nella richiesta di Eliminazione della Mail, Server non connesso");
         }
     }
-
     public void socketInMail(){
         try{
             inMailList.clear();
@@ -188,64 +191,14 @@ public class Client{
             inputStream = new ObjectInputStream(socket.getInputStream());
 
             inMailList = (ArrayList<Email>) inputStream.readObject();
-            Platform.runLater(()-> setMailProperty());
+            if(inMailList.size() > 0)
+                Platform.runLater(()-> setMailProperty("in",inMailList));
             setError("");
             socket.close();
         }catch(IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server");
             setError("Errore nella richiesta delle Mail in Entrata, Server non connesso");
         }
-    }
-
-    public void setMailSide(String side){
-        if(side.equals("in") || side.equals("out"))
-            mailSide = side;
-    }
-    public void setMailProperty(){
-
-        /*MailProperty.clear();
-        MailContent.clear();
-        MailProperty.set(MailContent);
-
-        if(MailContent.isEmpty()) {
-                for (int i = 0; i < inMailList.size(); i++) {
-                    MailContent.add(inMailList.get(i));
-
-                }
-                MailProperty.set(MailContent);
-        }*/
-
-        MailProperty.clear();
-        MailContent.clear();
-        MailProperty.set(MailContent);
-
-        if(MailContent.isEmpty()) {
-            if (mailSide.equals("in")){
-                for (int i = 0; i < inCurrentEmailList.size(); i++) {
-                    MailContent.add(inCurrentEmailList.get(i));
-                }
-                while (0 < inMailList.size()){
-                    MailContent.add(inMailList.get(0));
-                    inCurrentEmailList.add(inMailList.get(0));
-                    inMailList.remove(0);
-                }
-            }
-            else {
-                for (int i = 0; i < outCurrentEmailList.size(); i++) {
-                    MailContent.add(outCurrentEmailList.get(i));
-                }
-                while (0 < outMailList.size()){
-                    MailContent.add(outMailList.get(0));
-                    inCurrentEmailList.add(outMailList.get(0));
-                    outMailList.remove(0);
-                }
-            }
-            MailProperty.set(MailContent);
-
-
-        }
-
-
     }
     public void socketOutMail(){
         try{
@@ -258,7 +211,8 @@ public class Client{
             outputStream.writeObject(outCurrentEmailList);
             inputStream = new ObjectInputStream(socket.getInputStream());
             outMailList = (ArrayList<Email>) inputStream.readObject();
-            Platform.runLater(()-> setMailProperty());
+            if(outMailList.size() > 0)
+                Platform.runLater(()-> setMailProperty("out",outMailList));
             setError("");
             socket.close();
 
@@ -267,7 +221,30 @@ public class Client{
             setError("Errore nella richiesta delle Mail in Uscita, Server non connesso");
         }
     }
+    public void setMailProperty(String side, ArrayList<Email> ml){
+        if(side.equals("out")){
+            outbox.clear();
+            outbox.addAll(outCurrentEmailList);
+            outbox.addAll(ml);
+            outCurrentEmailList.addAll(ml);
+            Collections.reverse(outbox);
+            //Collections.reverse(outbox);
+        }else {
+            inbox.clear();
+            inbox.addAll(inCurrentEmailList);
+            inbox.addAll(ml);
+            inCurrentEmailList.addAll(ml);
+            Collections.reverse(inbox);
+            //Collections.reverse(inbox);
+            if (firstConnection)
+                firstConnection = false;
+            else
+                setError("Hai delle nuove mail da leggere");
 
+        }
+
+
+    }
     public String getAccount() {
         return account;
     }
@@ -285,7 +262,7 @@ public class Client{
     }
     public boolean socketUsername(){
         try {
-            System.out.println("Sono in socketUSer");
+            System.out.println("Sono in socketUser");
             socket = new Socket(InetAddress.getLocalHost(), 6000);
             outputStream= new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
@@ -293,8 +270,6 @@ public class Client{
             outputStream.writeObject("account");
             inputStream = new ObjectInputStream(socket.getInputStream());
             account = (String) inputStream.readObject();
-            System.out.println(account);
-            System.out.println(Objects.equals(account, ""));
             if(Objects.equals(account, "")){
                 System.out.println("Ciao");
                 Platform.exit();
@@ -315,7 +290,6 @@ public class Client{
         }
 
 }
-
     public void openStreams() throws IOException {
         System.out.println("Server Connesso");
         inputStream = new ObjectInputStream(socket.getInputStream());
@@ -354,7 +328,6 @@ public class Client{
 
         }
     }
-
     public void setError(String error){
         Platform.runLater(() -> label.set(error));
 

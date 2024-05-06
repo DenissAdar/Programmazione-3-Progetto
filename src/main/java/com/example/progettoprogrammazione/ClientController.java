@@ -153,10 +153,11 @@ public class ClientController {
     }
     @FXML
     public void showInMail(){
-        client.setMailSide("in");
         client.socketInMail();
         setVisibility(true);
         inviaBtn.setVisible(false);
+
+        mailList.itemsProperty().bind(client.getInMailProperty());
 
         //dataLable.setVisible(false);
         //dataTxt.setVisible(false);
@@ -164,10 +165,11 @@ public class ClientController {
 
     @FXML
     public void showOutMail(){
-        client.setMailSide("out");
         replyBtn.setVisible(false);
         replyAllBtn.setVisible(false);
         client.socketOutMail();
+
+        mailList.itemsProperty().bind(client.getOutMailProperty());
 
     }
 
@@ -247,10 +249,11 @@ public class ClientController {
         client = new Client();
         setVisibility(true);
         replyBtn.setVisible(false);
+        inviaBtn.setVisible(false);
 
         accountDisplay.textProperty().bind(client.getAccountProperty()) ;
-        mailList.itemsProperty().bind(client.getMailProperty());
         connectionNotification.textProperty().bind(client.getErrorLabelProperty());
+        mailList.itemsProperty().bind(client.getInMailProperty());
 
         //showInMail();
 

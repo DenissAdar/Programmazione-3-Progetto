@@ -66,11 +66,9 @@ public class Server {
             throw new RuntimeException(e);
         }
     }
-
     public ListProperty<String> getLogList(){
         return logList;
     }
-
     public void setAccountList(){
         //lista = new String[jsonCount()];
         int i=0;
@@ -89,11 +87,7 @@ public class Server {
             throw new RuntimeException(e);
         }
     }
-
     public ArrayList<String> getAccountList(){return accounts;}
-
-
-
     //Decide randomicamente quale username dare ad un client appena creato
     class ThreadAccount implements Runnable{
         ObjectOutputStream out;
@@ -134,7 +128,6 @@ public class Server {
             }
         }
     }
-
     // Metodo che gestisce le email in entrata
     class ThreadInMail implements Runnable{
         ObjectOutputStream out;
@@ -152,15 +145,16 @@ public class Server {
         public void run(){
             try{
                 emailList = jSonReader("Entrata",account);
-                for (int i = 0; i < emailList.size(); i++){
+                /*for (int i = 0; i < emailList.size(); i++){
                     if (clientCurrentEmailList.contains(emailList.get(i))){
                         emailList.remove(i);
                         i--;
                     }
-                }
+                }*/
+                emailList.removeAll(clientCurrentEmailList);
                 out.writeObject(emailList);
                 out.flush();
-                Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in ingresso"));
+                //Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in ingresso"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
@@ -169,27 +163,28 @@ public class Server {
         ObjectOutputStream out;
         String account;
         ArrayList<Email> emailList = new ArrayList<>();
-        ArrayList<Email> clientCurrentEmail;
+        ArrayList<Email> clientCurrentEmailList;
 
-        public ThreadOutMail(ObjectOutputStream out, String account, ArrayList<Email> clientCurrentEmail){
+        public ThreadOutMail(ObjectOutputStream out, String account, ArrayList<Email> clientCurrentEmailList){
             this.out = out;
             this.account = account;
-            this.clientCurrentEmail = clientCurrentEmail;
+            this.clientCurrentEmailList = clientCurrentEmailList;
         }
 
         @Override
         public void run(){
             try{
                 emailList = jSonReader("Uscita",account);
-                for (int i = 0; i < emailList.size(); i++){
+                /*for (int i = 0; i < emailList.size(); i++){
                     if (clientCurrentEmail.contains(emailList.get(i))){
                         emailList.remove(i);
                         i--;
                     }
-                }
+                }*/
+                emailList.removeAll(clientCurrentEmailList);
                 out.writeObject(emailList);
                 out.flush();
-                Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in uscita"));
+                //Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in uscita"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
@@ -260,7 +255,6 @@ public class Server {
             catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
         }
     }
-
     // Metodo che gestisce la chiusura
     class ThreadExit implements Runnable{
         ObjectOutputStream out;
@@ -283,7 +277,6 @@ public class Server {
             }
         }
     }
-
     class RunServer implements Runnable{
         String account = "Si è connesso ";
         private final SimpleStringProperty accountLog = new SimpleStringProperty();
@@ -358,10 +351,9 @@ public class Server {
 
 
     }
-
     public void openStreams() {
         try {
-            System.out.println("Server Connesso");
+            //System.out.println("Server Connesso");
             socketOutputStream = new ObjectOutputStream(socket.getOutputStream());
             socketOutputStream.flush();
             socketInputStream = new ObjectInputStream(socket.getInputStream());
@@ -370,7 +362,6 @@ public class Server {
         }
 
     }
-
     public void closeStreams() {
         try {
 
@@ -383,11 +374,11 @@ public class Server {
             }
 
             executor.shutdown();
+            exit();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
     public void exit(){
         try{
             serverSocket.close();

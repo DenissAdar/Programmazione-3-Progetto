@@ -1,6 +1,7 @@
 package com.example.progettoprogrammazione;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
 
 // Creo i dati che sono dentro a "contenuto" del file json
 public class Email implements Serializable {
@@ -55,24 +56,15 @@ private String idMail;
         return object;
     }
 
-
-/*
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Email email)) return false;
-        return Objects.equals(getMessage(), email.getMessage()) && Objects.equals(getObject(), email.getObject()) && Objects.equals(getSender(), email.getSender()) && Objects.equals(getRecevier(), email.getRecevier());
+        return Objects.equals(getMessage(), email.getMessage()) && Objects.equals(getObject(), email.getObject()) && Objects.equals(getSender(), email.getSender()) && Objects.equals(getReceiver(), email.getReceiver()) && Objects.equals(getDate(), email.getDate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getMessage(), getObject(), getSender(), getRecevier());
-
-    }*/
-
-
-
-
-
-
+        return Objects.hash(getMessage(), getObject(), getSender(), getReceiver(), getDate());
+    }
 }
