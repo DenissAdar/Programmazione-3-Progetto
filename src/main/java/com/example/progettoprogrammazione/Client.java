@@ -21,19 +21,13 @@ import javafx.collections.ObservableList;
  * @Authors: Deniss,Marius,Gaia
  */
 
-
 public class Client{
-
     private Socket socket = null;
     private ObjectOutputStream outputStream = null;
     private ObjectInputStream inputStream = null;
-
     private String account = "";
-
     private ObjectProperty<String> label = new SimpleObjectProperty<>();
-
     private ObjectProperty<String> accountProperty = new SimpleObjectProperty<>();
-
     private SimpleStringProperty senderProperty;
     private SimpleStringProperty receiverProperty;
     private SimpleStringProperty objectProperty;
@@ -43,8 +37,7 @@ public class Client{
     private ArrayList<String> accounts = new ArrayList<>();
     private ArrayList<Email> inCurrentEmailList = new ArrayList<>();
     private ArrayList<Email> outCurrentEmailList = new ArrayList<>();
-    Thread t1;
-
+    private Thread t1;
     private boolean firstConnection = true;
     private ListProperty<Email> inbox;
     private ObservableList<Email> inboxContent;
@@ -90,36 +83,66 @@ public class Client{
         t1.start();
     }
 
-
-
-    public SimpleStringProperty getSenderProperty(){
-        System.out.println("Valore di SenderProeprty" + senderProperty);
-        return senderProperty;
-    }
-
-    public void setSenderProperty(String s){senderProperty.set(s);}
+    //<editor-fold desc="GET & SET">
     public SimpleStringProperty getReceiverProperty(){return receiverProperty;}
     public void setReceiverProperty(String s){receiverProperty.set(s);}
-
     public SimpleStringProperty getObjectProperty(){return objectProperty;}
     public void setObjectProperty(String s){objectProperty.set(s);}
-
     public SimpleStringProperty getMessageProperty(){return messageProperty;}
     public void setMessageProperty(String s){messageProperty.set(s);}
-
-    //TODO CI STO LAVORANDO E' LA LABEL di errore
     public ObjectProperty<String> getErrorLabelProperty(){
         return label;
     }
-    //LIST
+    public void setError(String error){
+        Platform.runLater(() -> label.set(error));
+
+    }
     public ListProperty<Email> getInMailProperty() {
         return inbox;
     }
     public ListProperty<Email> getOutMailProperty() {
         return outbox;
     }
+    public String getAccount() {
+        return account;
+    }
+    public ObjectProperty<String> getAccountProperty(){
+        return accountProperty;
+    }
+    public void setMailProperty(String side, ArrayList<Email> ml){
+        if(side.equals("out")){
+            outCurrentEmailList.addAll(ml);
+            outbox.clear();
+            outbox.addAll(outCurrentEmailList);
+            Collections.reverse(outbox);
+        }else {
+            inCurrentEmailList.addAll(ml);
+            inbox.clear();
+            inbox.addAll(inCurrentEmailList);
+            Collections.reverse(inbox);
+            if (firstConnection)
+                firstConnection = false;
+            else {
+                setError("Hai delle nuove mail da leggere");
+                System.out.println("Ho settato l'errore");
+            }
+        }
 
+
+    }
+    public void setAccountProperty() {
+        try {
+            accountProperty.setValue(account);
+        }catch (NullPointerException e){
+            System.out.println("Trovato NullPointer Exception ");
+        }
+    }
+
+    //</editor-fold>
+
+    //<editor-fold desc="SOCKET">
     public void socketSendMail(Email email){
+        boolean response;
         try{
             Email e = email;
             System.out.println("Inizio "+email.visualizzaMail());
@@ -132,12 +155,16 @@ public class Client{
             outputStream.writeObject(this.getAccount());
             outputStream.writeObject("send");
             outputStream.writeObject(email);
+            inputStream = new ObjectInputStream(socket.getInputStream());
+            response = (boolean) inputStream.readObject();
+            if(!response)
+                setError("Il destinatario non esiste!,FACCIA DI MERDA");
             socket.close();
 
-        }catch(IOException  e) {
-            System.out.println("Non è stato possibile connettersi al server");
+        }catch(IOException | ClassNotFoundException e) {
+            System.out.println("errore send\n"+e);
             setError("Errore nella richiesta di Mandare una Mail, Server non connesso");
-            //TODO comunicarlo alla label
+
         }
     }
     public void socketDeleteMail(Email email,String side){
@@ -167,7 +194,6 @@ public class Client{
             setError("Errore nella richiesta di Eliminazione della Mail, Server non connesso");
         }
     }
-
     public void socketInMail(){
         try{
             inMailList.clear();
@@ -180,12 +206,18 @@ public class Client{
             inputStream = new ObjectInputStream(socket.getInputStream());
 
             inMailList = (ArrayList<Email>) inputStream.readObject();
+
             if(inMailList.size() > 0)
                 Platform.runLater(()-> setMailProperty("in",inMailList));
+            else if(firstConnection)
+                firstConnection = false;
+
             socket.close();
         }catch(IOException | ClassNotFoundException e) {
             System.out.println("Non è stato possibile connettersi al server");
             setError("Errore nella richiesta delle Mail in Entrata, Server non connesso");
+        }finally {
+            setError("");
         }
     }
     public void socketOutMail(){
@@ -199,6 +231,7 @@ public class Client{
             outputStream.writeObject(outCurrentEmailList);
             inputStream = new ObjectInputStream(socket.getInputStream());
             outMailList = (ArrayList<Email>) inputStream.readObject();
+            System.out.println("\n\n"+outMailList);
             if(outMailList.size() > 0)
                 Platform.runLater(()-> setMailProperty("out",outMailList));
 
@@ -208,42 +241,6 @@ public class Client{
             System.out.println("Non è stato possibile connettersi al server");
             setError("Errore nella richiesta delle Mail in Uscita, Server non connesso");
         }
-    }
-    public void setMailProperty(String side, ArrayList<Email> ml){
-        if(side.equals("out")){
-            outCurrentEmailList.addAll(ml);
-            outbox.clear();
-            outbox.addAll(outCurrentEmailList);
-            Collections.reverse(outbox);
-        }else {
-            inCurrentEmailList.addAll(ml);
-            inbox.clear();
-            inbox.addAll(inCurrentEmailList);
-            Collections.reverse(inbox);
-            if (firstConnection)
-                firstConnection = false;
-            else {
-                setError("Hai delle nuove mail da leggere");
-                System.out.println("Ho settato l'errore");
-            }
-        }
-
-
-    }
-    public String getAccount() {
-        return account;
-    }
-
-
-    public void setAccountProperty() {
-        try {
-            accountProperty.setValue(account);
-        }catch (NullPointerException e){
-            System.out.println("Trovato NullPointer Exception ");
-        }
-    }
-    public ObjectProperty<String> getAccountProperty(){
-        return accountProperty;
     }
     public boolean socketUsername(){
         try {
@@ -255,10 +252,10 @@ public class Client{
             outputStream.writeObject("account");
             inputStream = new ObjectInputStream(socket.getInputStream());
             account = (String) inputStream.readObject();
-            if(Objects.equals(account, "")){
-                System.out.println("Ciao");
+            if(account.equals("error")){
                 Platform.exit();
                 socket.close();
+                exit();
                 return false;
             }
             else{
@@ -275,6 +272,10 @@ public class Client{
         }
 
 }
+    //</editor-fold>
+
+    //<editor-fold desc="GENERAL">
+
     public void openStreams() throws IOException {
         System.out.println("Server Connesso");
         inputStream = new ObjectInputStream(socket.getInputStream());
@@ -313,10 +314,7 @@ public class Client{
 
         }
     }
-    public void setError(String error){
-        Platform.runLater(() -> label.set(error));
-
-    }
+    //</editor-fold>
 }
 
 

@@ -91,7 +91,7 @@ public class ClientController {
         String oggetto = "R:" + oggettoTxt.textProperty().getValue();
 
         newMailCreation();
-        mittenteTxt.textProperty().set(destinatario);
+        mittenteTxt.textProperty().set(accountDisplay.textProperty().getValue());
         destinatarioTxt.textProperty().set(mittente);
         oggettoTxt.textProperty().set(oggetto);
         oggettoTxt.setEditable(false);
@@ -128,7 +128,6 @@ public class ClientController {
     public void newMailCreation(){
         clearFields();
         mittenteTxt.textProperty().set(client.getAccount());
-        client.setSenderProperty(mittenteTxt.textProperty().get());
 
         mittenteTxt.setEditable(false);
         destinatarioTxt.setEditable(true);
@@ -162,7 +161,6 @@ public class ClientController {
         //dataLable.setVisible(false);
         //dataTxt.setVisible(false);
     }
-
     @FXML
     public void showOutMail(){
         replyBtn.setVisible(false);
@@ -173,15 +171,13 @@ public class ClientController {
         clearFields();
 
     }
-
     @FXML
     public void displayMail(){
         // TODO Manca bindare la data che sono gay e non ho molto sbatti di f
         Email selectedMail  = mailList.getSelectionModel().getSelectedItem();
         if(selectedMail == null){
-            System.out.println("Selezionato mail inesistente");
+            System.out.println("Selezionata mail inesistente");
         }else {
-
             dataLable.setVisible(true);
             dataTxt.setVisible(true);
 
@@ -202,6 +198,8 @@ public class ClientController {
                 replyBtn.setVisible(false);
                 replyAllBtn.setVisible(false);
             }
+            if(!destinatarioTxt.textProperty().getValue().contains(","))
+                replyAllBtn.setVisible(false);
             inviaBtn.setVisible(false);
         }
 
@@ -223,8 +221,7 @@ public class ClientController {
         dataTxt.textProperty().setValue(getDate());
         Email e;
 
-        /*ArrayList<String> p = new ArrayList<>();
-        p = destinatarioTxt.textProperty().getValue().split(",");*/
+
         if(oggettoTxt.textProperty().getValue().isEmpty())oggettoTxt.textProperty().set("(No Subject)");
         e = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue() , oggettoTxt.textProperty().getValue() , mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
 
@@ -234,8 +231,6 @@ public class ClientController {
 
 
 
-        //todo MARIUS
-        //connectionNotification.textProperty().set(client.getErroreInMittente());
     }
     @FXML
     public void deleteMail(){
@@ -246,19 +241,17 @@ public class ClientController {
         client.socketDeleteMail(em,side);
 
     }
-
     public void init(){
         client = new Client();
-        setVisibility(true);
-        replyBtn.setVisible(false);
-        inviaBtn.setVisible(false);
+        setVisibility(false);
+
         side = "in";
 
         accountDisplay.textProperty().bind(client.getAccountProperty()) ;
         connectionNotification.textProperty().bind(client.getErrorLabelProperty());
         mailList.itemsProperty().bind(client.getInMailProperty());
 
-        //showInMail();
+
 
     }
 

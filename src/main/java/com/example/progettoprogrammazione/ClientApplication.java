@@ -29,8 +29,6 @@ public class ClientApplication extends Application {
             controller.handleWindowClose();
         });
 }
-
-
     public static void main(String[] args) {
         launch();
 

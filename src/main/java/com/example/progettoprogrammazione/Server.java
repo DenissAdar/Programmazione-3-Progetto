@@ -33,6 +33,9 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * @Authors: Deniss,Marius,Gaia
+ */
 public class Server {
 
     ArrayList<String> accounts = new ArrayList<>();
@@ -53,7 +56,6 @@ public class Server {
             this.logListContent = FXCollections.observableList(new LinkedList<>());
             this.logList = new SimpleListProperty<>();
             this.logList.set(logListContent);
-            Thread.currentThread().setName("principale");
             logListContent.addListener(new ListChangeListener<String>() {
                 @Override
                 public void onChanged(Change<? extends String> change) {
@@ -87,7 +89,6 @@ public class Server {
             throw new RuntimeException(e);
         }
     }
-    public ArrayList<String> getAccountList(){return accounts;}
     //Decide randomicamente quale username dare ad un client appena creato
     class ThreadAccount implements Runnable{
         ObjectOutputStream out;
@@ -96,13 +97,9 @@ public class Server {
         // Metodo che seleziona un account in maniera randomica
         public String accountPicker()  {
             String accountScelto;
-            //TODO RISOLVERE QUI ENTRA IN UN LOOP INFINITO, NON VA BENE
-            // DEVE RETURNARE "" SE LOGGED ACCOUNTS
-            // RISOLVERE IN MODO MIGLIORE
             do {
                 accountScelto = accounts.get(ThreadLocalRandom.current().nextInt(0, accounts.size()));
-                System.out.println("Account scelto" + accountScelto);
-                if(logged_accounts.size()==3){return "";}
+                if(logged_accounts.size() == accounts.size()) return "error";
             }while (logged_accounts.contains(accountScelto));
             logged_accounts.add(accountScelto);
             return accountScelto;
@@ -111,18 +108,16 @@ public class Server {
         public ThreadAccount(ObjectOutputStream out, Socket socket) {
             this.out = out;
             this.socket = socket;
-            Thread.currentThread().setName("5");
+
         }
 
         @Override
         public void run() {
             try {
                 String randomUser = accountPicker();
-                System.out.println(randomUser);
                 out.writeObject(randomUser);
                 Platform.runLater(() -> logList.add(randomUser +" ha fatto l'accesso.")); /*loglist è l'elemento LOG dell'applicazione di sever lato grafico */
-                this.socket.close(); /*todo da rivedere chiusura*/
-
+                //this.socket.close(); /*todo da rivedere chiusura*/
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -181,11 +176,12 @@ public class Server {
         ObjectInputStream in;
         String account;
         Email email;
+        boolean response = true;
         ArrayList<String> receivers = new ArrayList<>();
 
 
         public ThreadSend(ObjectInputStream in,ObjectOutputStream out,String account){
-            Thread.currentThread().setName("4");
+
             this.in = in;
             this.out = out;
             this.account = account;
@@ -209,9 +205,10 @@ public class Server {
                     }
                     else {
                         Platform.runLater(() -> logList.add("L'utente: " + account + " cerca di mandare un email all'utente " + email.getReceiver() + " che non esiste!"));
+                        response = false;
                     }
                 }
-
+                out.writeObject(response);
             }catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
 
         }
@@ -225,7 +222,7 @@ public class Server {
         boolean flag=false;
 
         public ThreadDelete(ObjectInputStream in,ObjectOutputStream out,String account) {
-            Thread.currentThread().setName("3");
+
             this.in = in;
             this.out = out;
             this.account = account;
@@ -246,7 +243,7 @@ public class Server {
         ObjectOutputStream out;
         String exitUser;
         public ThreadExit(ObjectOutputStream out, String account){
-            Thread.currentThread().setName("2");
+
             this.exitUser = account;
             this.out = out;
         }
