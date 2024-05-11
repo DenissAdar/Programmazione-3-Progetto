@@ -47,7 +47,6 @@
       <Separator layoutY="81.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0" />
     <Button fx:id="inMailBtn" alignment="BASELINE_LEFT" layoutX="39.0" layoutY="95.0" mnemonicParsing="false" onAction="#showInMail" prefHeight="40.0" prefWidth="93.0" text="Mail in Entrata" />
       <Button fx:id="outMailBtn" alignment="CENTER" layoutX="216.0" layoutY="95.0" mnemonicParsing="false" onAction="#showOutMail" prefHeight="40.0" prefWidth="93.0" text="Mail in Uscita" />
-      <Button fx:id="updateBtn" layoutX="142.0" layoutY="658.0" mnemonicParsing="false" text="Refresh" />
       <Button fx:id="newMailBtn" layoutX="589.0" layoutY="26.0" mnemonicParsing="false" onAction="#newMailCreation" text="+" textFill="#058b10">
          <font>
             <Font name="Arial" size="19.0" />

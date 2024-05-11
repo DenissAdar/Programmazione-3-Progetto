@@ -1,13 +1,9 @@
 package com.example.progettoprogrammazione;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
 
 /**
  * @Authors: Deniss,Marius,Gaia

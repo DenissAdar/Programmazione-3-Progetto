@@ -64,11 +64,9 @@ public class ClientController {
     private Button replyBtn;
 
     @FXML
-    private Button updateBtn;
-
-    @FXML
     private Label dataLable;
     private Client client;
+    private String side;
 
     @FXML
     public void forwardBtn(){
@@ -128,7 +126,7 @@ public class ClientController {
     }
     @FXML
     public void newMailCreation(){
-
+        clearFields();
         mittenteTxt.textProperty().set(client.getAccount());
         client.setSenderProperty(mittenteTxt.textProperty().get());
 
@@ -138,7 +136,6 @@ public class ClientController {
         mailBodyTxt.setEditable(true);
         dataTxt.setEditable(true);
 
-        clearFields();
         replyBtn.setVisible(false);
 
         setVisibility(false);
@@ -146,8 +143,10 @@ public class ClientController {
 
     }
     public void clearFields(){
+        mittenteTxt.clear();
         destinatarioTxt.clear();
         oggettoTxt.clear();
+        dataTxt.clear();
         mailBodyTxt.clear();
         setVisibility(false);
     }
@@ -156,8 +155,9 @@ public class ClientController {
         client.socketInMail();
         setVisibility(true);
         inviaBtn.setVisible(false);
-
+        side = "in";
         mailList.itemsProperty().bind(client.getInMailProperty());
+        clearFields();
 
         //dataLable.setVisible(false);
         //dataTxt.setVisible(false);
@@ -168,8 +168,9 @@ public class ClientController {
         replyBtn.setVisible(false);
         replyAllBtn.setVisible(false);
         client.socketOutMail();
-
+        side = "out";
         mailList.itemsProperty().bind(client.getOutMailProperty());
+        clearFields();
 
     }
 
@@ -239,10 +240,11 @@ public class ClientController {
     @FXML
     public void deleteMail(){
         Email em = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue(),
-                oggettoTxt.textProperty().getValue(), mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue()
-        );
+                oggettoTxt.textProperty().getValue(), mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
         clearFields();
-        client.socketDeleteMail(em);
+
+        client.socketDeleteMail(em,side);
+
     }
 
     public void init(){
@@ -250,6 +252,7 @@ public class ClientController {
         setVisibility(true);
         replyBtn.setVisible(false);
         inviaBtn.setVisible(false);
+        side = "in";
 
         accountDisplay.textProperty().bind(client.getAccountProperty()) ;
         connectionNotification.textProperty().bind(client.getErrorLabelProperty());

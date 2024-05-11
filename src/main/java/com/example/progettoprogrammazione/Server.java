@@ -145,16 +145,9 @@ public class Server {
         public void run(){
             try{
                 emailList = jSonReader("Entrata",account);
-                /*for (int i = 0; i < emailList.size(); i++){
-                    if (clientCurrentEmailList.contains(emailList.get(i))){
-                        emailList.remove(i);
-                        i--;
-                    }
-                }*/
                 emailList.removeAll(clientCurrentEmailList);
                 out.writeObject(emailList);
                 out.flush();
-                //Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in ingresso"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
@@ -175,12 +168,6 @@ public class Server {
         public void run(){
             try{
                 emailList = jSonReader("Uscita",account);
-                /*for (int i = 0; i < emailList.size(); i++){
-                    if (clientCurrentEmail.contains(emailList.get(i))){
-                        emailList.remove(i);
-                        i--;
-                    }
-                }*/
                 emailList.removeAll(clientCurrentEmailList);
                 out.writeObject(emailList);
                 out.flush();
@@ -249,7 +236,6 @@ public class Server {
             try{
                 email = (Email) in.readObject(); //Ho una Mail
                 jSonDeleter(email , account);
-                //todo Cambiare la scritta del log, non mi interessa d
                 Platform.runLater(() -> logList.add(account + " ha cancellato una mail ricevuta con oggetto "+email.getObject() + " con successo!"));
             }
             catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
@@ -315,7 +301,6 @@ public class Server {
                             executor.execute(new ThreadAccount(socketOutputStream, socket));
                             break;
                         case "emailIn":
-
                             executor.execute(new ThreadInMail(socketOutputStream,account,(ArrayList<Email>) socketInputStream.readObject()));
                             break;
                         case "emailOut":
@@ -338,11 +323,11 @@ public class Server {
                     }
                 }
             } catch (IOException e) {
-                //e.printStackTrace();
+
                 System.out.println("RunServer catch (IOException e) ");
 
             } catch (ClassNotFoundException e) {
-                //throw new RuntimeException(e);
+
                 System.out.println("RunServer catch (ClassNotFoundException e)");
             }
 
@@ -353,7 +338,6 @@ public class Server {
     }
     public void openStreams() {
         try {
-            //System.out.println("Server Connesso");
             socketOutputStream = new ObjectOutputStream(socket.getOutputStream());
             socketOutputStream.flush();
             socketInputStream = new ObjectInputStream(socket.getInputStream());

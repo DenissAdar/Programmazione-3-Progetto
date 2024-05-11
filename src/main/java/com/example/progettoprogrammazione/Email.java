@@ -1,18 +1,18 @@
 package com.example.progettoprogrammazione;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Objects;
 
-// Creo i dati che sono dentro a "contenuto" del file json
-public class Email implements Serializable {
+/**
+ * @Authors: Deniss,Marius,Gaia
+ */
 
+public class Email implements Serializable {
 
     private String message;
     private String object;
     private String sender;
     private String receiver;
     private String date;
-private String idMail;
 
     public Email(String sender, String receiver, String object,  String message, String date) {
         this.message = message;
