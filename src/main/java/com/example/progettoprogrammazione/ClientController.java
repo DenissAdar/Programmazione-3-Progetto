@@ -87,7 +87,6 @@ public class ClientController {
     @FXML
     public void replyMail(){
         String mittente = mittenteTxt.textProperty().getValue();
-        String destinatario = destinatarioTxt.textProperty().getValue();
         String oggetto = "R:" + oggettoTxt.textProperty().getValue();
 
         newMailCreation();
@@ -173,10 +172,9 @@ public class ClientController {
     }
     @FXML
     public void displayMail(){
-        // TODO Manca bindare la data che sono gay e non ho molto sbatti di f
         Email selectedMail  = mailList.getSelectionModel().getSelectedItem();
         if(selectedMail == null){
-            System.out.println("Selezionata mail inesistente");
+            client.setError("Selezionata mail inesistente");
         }else {
             dataLable.setVisible(true);
             dataTxt.setVisible(true);
@@ -222,15 +220,12 @@ public class ClientController {
         Email e;
 
 
-        if(oggettoTxt.textProperty().getValue().isEmpty())oggettoTxt.textProperty().set("(No Subject)");
+        if(oggettoTxt.textProperty().getValue().isEmpty())
+                oggettoTxt.textProperty().set("(No Subject)");
         e = new Email(mittenteTxt.textProperty().getValue(), destinatarioTxt.textProperty().getValue() , oggettoTxt.textProperty().getValue() , mailBodyTxt.textProperty().getValue(), dataTxt.textProperty().getValue());
 
         clearFields();
         client.socketSendMail(e);
-
-
-
-
     }
     @FXML
     public void deleteMail(){

@@ -23,7 +23,7 @@ public class ServerController {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Shutting down server...");
-            server.exit();
+            //server.exit();
             System.out.println("Server shut down.");
         }));
     }
