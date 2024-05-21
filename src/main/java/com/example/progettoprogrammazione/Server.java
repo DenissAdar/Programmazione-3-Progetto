@@ -39,8 +39,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Server {
 
     ArrayList<String> accounts = new ArrayList<>();
-    ArrayList<String> logged_accounts = new ArrayList<>();
-    //private static AtomicInteger uniqueId = new AtomicInteger(0);
+    ArrayList<String> loggedAccounts = new ArrayList<>();
+
     private String jsonFilePath= "src/main/java/com/example/progettoprogrammazione/accounts/account.json";
     ServerSocket serverSocket;
     ThreadPoolExecutor executor;
@@ -96,13 +96,13 @@ public class Server {
 
         // Metodo che seleziona un account in maniera randomica
         public String accountPicker()  {
-            String accountScelto;
+            String pickedAccount;
             do {
-                accountScelto = accounts.get(ThreadLocalRandom.current().nextInt(0, accounts.size()));
-                if(logged_accounts.size() == accounts.size()) return "error";
-            }while (logged_accounts.contains(accountScelto));
-            logged_accounts.add(accountScelto);
-            return accountScelto;
+                pickedAccount = accounts.get(ThreadLocalRandom.current().nextInt(0, accounts.size()));
+                if(loggedAccounts.size() == accounts.size()) return "error";
+            }while (loggedAccounts.contains(pickedAccount));
+            loggedAccounts.add(pickedAccount);
+            return pickedAccount;
         }
 
         public ThreadAccount(ObjectOutputStream out, Socket socket) {
@@ -140,9 +140,16 @@ public class Server {
         public void run(){
             try{
                 emailList = jSonReader("Entrata",account);
+                /*for (int i = 0; i < emailList.size(); i++){
+                    if (clientCurrentEmailList.contains(emailList.get(i))){
+                        emailList.remove(i);
+                        i--;
+                    }
+                }*/
                 emailList.removeAll(clientCurrentEmailList);
                 out.writeObject(emailList);
                 out.flush();
+                //Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in ingresso"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
@@ -163,6 +170,12 @@ public class Server {
         public void run(){
             try{
                 emailList = jSonReader("Uscita",account);
+                /*for (int i = 0; i < emailList.size(); i++){
+                    if (clientCurrentEmail.contains(emailList.get(i))){
+                        emailList.remove(i);
+                        i--;
+                    }
+                }*/
                 emailList.removeAll(clientCurrentEmailList);
                 out.writeObject(emailList);
                 out.flush();
@@ -233,6 +246,7 @@ public class Server {
             try{
                 email = (Email) in.readObject(); //Ho una Mail
                 jSonDeleter(email , account);
+                //todo Cambiare la scritta del log, non mi interessa d
                 Platform.runLater(() -> logList.add(account + " ha cancellato una mail ricevuta con oggetto "+email.getObject() + " con successo!"));
             }
             catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
@@ -250,7 +264,7 @@ public class Server {
         @Override
         public void run(){
             try {
-                logged_accounts.remove(exitUser);
+                loggedAccounts.remove(exitUser);
                 Platform.runLater(() -> logList.add(exitUser + " ha fatto il LOGOUT."));
 
                 out.writeObject(true);
@@ -298,6 +312,7 @@ public class Server {
                             executor.execute(new ThreadAccount(socketOutputStream, socket));
                             break;
                         case "emailIn":
+
                             executor.execute(new ThreadInMail(socketOutputStream,account,(ArrayList<Email>) socketInputStream.readObject()));
                             break;
                         case "emailOut":
@@ -320,11 +335,11 @@ public class Server {
                     }
                 }
             } catch (IOException e) {
-
+                //e.printStackTrace();
                 System.out.println("RunServer catch (IOException e) ");
 
             } catch (ClassNotFoundException e) {
-
+                //throw new RuntimeException(e);
                 System.out.println("RunServer catch (ClassNotFoundException e)");
             }
 
@@ -335,6 +350,7 @@ public class Server {
     }
     public void openStreams() {
         try {
+            //System.out.println("Server Connesso");
             socketOutputStream = new ObjectOutputStream(socket.getOutputStream());
             socketOutputStream.flush();
             socketInputStream = new ObjectInputStream(socket.getInputStream());

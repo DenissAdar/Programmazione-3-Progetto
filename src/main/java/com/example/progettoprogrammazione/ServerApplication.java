@@ -17,6 +17,7 @@ public class ServerApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(ClientApplication.class.getResource("server.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         controller = fxmlLoader.getController();
+
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();

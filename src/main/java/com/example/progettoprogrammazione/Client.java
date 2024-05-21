@@ -272,10 +272,6 @@ public class Client{
         }
 
 }
-    //</editor-fold>
-
-    //<editor-fold desc="GENERAL">
-
     public void openStreams() throws IOException {
         System.out.println("Server Connesso");
         inputStream = new ObjectInputStream(socket.getInputStream());
