@@ -62,7 +62,7 @@ public class Client{
                         socketInMail();
                         socketOutMail();
 
-                       Thread.sleep(5000);
+                       Thread.sleep(10000);
 
                     }catch (InterruptedException e) {
                         System.out.println("Errore thread costruttore client");
@@ -126,22 +126,30 @@ public class Client{
 
 
     public void socketSendMail(Email email){
-        boolean response;
+        int response=0;
         try{
             Email e = email;
             socket = new Socket(InetAddress.getLocalHost(), 6000);
-            if(Objects.equals(e.getReceiver(), "")){
-                setError("Mail non mandata perchè non c'è il Destinatario");
-            }else   setError("");
+
+            setError("");
+
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
             outputStream.writeObject(this.getAccount());
             outputStream.writeObject("send");
             outputStream.writeObject(email);
             inputStream = new ObjectInputStream(socket.getInputStream());
-            response = (boolean) inputStream.readObject();
-            if(!response)
-                setError("Il destinatario non esiste!");
+            response = (int) inputStream.readObject();
+
+            //il Server ci dice che il destinatario non rispetta la sintassi
+            if(response==1)
+                setError("La mail del destinatario non rispetta il formato: '@example.com'");
+            //il Server ci dice che il destinatario non e' esiste
+            if(response==2)
+                setError("Il destinatario non è presente nella lista degli account registrati!");
+            //il server ci dice che non c'e' nulla nel campo destinatario
+            if(response==3)
+                setError("Mail non mandata perchè non c'è il Destinatario");
             socket.close();
 
         }catch(IOException | ClassNotFoundException e) {

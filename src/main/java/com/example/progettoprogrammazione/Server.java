@@ -189,7 +189,8 @@ public class Server {
         ObjectInputStream in;
         String account;
         Email email;
-        boolean response = true;
+        //boolean response = true;
+        int response =0;
         ArrayList<String> receivers = new ArrayList<>();
 
 
@@ -217,8 +218,17 @@ public class Server {
                         Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getReceiver()));
                     }
                     else {
+
+                        //Uso l'intero response per comunicare se si tratta di un problema di sintassi o di un utente non esistente
+                        if(email.getReceiver().contains("@example.com")){
+                            //Contiene @example.com ma la parte prima non e' presente nella lista
+                            response = 2;
+                        }
+                           //Non contiene nulla
+                            else if(email.getReceiver().equals("")) response = 3;
+                            //Non contiene @example.com quindi non rispetta il formato
+                            else response = 1;
                         Platform.runLater(() -> logList.add("L'utente: " + account + " cerca di mandare un email all'utente " + email.getReceiver() + " che non esiste!"));
-                        response = false;
                     }
                 }
                 out.writeObject(response);
