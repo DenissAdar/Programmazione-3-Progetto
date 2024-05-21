@@ -40,10 +40,11 @@ public class Server {
 
     ArrayList<String> accounts = new ArrayList<>();
     ArrayList<String> loggedAccounts = new ArrayList<>();
+
     private String jsonFilePath= "src/main/java/com/example/progettoprogrammazione/accounts/account.json";
     ServerSocket serverSocket;
     ThreadPoolExecutor executor;
-    private ListProperty<String> logList; // binding in sever controller
+    private ListProperty<String> logList; /*binding in sever controller*/
     private ObservableList<String> logListContent;
 
     private Socket socket;
@@ -57,7 +58,9 @@ public class Server {
             this.logList.set(logListContent);
             logListContent.addListener(new ListChangeListener<String>() {
                 @Override
-                public void onChanged(Change<? extends String> change) {}
+                public void onChanged(Change<? extends String> change) {
+
+                }
             });
             serverSocket = new ServerSocket(6000);
             new Thread(new RunServer()).start();
@@ -86,8 +89,7 @@ public class Server {
             throw new RuntimeException(e);
         }
     }
-
-    // Decide randomicamente quale username dare ad un client appena creato
+    //Decide randomicamente quale username dare ad un client appena creato
     class ThreadAccount implements Runnable{
         ObjectOutputStream out;
         Socket socket;
@@ -106,6 +108,7 @@ public class Server {
         public ThreadAccount(ObjectOutputStream out, Socket socket) {
             this.out = out;
             this.socket = socket;
+
         }
 
         @Override
@@ -120,9 +123,6 @@ public class Server {
             }
         }
     }
-
-    /* -------------------------- GESTIONE CASE --------------------- ----- */
-
     // Metodo che gestisce le email in entrata
     class ThreadInMail implements Runnable{
         ObjectOutputStream out;
@@ -140,15 +140,19 @@ public class Server {
         public void run(){
             try{
                 emailList = jSonReader("Entrata",account);
-                //carica tutte le email in entrata (sopra) e rimuove le mail che sono già presenti nella view
-                //nella riga sotto, così il server manda solo le mail nuove.
+                /*for (int i = 0; i < emailList.size(); i++){
+                    if (clientCurrentEmailList.contains(emailList.get(i))){
+                        emailList.remove(i);
+                        i--;
+                    }
+                }*/
                 emailList.removeAll(clientCurrentEmailList);
                 out.writeObject(emailList);
                 out.flush();
+                //Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in ingresso"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
-
     // Metodo che gestisce le email in uscita
     class ThreadOutMail implements Runnable{
         ObjectOutputStream out;
@@ -166,13 +170,19 @@ public class Server {
         public void run(){
             try{
                 emailList = jSonReader("Uscita",account);
+                /*for (int i = 0; i < emailList.size(); i++){
+                    if (clientCurrentEmail.contains(emailList.get(i))){
+                        emailList.remove(i);
+                        i--;
+                    }
+                }*/
                 emailList.removeAll(clientCurrentEmailList);
                 out.writeObject(emailList);
                 out.flush();
+                //Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in uscita"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
-
     // Metodo che gestisce l'invio di una mail
     class ThreadSend implements Runnable{
         ObjectOutputStream out;
@@ -193,7 +203,6 @@ public class Server {
         public void run(){
             try{
                 email = (Email) in.readObject(); //Ho una Mail
-                //controllo se ho più destinatari e in caso gli splito per mandare la mail a ciascuno
                 if(email.getReceiver().contains(",")){
                     String[] singleReceiver = email.getReceiver().split(",");
                     for(int i = 0; i < singleReceiver.length ; i++){
@@ -203,7 +212,6 @@ public class Server {
                     }
                 }
                 else {
-                    // se il destinatario è presente tra le mail registrate nel file jSon la mando
                     if(accounts.contains(email.getReceiver())){
                         jSonWriter(email,account);
                         Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getReceiver()));
@@ -218,8 +226,6 @@ public class Server {
 
         }
     }
-
-    // Metodo che gestisce l'eliminazione di una mail
     class ThreadDelete implements Runnable{
         ObjectOutputStream out;
         ObjectInputStream in;
@@ -240,12 +246,12 @@ public class Server {
             try{
                 email = (Email) in.readObject(); //Ho una Mail
                 jSonDeleter(email , account);
+                //todo Cambiare la scritta del log, non mi interessa d
                 Platform.runLater(() -> logList.add(account + " ha cancellato una mail ricevuta con oggetto "+email.getObject() + " con successo!"));
             }
             catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
         }
     }
-
     // Metodo che gestisce la chiusura
     class ThreadExit implements Runnable{
         ObjectOutputStream out;
@@ -268,8 +274,6 @@ public class Server {
             }
         }
     }
-
-
     class RunServer implements Runnable{
         String account = "Si è connesso ";
         private final SimpleStringProperty accountLog = new SimpleStringProperty();
@@ -278,6 +282,7 @@ public class Server {
         private String action;
 
         public RunServer(){
+
         }
 
         @Override
@@ -285,6 +290,7 @@ public class Server {
             try {
                 setAccountList();
                 executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
+                /*serve a richimare i thread funzioni più avanti ---> executor.execute(new ThreadUser(out));*/
                 while (true) {
                     // Si blocca finchè non riceve qualcosa, va avanti SOLO SE LO RICEVE
                     socket = serverSocket.accept();
@@ -306,6 +312,7 @@ public class Server {
                             executor.execute(new ThreadAccount(socketOutputStream, socket));
                             break;
                         case "emailIn":
+
                             executor.execute(new ThreadInMail(socketOutputStream,account,(ArrayList<Email>) socketInputStream.readObject()));
                             break;
                         case "emailOut":
@@ -328,11 +335,11 @@ public class Server {
                     }
                 }
             } catch (IOException e) {
-
+                //e.printStackTrace();
                 System.out.println("RunServer catch (IOException e) ");
 
             } catch (ClassNotFoundException e) {
-
+                //throw new RuntimeException(e);
                 System.out.println("RunServer catch (ClassNotFoundException e)");
             }
 
@@ -341,12 +348,9 @@ public class Server {
 
 
     }
-
-
-    /* -------------------------- GESTIONE SOCKET --------------------- ----- */
-
     public void openStreams() {
         try {
+            //System.out.println("Server Connesso");
             socketOutputStream = new ObjectOutputStream(socket.getOutputStream());
             socketOutputStream.flush();
             socketInputStream = new ObjectInputStream(socket.getInputStream());
@@ -385,6 +389,25 @@ public class Server {
     /* -------------------------- GESTIONE JSON --------------------- ----- */
 
 
+    // Metodo che conta quanti account ci sono nel file json
+    public int jsonCount() {
+        int count = 0;
+        try {
+            ObjectMapper countObjectMapper = new ObjectMapper();
+            JsonNode rootNode = countObjectMapper.readTree(new File(jsonFilePath));
+
+            // Itera sui nodi del file JSON
+            for (JsonNode emailNode : rootNode) {
+                String email = emailNode.get("email").asText();
+                count++;
+                System.out.println(count);
+            }
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
 
     // Metodo JsonReader che restituisce le mail in entrata o in uscita in base ad un valore che gli viene passato come parametro (ingresso,uscita)
     public synchronized ArrayList<Email>  jSonReader (String mailListType, String account){
@@ -459,20 +482,20 @@ public class Server {
                          // Salva le modifiche nel file JSON
                          writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
                      }
-                           if (registeredAccount.equals(newEmail.getReceiver())){
-                               newEmailNode = writeObjectMapper.createObjectNode();
-                               newEmailNode.put("from", newEmail.getSender());
+                         if (registeredAccount.equals(newEmail.getReceiver())){
+                             newEmailNode = writeObjectMapper.createObjectNode();
+                             newEmailNode.put("from", newEmail.getSender());
 
-                               newEmailNode.put("to", newEmail.getReceiver());
-                               newEmailNode.put("object", newEmail.getObject());
-                               newEmailNode.put("text", newEmail.getMessage());
-                               newEmailNode.put("dateTime", newEmail.getDate());
+                             newEmailNode.put("to", newEmail.getReceiver());
+                             newEmailNode.put("object", newEmail.getObject());
+                             newEmailNode.put("text", newEmail.getMessage());
+                             newEmailNode.put("dateTime", newEmail.getDate());
 
-                               ArrayNode contentNode = (ArrayNode) accountNode.path("content");
-                               contentNode.add(newEmailNode);
+                             ArrayNode contentNode = (ArrayNode) accountNode.path("content");
+                             contentNode.add(newEmailNode);
 
-                               // Salva le modifiche nel file JSON
-                               writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
+                             // Salva le modifiche nel file JSON
+                             writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
 
                          }}
                      else{
@@ -566,37 +589,50 @@ public class Server {
 
     }
 
-     public synchronized void jSonDeleter(Email newEmail, String account) throws JSONException, IOException {
-        String jsonString = new String(Files.readAllBytes(Paths.get(jsonFilePath)));
-        JSONArray jsonArray = new JSONArray(jsonString);
-        // Scorrere l'array JSON
-         for (int i = 0; i < jsonArray.length(); i++) {
-             JSONObject jsonObject = jsonArray.getJSONObject(i);
-             String email = jsonObject.getString("email");
-             // Verificare se l'email corrente corrisponde all'account specificato
-             if (email.equals(account)) {
-                 JSONArray contentArray = jsonObject.getJSONArray("content");
-                 // Scorrere il contenuto (content) dell'email
-                 for (int j = 0; j < contentArray.length(); j++) {
-                     JSONObject contentObject = contentArray.getJSONObject(j);
-                     System.out.println("Contenuto di contentObject : " + contentObject);
-                     // Verificare se i campi dell'oggetto Email corrispondono ai campi del JSON
-                     if (contentObject.getString("from").equals(newEmail.getSender()) &&
-                             contentObject.getString("to").equals(newEmail.getReceiver()) &&
-                             contentObject.getString("object").equals(newEmail.getObject()) &&
-                             contentObject.getString("text").equals(newEmail.getMessage()) &&
-                             contentObject.getString("dateTime").equals(newEmail.getDate())) {
 
-                         // Rimuovere il nodo content se i campi corrispondono
-                         contentArray.remove(j);
-                         j--; // Aggiornare l'indice dopo la rimozione
-                     }
-                 }
-             }
-         }
-         Files.write(Paths.get(jsonFilePath), jsonArray.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-     }
+    public synchronized void jSonDeleter(Email emailToDelete, String account) throws IOException {
+        try {
+            // Legge il contenuto del file JSON
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(new File(jsonFilePath));
 
+            if (rootNode.isArray()) {
+                ArrayNode accounts = (ArrayNode) rootNode;
+
+                // Scorre gli account nel JSON
+                for (JsonNode accountNode : accounts) {
+                    String email = accountNode.path("email").asText();
+
+                    // Verifica se l'email dell'account corrente corrisponde all'account specificato
+                    if (email.equals(account)) {
+                        ArrayNode contentNode = (ArrayNode) accountNode.path("content");
+
+                        // Scorre il contenuto dell'email
+                        for (int i = 0; i < contentNode.size(); i++) {
+                            JsonNode emailNode = contentNode.get(i);
+                            if (emailNode.path("from").asText().equals(emailToDelete.getSender()) &&
+                                    emailNode.path("to").asText().equals(emailToDelete.getReceiver()) &&
+                                    emailNode.path("object").asText().equals(emailToDelete.getObject()) &&
+                                    emailNode.path("text").asText().equals(emailToDelete.getMessage()) &&
+                                    emailNode.path("dateTime").asText().equals(emailToDelete.getDate())) {
+
+                                // Rimuove l'email se tutti i campi corrispondono
+                                contentNode.remove(i);
+                                break; // Esce dal ciclo una volta trovata e rimossa l'email corrispondente
+                            }
+                        }
+                        break; // Esce dal ciclo una volta trovato l'account corrispondente
+                    }
+                }
+
+                // Sovrascrive il file JSON con le modifiche
+                objectMapper.writeValue(new File(jsonFilePath), accounts);
+            }
+        } catch (IOException e) {
+            System.err.println("Errore durante la lettura/scrittura del file JSON: " + e.getMessage());
+
+        }
+    }
 }
 
 

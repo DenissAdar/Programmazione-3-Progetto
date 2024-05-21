@@ -1,1 +1,225 @@
-[{"email":"gaia@example.com","content":[{"dateTime":"2024-05-11","from":"denis@example.com","to":"gaia@example.com","text":"den->gaia","object":"den->gaia"},{"dateTime":"2024-05-11","from":"marius@example.com","to":"denis@example.com,gaia@example.com","text":"marius->den,gaia","object":"marius->den,gaia"},{"dateTime":"2024-05-11","from":"gaia@example.com","to":"denis@example.com,marius@example.com","text":"r_all gaia->den,marius","object":"R-All:marius->den,gaia"},{"dateTime":"2024-05-11","from":"gaia@example.com","to":"denis@example.com,marius@example.com","text":"r_all gaia->den,marius","object":"R-All:marius->den,gaia"},{"dateTime":"2024-05-11","from":"marius@example.com","to":"denis@example.com,gaia@example.com","text":"ghg","object":"R-All:R-All:marius->den,gaia"},{"dateTime":"2024-05-11","from":"gaia@example.com","to":"marius@example.com","text":"gaia->marius","object":"gaia->marius"},{"dateTime":"2024-05-11","from":"marius@example.com","to":"gaia@example.com","text":"marius->gaia","object":"marius->gaia"},{"dateTime":"2024-05-11","from":"gaia@example.com","to":"denis@example.com,marius@example.com","text":"gaia->den,marius","object":"R-All:marius->den,gaia"},{"dateTime":"2024-05-11","from":"gaia@example.com","to":"denis@example.com,marius@example.com","text":"gaia->den,marius","object":"R-All:marius->den,gaia"},{"dateTime":"2024-05-11","from":"lorenzo@example.com","to":"gaia@example.com","text":"","object":"lorenzo->gaia"},{"dateTime":"2024-05-11","from":"gaia@example.com","to":"denis@example.com,lorenzo@example.com","text":"","object":"FWD:lorenzo->gaia"},{"dateTime":"2024-05-11","from":"gaia@example.com","to":"denis@example.com,lorenzo@example.com","text":"","object":"FWD:lorenzo->gaia"},{"dateTime":"2024-05-11","from":"lorenzo@example.com","to":"gaia@example.com","text":"ggg","object":"gggg"}]},{"email":"denis@example.com","content":[{"dateTime":"2024-05-11","from":"denis@example.com","to":"gaia@example.com","text":"den->gaia","object":"den->gaia"},{"dateTime":"2024-05-11","from":"marius@example.com","to":"denis@example.com,gaia@example.com","text":"marius->den,gaia","object":"marius->den,gaia"},{"dateTime":"2024-05-11","from":"gaia@example.com","to":"denis@example.com,marius@example.com","text":"r_all gaia->den,marius","object":"R-All:marius->den,gaia"},{"dateTime":"2024-05-11","from":"marius@example.com","to":"denis@example.com,gaia@example.com","text":"ghg","object":"R-All:R-All:marius->den,gaia"},{"dateTime":"2024-05-11","from":"marius@example.com","to":"denis@example.com","text":"","object":"marius->den"},{"dateTime":"2024-05-11","from":"gaia@example.com","to":"denis@example.com,marius@example.com","text":"gaia->den,marius","object":"R-All:marius->den,gaia"}]},{"email":"marius@example.com","content":[{"dateTime":"2024-05-11","from":"marius@example.com","to":"denis@example.com,gaia@example.com","text":"marius->den,gaia","object":"marius->den,gaia"},{"dateTime":"2024-05-11","from":"marius@example.com","to":"denis@example.com,gaia@example.com","text":"marius->den,gaia","object":"marius->den,gaia"},{"dateTime":"2024-05-11","from":"gaia@example.com","to":"denis@example.com,marius@example.com","text":"r_all gaia->den,marius","object":"R-All:marius->den,gaia"},{"dateTime":"2024-05-11","from":"marius@example.com","to":"denis@example.com,gaia@example.com","text":"ghg","object":"R-All:R-All:marius->den,gaia"},{"dateTime":"2024-05-11","from":"marius@example.com","to":"denis@example.com,gaia@example.com","text":"ghg","object":"R-All:R-All:marius->den,gaia"},{"dateTime":"2024-05-11","from":"gaia@example.com","to":"marius@example.com","text":"gaia->marius","object":"gaia->marius"},{"dateTime":"2024-05-11","from":"marius@example.com","to":"denis@example.com","text":"","object":"marius->den"},{"dateTime":"2024-05-11","from":"gaia@example.com","to":"denis@example.com,marius@example.com","text":"gaia->den,marius","object":"R-All:marius->den,gaia"}]},{"email":"lorenzo@example.com","content":[{"dateTime":"2024-05-11","from":"lorenzo@example.com","to":"gaia@example.com","text":"","object":"lorenzo->gaia"},{"dateTime":"2024-05-11","from":"gaia@example.com","to":"denis@example.com,lorenzo@example.com","text":"","object":"FWD:lorenzo->gaia"}]}]
+[
+  {
+    "email": "gaia@example.com",
+    "content": [
+      {
+        "dateTime": "2024-05-11",
+        "from": "denis@example.com",
+        "to": "gaia@example.com",
+        "text": "den->gaia",
+        "object": "den->gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "marius@example.com",
+        "to": "denis@example.com,gaia@example.com",
+        "text": "marius->den,gaia",
+        "object": "marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "gaia@example.com",
+        "to": "denis@example.com,marius@example.com",
+        "text": "r_all gaia->den,marius",
+        "object": "R-All:marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "gaia@example.com",
+        "to": "denis@example.com,marius@example.com",
+        "text": "r_all gaia->den,marius",
+        "object": "R-All:marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "marius@example.com",
+        "to": "denis@example.com,gaia@example.com",
+        "text": "ghg",
+        "object": "R-All:R-All:marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "gaia@example.com",
+        "to": "marius@example.com",
+        "text": "gaia->marius",
+        "object": "gaia->marius"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "marius@example.com",
+        "to": "gaia@example.com",
+        "text": "marius->gaia",
+        "object": "marius->gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "gaia@example.com",
+        "to": "denis@example.com,marius@example.com",
+        "text": "gaia->den,marius",
+        "object": "R-All:marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "gaia@example.com",
+        "to": "denis@example.com,marius@example.com",
+        "text": "gaia->den,marius",
+        "object": "R-All:marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "lorenzo@example.com",
+        "to": "gaia@example.com",
+        "text": "",
+        "object": "lorenzo->gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "gaia@example.com",
+        "to": "denis@example.com,lorenzo@example.com",
+        "text": "",
+        "object": "FWD:lorenzo->gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "gaia@example.com",
+        "to": "denis@example.com,lorenzo@example.com",
+        "text": "",
+        "object": "FWD:lorenzo->gaia"
+      }
+    ]
+  },
+  {
+    "email": "denis@example.com",
+    "content": [
+      {
+        "dateTime": "2024-05-11",
+        "from": "denis@example.com",
+        "to": "gaia@example.com",
+        "text": "den->gaia",
+        "object": "den->gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "marius@example.com",
+        "to": "denis@example.com,gaia@example.com",
+        "text": "marius->den,gaia",
+        "object": "marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "gaia@example.com",
+        "to": "denis@example.com,marius@example.com",
+        "text": "r_all gaia->den,marius",
+        "object": "R-All:marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "marius@example.com",
+        "to": "denis@example.com,gaia@example.com",
+        "text": "ghg",
+        "object": "R-All:R-All:marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "marius@example.com",
+        "to": "denis@example.com",
+        "text": "",
+        "object": "marius->den"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "gaia@example.com",
+        "to": "denis@example.com,marius@example.com",
+        "text": "gaia->den,marius",
+        "object": "R-All:marius->den,gaia"
+      }
+    ]
+  },
+  {
+    "email": "marius@example.com",
+    "content": [
+      {
+        "dateTime": "2024-05-11",
+        "from": "marius@example.com",
+        "to": "denis@example.com,gaia@example.com",
+        "text": "marius->den,gaia",
+        "object": "marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "marius@example.com",
+        "to": "denis@example.com,gaia@example.com",
+        "text": "marius->den,gaia",
+        "object": "marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "gaia@example.com",
+        "to": "denis@example.com,marius@example.com",
+        "text": "r_all gaia->den,marius",
+        "object": "R-All:marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "marius@example.com",
+        "to": "denis@example.com,gaia@example.com",
+        "text": "ghg",
+        "object": "R-All:R-All:marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "marius@example.com",
+        "to": "denis@example.com,gaia@example.com",
+        "text": "ghg",
+        "object": "R-All:R-All:marius->den,gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "gaia@example.com",
+        "to": "marius@example.com",
+        "text": "gaia->marius",
+        "object": "gaia->marius"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "marius@example.com",
+        "to": "denis@example.com",
+        "text": "",
+        "object": "marius->den"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "marius@example.com",
+        "to": "gaia@example.com",
+        "text": "marius->gaia",
+        "object": "marius->gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "gaia@example.com",
+        "to": "denis@example.com,marius@example.com",
+        "text": "gaia->den,marius",
+        "object": "R-All:marius->den,gaia"
+      }
+    ]
+  },
+  {
+    "email": "lorenzo@example.com",
+    "content": [
+      {
+        "dateTime": "2024-05-11",
+        "from": "lorenzo@example.com",
+        "to": "gaia@example.com",
+        "text": "",
+        "object": "lorenzo->gaia"
+      },
+      {
+        "dateTime": "2024-05-11",
+        "from": "gaia@example.com",
+        "to": "denis@example.com,lorenzo@example.com",
+        "text": "",
+        "object": "FWD:lorenzo->gaia"
+      }
+    ]
+  }
+]
