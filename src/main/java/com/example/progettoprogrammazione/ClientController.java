@@ -157,8 +157,7 @@ public class ClientController {
         mailList.itemsProperty().bind(client.getInMailProperty());
         clearFields();
 
-        //dataLable.setVisible(false);
-        //dataTxt.setVisible(false);
+
     }
     @FXML
     public void showOutMail(){

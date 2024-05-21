@@ -39,12 +39,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Server {
 
     ArrayList<String> accounts = new ArrayList<>();
-    ArrayList<String> logged_accounts = new ArrayList<>();
-    //private static AtomicInteger uniqueId = new AtomicInteger(0);
+    ArrayList<String> loggedAccounts = new ArrayList<>();
     private String jsonFilePath= "src/main/java/com/example/progettoprogrammazione/accounts/account.json";
     ServerSocket serverSocket;
     ThreadPoolExecutor executor;
-    private ListProperty<String> logList; /*binding in sever controller*/
+    private ListProperty<String> logList; // binding in sever controller
     private ObservableList<String> logListContent;
 
     private Socket socket;
@@ -58,9 +57,7 @@ public class Server {
             this.logList.set(logListContent);
             logListContent.addListener(new ListChangeListener<String>() {
                 @Override
-                public void onChanged(Change<? extends String> change) {
-
-                }
+                public void onChanged(Change<? extends String> change) {}
             });
             serverSocket = new ServerSocket(6000);
             new Thread(new RunServer()).start();
@@ -89,26 +86,26 @@ public class Server {
             throw new RuntimeException(e);
         }
     }
-    //Decide randomicamente quale username dare ad un client appena creato
+
+    // Decide randomicamente quale username dare ad un client appena creato
     class ThreadAccount implements Runnable{
         ObjectOutputStream out;
         Socket socket;
 
         // Metodo che seleziona un account in maniera randomica
         public String accountPicker()  {
-            String accountScelto;
+            String pickedAccount;
             do {
-                accountScelto = accounts.get(ThreadLocalRandom.current().nextInt(0, accounts.size()));
-                if(logged_accounts.size() == accounts.size()) return "error";
-            }while (logged_accounts.contains(accountScelto));
-            logged_accounts.add(accountScelto);
-            return accountScelto;
+                pickedAccount = accounts.get(ThreadLocalRandom.current().nextInt(0, accounts.size()));
+                if(loggedAccounts.size() == accounts.size()) return "error";
+            }while (loggedAccounts.contains(pickedAccount));
+            loggedAccounts.add(pickedAccount);
+            return pickedAccount;
         }
 
         public ThreadAccount(ObjectOutputStream out, Socket socket) {
             this.out = out;
             this.socket = socket;
-
         }
 
         @Override
@@ -123,6 +120,9 @@ public class Server {
             }
         }
     }
+
+    /* -------------------------- GESTIONE CASE --------------------- ----- */
+
     // Metodo che gestisce le email in entrata
     class ThreadInMail implements Runnable{
         ObjectOutputStream out;
@@ -140,12 +140,15 @@ public class Server {
         public void run(){
             try{
                 emailList = jSonReader("Entrata",account);
+                //carica tutte le email in entrata (sopra) e rimuove le mail che sono già presenti nella view
+                //nella riga sotto, così il server manda solo le mail nuove.
                 emailList.removeAll(clientCurrentEmailList);
                 out.writeObject(emailList);
                 out.flush();
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
+
     // Metodo che gestisce le email in uscita
     class ThreadOutMail implements Runnable{
         ObjectOutputStream out;
@@ -166,10 +169,10 @@ public class Server {
                 emailList.removeAll(clientCurrentEmailList);
                 out.writeObject(emailList);
                 out.flush();
-                //Platform.runLater(() -> logList.add("L'utente: " + account + " ha richiesto le mail in uscita"));
             }catch(IOException e){throw new RuntimeException(e);}
         }
     }
+
     // Metodo che gestisce l'invio di una mail
     class ThreadSend implements Runnable{
         ObjectOutputStream out;
@@ -190,6 +193,7 @@ public class Server {
         public void run(){
             try{
                 email = (Email) in.readObject(); //Ho una Mail
+                //controllo se ho più destinatari e in caso gli splito per mandare la mail a ciascuno
                 if(email.getReceiver().contains(",")){
                     String[] singleReceiver = email.getReceiver().split(",");
                     for(int i = 0; i < singleReceiver.length ; i++){
@@ -199,6 +203,7 @@ public class Server {
                     }
                 }
                 else {
+                    // se il destinatario è presente tra le mail registrate nel file jSon la mando
                     if(accounts.contains(email.getReceiver())){
                         jSonWriter(email,account);
                         Platform.runLater(() -> logList.add("L'utente: " + account + " ha mandato una mail a " + email.getReceiver()));
@@ -213,6 +218,8 @@ public class Server {
 
         }
     }
+
+    // Metodo che gestisce l'eliminazione di una mail
     class ThreadDelete implements Runnable{
         ObjectOutputStream out;
         ObjectInputStream in;
@@ -238,6 +245,7 @@ public class Server {
             catch(IOException | ClassNotFoundException e){throw new RuntimeException(e);}
         }
     }
+
     // Metodo che gestisce la chiusura
     class ThreadExit implements Runnable{
         ObjectOutputStream out;
@@ -250,7 +258,7 @@ public class Server {
         @Override
         public void run(){
             try {
-                logged_accounts.remove(exitUser);
+                loggedAccounts.remove(exitUser);
                 Platform.runLater(() -> logList.add(exitUser + " ha fatto il LOGOUT."));
 
                 out.writeObject(true);
@@ -260,6 +268,8 @@ public class Server {
             }
         }
     }
+
+
     class RunServer implements Runnable{
         String account = "Si è connesso ";
         private final SimpleStringProperty accountLog = new SimpleStringProperty();
@@ -268,7 +278,6 @@ public class Server {
         private String action;
 
         public RunServer(){
-
         }
 
         @Override
@@ -276,7 +285,6 @@ public class Server {
             try {
                 setAccountList();
                 executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
-                /*serve a richimare i thread funzioni più avanti ---> executor.execute(new ThreadUser(out));*/
                 while (true) {
                     // Si blocca finchè non riceve qualcosa, va avanti SOLO SE LO RICEVE
                     socket = serverSocket.accept();
@@ -333,6 +341,10 @@ public class Server {
 
 
     }
+
+
+    /* -------------------------- GESTIONE SOCKET --------------------- ----- */
+
     public void openStreams() {
         try {
             socketOutputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -373,25 +385,6 @@ public class Server {
     /* -------------------------- GESTIONE JSON --------------------- ----- */
 
 
-    // Metodo che conta quanti account ci sono nel file json
-    public int jsonCount() {
-        int count = 0;
-        try {
-            ObjectMapper countObjectMapper = new ObjectMapper();
-            JsonNode rootNode = countObjectMapper.readTree(new File(jsonFilePath));
-
-            // Itera sui nodi del file JSON
-            for (JsonNode emailNode : rootNode) {
-                String email = emailNode.get("email").asText();
-                count++;
-                System.out.println(count);
-            }
-        }
-        catch(IOException e) {
-            e.printStackTrace();
-        }
-        return count;
-    }
 
     // Metodo JsonReader che restituisce le mail in entrata o in uscita in base ad un valore che gli viene passato come parametro (ingresso,uscita)
     public synchronized ArrayList<Email>  jSonReader (String mailListType, String account){
@@ -466,20 +459,20 @@ public class Server {
                          // Salva le modifiche nel file JSON
                          writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
                      }
-                         if (registeredAccount.equals(newEmail.getReceiver())){
-                             newEmailNode = writeObjectMapper.createObjectNode();
-                             newEmailNode.put("from", newEmail.getSender());
+                           if (registeredAccount.equals(newEmail.getReceiver())){
+                               newEmailNode = writeObjectMapper.createObjectNode();
+                               newEmailNode.put("from", newEmail.getSender());
 
-                             newEmailNode.put("to", newEmail.getReceiver());
-                             newEmailNode.put("object", newEmail.getObject());
-                             newEmailNode.put("text", newEmail.getMessage());
-                             newEmailNode.put("dateTime", newEmail.getDate());
+                               newEmailNode.put("to", newEmail.getReceiver());
+                               newEmailNode.put("object", newEmail.getObject());
+                               newEmailNode.put("text", newEmail.getMessage());
+                               newEmailNode.put("dateTime", newEmail.getDate());
 
-                             ArrayNode contentNode = (ArrayNode) accountNode.path("content");
-                             contentNode.add(newEmailNode);
+                               ArrayNode contentNode = (ArrayNode) accountNode.path("content");
+                               contentNode.add(newEmailNode);
 
-                             // Salva le modifiche nel file JSON
-                             writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
+                               // Salva le modifiche nel file JSON
+                               writeObjectMapper.writeValue(new File(jsonFilePath), accounts);
 
                          }}
                      else{
@@ -574,36 +567,35 @@ public class Server {
     }
 
      public synchronized void jSonDeleter(Email newEmail, String account) throws JSONException, IOException {
-     String jsonString = new String(Files.readAllBytes(Paths.get(jsonFilePath)));
-     JSONArray jsonArray = new JSONArray(jsonString);
+        String jsonString = new String(Files.readAllBytes(Paths.get(jsonFilePath)));
+        JSONArray jsonArray = new JSONArray(jsonString);
+        // Scorrere l'array JSON
+         for (int i = 0; i < jsonArray.length(); i++) {
+             JSONObject jsonObject = jsonArray.getJSONObject(i);
+             String email = jsonObject.getString("email");
+             // Verificare se l'email corrente corrisponde all'account specificato
+             if (email.equals(account)) {
+                 JSONArray contentArray = jsonObject.getJSONArray("content");
+                 // Scorrere il contenuto (content) dell'email
+                 for (int j = 0; j < contentArray.length(); j++) {
+                     JSONObject contentObject = contentArray.getJSONObject(j);
+                     System.out.println("Contenuto di contentObject : " + contentObject);
+                     // Verificare se i campi dell'oggetto Email corrispondono ai campi del JSON
+                     if (contentObject.getString("from").equals(newEmail.getSender()) &&
+                             contentObject.getString("to").equals(newEmail.getReceiver()) &&
+                             contentObject.getString("object").equals(newEmail.getObject()) &&
+                             contentObject.getString("text").equals(newEmail.getMessage()) &&
+                             contentObject.getString("dateTime").equals(newEmail.getDate())) {
 
-     // Scorrere l'array JSON
-     for (int i = 0; i < jsonArray.length(); i++) {
-         JSONObject jsonObject = jsonArray.getJSONObject(i);
-         String email = jsonObject.getString("email");
-         // Verificare se l'email corrente corrisponde all'account specificato
-         if (email.equals(account)) {
-             JSONArray contentArray = jsonObject.getJSONArray("content");
-             // Scorrere il contenuto (content) dell'email
-             for (int j = 0; j < contentArray.length(); j++) {
-                 JSONObject contentObject = contentArray.getJSONObject(j);
-                 System.out.println("Contenuto di contentObject : " + contentObject);
-                 // Verificare se i campi dell'oggetto Email corrispondono ai campi del JSON
-                 if (contentObject.getString("from").equals(newEmail.getSender()) &&
-                         contentObject.getString("to").equals(newEmail.getReceiver()) &&
-                         contentObject.getString("object").equals(newEmail.getObject()) &&
-                         contentObject.getString("text").equals(newEmail.getMessage()) &&
-                         contentObject.getString("dateTime").equals(newEmail.getDate())) {
-
-                     // Rimuovere il nodo content se i campi corrispondono
-                     contentArray.remove(j);
-                     j--; // Aggiornare l'indice dopo la rimozione
+                         // Rimuovere il nodo content se i campi corrispondono
+                         contentArray.remove(j);
+                         j--; // Aggiornare l'indice dopo la rimozione
+                     }
                  }
              }
          }
+         Files.write(Paths.get(jsonFilePath), jsonArray.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
      }
-     Files.write(Paths.get(jsonFilePath), jsonArray.toString().getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
- }
 
 }
 
