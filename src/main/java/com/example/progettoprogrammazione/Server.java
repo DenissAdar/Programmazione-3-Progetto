@@ -389,25 +389,6 @@ public class Server {
     /* -------------------------- GESTIONE JSON --------------------- ----- */
 
 
-    // Metodo che conta quanti account ci sono nel file json
-    public int jsonCount() {
-        int count = 0;
-        try {
-            ObjectMapper countObjectMapper = new ObjectMapper();
-            JsonNode rootNode = countObjectMapper.readTree(new File(jsonFilePath));
-
-            // Itera sui nodi del file JSON
-            for (JsonNode emailNode : rootNode) {
-                String email = emailNode.get("email").asText();
-                count++;
-                System.out.println(count);
-            }
-        }
-        catch(IOException e) {
-            e.printStackTrace();
-        }
-        return count;
-    }
 
     // Metodo JsonReader che restituisce le mail in entrata o in uscita in base ad un valore che gli viene passato come parametro (ingresso,uscita)
     public synchronized ArrayList<Email>  jSonReader (String mailListType, String account){
@@ -416,7 +397,6 @@ public class Server {
             inMail.clear();
             ObjectMapper readObjectMapper = new ObjectMapper();
             JsonNode rootNode = readObjectMapper.readTree(new File(jsonFilePath));
-
             // Itera sui nodi del file JSON
             for (JsonNode emailNode : rootNode) {
                 String email = emailNode.get("email").asText();
@@ -588,8 +568,6 @@ public class Server {
 
 
     }
-
-
     public synchronized void jSonDeleter(Email emailToDelete, String account) throws IOException {
         try {
             // Legge il contenuto del file JSON

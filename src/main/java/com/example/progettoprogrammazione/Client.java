@@ -111,7 +111,6 @@ public class Client{
                 firstConnection = false;
             else {
                 setError("Hai delle nuove mail da leggere");
-                System.out.println("Ho settato l'errore");
             }
         }
 
